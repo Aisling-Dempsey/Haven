@@ -7,7 +7,9 @@
 env
 
 #machine code
-.pyc
+*.pyc
+
+
 
 # IntelliJ project files
 .idea
