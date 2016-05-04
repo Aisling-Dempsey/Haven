@@ -1,0 +1,16 @@
+# Created by .ignore support plugin (hsz.mobi)
+
+#secrets
+*secrets.*
+
+#virtual env
+env
+
+#machine code
+.pyc
+
+# IntelliJ project files
+.idea
+*.iml
+out
+gen
