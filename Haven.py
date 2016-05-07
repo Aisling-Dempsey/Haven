@@ -11,12 +11,24 @@ app = Flask(__name__)
 app.jinja_env.undefined = StrictUndefined
 
 # gets secret key from secrets.sh
+
+
 SECRET_KEY = os.environ['HAVEN_SECRET_KEY']
 app.secret_key= SECRET_KEY
 
-@app.route('/')
+
+# dict of api keys to be passed into every render template for google maps api
+KEYS ={maps: os.environ['MAPS_SECRET_KEY']
+
+}
+
 def hello_world():
-    return 'Hello World!'
+    return 'Hello World!
+
+@app.route('/')
+def homepage():
+    render_template(home.html, keys=KEYS)
+
 
 
 if __name__ == '__main__':

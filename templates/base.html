@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
     <head>
-        <script src="/static/jquery-2.2.3.min.js"></script>
+
         <link rel="stylesheet" href="/static/bootstrap.min.css">
         <link rel="stylesheet" href="/static/bootstrap-theme.min.css">
         <link rel="stylesheet" href="/static/stylesheet.css">
@@ -12,5 +12,15 @@
         {%  block body %}
             Body goes here
         {% endblock %}
+
+        <script src="/static/jquery-2.2.3.min.js"></script>
+
+
+        <script src="/static/jquery-2.2.3.min.js"></script>
+        <script src="/static/bootstrap.min.js"></script>
+
+        <!--google maps API script -->
+        <script async defer src="https://maps.googleapis.com/maps/api/js?key={{ keys[maps] }}&callback=initMap"
+                type="text/javascript"></script>
     </body>
 </html>
