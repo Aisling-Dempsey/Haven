@@ -6,7 +6,7 @@
         <link rel="stylesheet" href="/static/bootstrap-theme.min.css">
         <link rel="stylesheet" href="/static/stylesheet.css">
 
-        {%  block title %} Title goes here {% endblock %}
+        <title>{%  block title %}Haven{% endblock %}</title>
     </head>
     <body>
         {%  block body %}
@@ -20,7 +20,7 @@
         <script src="/static/bootstrap.min.js"></script>
 
         <!--google maps API script -->
-        <script async defer src="https://maps.googleapis.com/maps/api/js?key={{ keys[maps] }}&callback=initMap"
+        <script async defer src="https://maps.googleapis.com/maps/api/js?key={{ keys['maps'] }}&callback=initMap"
                 type="text/javascript"></script>
     </body>
 </html>
