@@ -6,7 +6,7 @@ db = SQLAlchemy()
 ##############################################################################
 # DB Models
 
-class User(db.model):
+class User(db.Model):
     __tablename__ = "users"
 
     user_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
@@ -15,7 +15,7 @@ class User(db.model):
     password = db.Column(db.String(15), nullable=False)
 
 
-class Business(db.model):
+class Business(db.Model):
     __tablename__ = "businesses"
 
     business_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
@@ -30,7 +30,7 @@ class Business(db.model):
     lat_long = db.Column([db.Integer, db.Integer])
 
 
-class Rating(db.model):
+class Rating(db.Model):
     __tablename__ = "ratings"
 
     rating_id = db.Column(db.Integer, autoincrement=True, primary_key=True)

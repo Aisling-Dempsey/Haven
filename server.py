@@ -3,6 +3,7 @@ from flask_debugtoolbar import DebugToolbarExtension
 from jinja2 import StrictUndefined
 from models import connect_to_db
 from yelpapi import YelpAPI
+import helper
 
 import os
 
