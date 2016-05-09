@@ -1,0 +1,66 @@
+{
+    "is_claimed": true,
+    "rating": 4.5,
+    "mobile_url": "http://m.yelp.com/biz/hackbright-academy-san-francisco?utm_campaign=yelp_api&utm_medium=api_v2_business&utm_source=eIU3umdazjr3-RNrYItdAw",
+    "rating_img_url": "https://s3-media2.fl.yelpcdn.com/assets/2/www/img/99493c12711e/ico/stars/v1/stars_4_half.png",
+    "review_count": 6,
+    "name": "Hackbright Academy",
+    "rating_img_url_small": "https://s3-media2.fl.yelpcdn.com/assets/2/www/img/a5221e66bc70/ico/stars/v1/stars_small_4_half.png",
+    "url": "http://www.yelp.com/biz/hackbright-academy-san-francisco?utm_campaign=yelp_api&utm_medium=api_v2_business&utm_source=eIU3umdazjr3-RNrYItdAw",
+    "categories": [
+        [
+            "Vocational & Technical School",
+            "vocation"
+        ]
+    ],
+    "reviews": [
+        {
+            "rating": 5,
+            "excerpt": "I would recommend Hackbright to any woman--sometimes I have to remind myself that not everyone is as interested in tech as I am!\n\nI've written a lot of blog...",
+            "time_created": 1375580694,
+            "rating_image_url": "https://s3-media1.fl.yelpcdn.com/assets/2/www/img/f1def11e4e79/ico/stars/v1/stars_5.png",
+            "rating_image_small_url": "https://s3-media1.fl.yelpcdn.com/assets/2/www/img/c7623205d5cd/ico/stars/v1/stars_small_5.png",
+            "user": {
+                "image_url": "http://s3-media2.fl.yelpcdn.com/photo/LNbTHpBdrwRh7-rgOM__2g/ms.jpg",
+                "id": "_kMxgJJg9F4-Oi2gkbdhBA",
+                "name": "Michelle G."
+            },
+            "rating_image_large_url": "https://s3-media3.fl.yelpcdn.com/assets/2/www/img/22affc4e6c38/ico/stars/v1/stars_large_5.png",
+            "id": "iUV0pFxrROmdWqsbdQtPVQ"
+        }
+    ],
+    "phone": "4158872215",
+    "snippet_text": "I would recommend Hackbright to any woman--sometimes I have to remind myself that not everyone is as interested in tech as I am!\n\nI've written a lot of blog...",
+    "image_url": "https://s3-media4.fl.yelpcdn.com/bphoto/Zn7vV7UC6l3dT4ShksMEpA/ms.jpg",
+    "snippet_image_url": "http://s3-media2.fl.yelpcdn.com/photo/LNbTHpBdrwRh7-rgOM__2g/ms.jpg",
+    "display_phone": "+1-415-887-2215",
+    "rating_img_url_large": "https://s3-media4.fl.yelpcdn.com/assets/2/www/img/9f83790ff7f6/ico/stars/v1/stars_large_4_half.png",
+    "id": "hackbright-academy-san-francisco",
+    "is_closed": false,
+    "location": {
+        "cross_streets": "Taylor St",
+        "city": "San Francisco",
+        "display_address": [
+            "683 Sutter St",
+            "Ste 201",
+            "Union Square",
+            "San Francisco, CA 94102"
+        ],
+        "geo_accuracy": 9.5,
+        "neighborhoods": [
+            "Union Square",
+            "Lower Nob Hill"
+        ],
+        "postal_code": "94102",
+        "country_code": "US",
+        "address": [
+            "683 Sutter St",
+            "Ste 201"
+        ],
+        "coordinate": {
+            "latitude": 37.788904,
+            "longitude": -122.411594
+        },
+        "state_code": "CA"
+    }
+}

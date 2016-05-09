@@ -21,18 +21,20 @@ app.secret_key = SECRET_KEY
 
 
 # dict of api keys to be passed into every render template for google maps api
-KEYS = {'maps': os.environ['MAPS_SECRET_KEY']
-        }
 
-YELP_CONSUMER_KEY = os.environ['YELP_CONSUMER_KEY']
-YELP_CONSUMER_SECRET = os.environ['YELP_CONSUMER_SECRET']
-YELP_TOKEN = os.environ['YELP_TOKEN']
-YELP_TOKEN_SECRET = os.environ['YELP_TOKEN_SECRET']
+KEYS = {'maps': os.environ['MAPS_SECRET_KEY'],
+        'YELP_CONSUMER_KEY': os.environ['YELP_CONSUMER_KEY'],
+        'YELP_CONSUMER_SECRET': os.environ['YELP_CONSUMER_SECRET'],
+        'YELP_TOKEN': os.environ['YELP_TOKEN'],
+        'YELP_TOKEN_SECRET': os.environ['YELP_TOKEN_SECRET']
+}
+
+
 
 
 # instantiates yelp api with appropriate keys.
-yelp_api = YelpAPI(YELP_CONSUMER_KEY, YELP_CONSUMER_SECRET, YELP_TOKEN, YELP_TOKEN_SECRET)
-
+yelp_api = YelpAPI(KEYS['YELP_CONSUMER_KEY'], KEYS['YELP_CONSUMER_SECRET'],
+                   KEYS['YELP_TOKEN'], KEYS['YELP_TOKEN_SECRET'])
 
 # EXAMPLE YELP QUERIES
 # search_results = yelp_api.search_query(args)
@@ -82,7 +84,7 @@ def ratings(username):
     return render_template('construction.html', keys=KEYS)
 
 @app.route('/:username/manage')
-def account_manage(username)
+def account_manage(username):
     """allows update of user information. Requires new login"""
     return render_template('construction.html', keys=KEYS)
 

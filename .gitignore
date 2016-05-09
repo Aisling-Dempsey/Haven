@@ -6,8 +6,11 @@
 #virtual env
 env
 
+#query samples
+/Samples
 #machine code
 *.pyc
+
 
 
 
