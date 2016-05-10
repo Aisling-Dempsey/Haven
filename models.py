@@ -25,7 +25,7 @@ class Business(db.Model):
     address_line_2 = db.Column(db.String(30))
     city = db.Column(db.String(20), nullable=False)
     zipcode = db.Column(db.String(5), nullable=False)
-    phone = db.Column(db.String(15))
+    phone = db.Column(db.String(15), nullable=False)
     latitude = db.Column(db.Float)
     longitude = db.Column(db.Float)
 
@@ -59,8 +59,7 @@ def connect_to_db(app):
 
 
 if __name__ == "__main__":
-    # As a convenience, if we run this module interactively, it will leave
-    # you in a state of being able to work with the database directly.
+    # if run interactively, this will allow access of the db
 
     from server import app
     connect_to_db(app)
