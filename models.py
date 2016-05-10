@@ -30,7 +30,6 @@ class Business(db.Model):
     longitude = db.Column(db.Float)
 
 
-
 class Rating(db.Model):
     __tablename__ = "ratings"
 

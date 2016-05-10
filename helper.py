@@ -2,7 +2,7 @@ import requests
 from models import Business, Rating, User
 from yelpapi import YelpAPI
 import os
-
+from models import connect_to_db, db
 
 
 KEYS = {'maps': os.environ['MAPS_SECRET_KEY'],
@@ -27,52 +27,60 @@ def current_lat_long():
     location = r.json()
     return (location['latitude'], location['longitude'])
 
-# todo refactor yelp call to other function
-def add_business(yelp_ID):
-    """adds business to local db by with yelp object"""
 
-    if yelp_ID != "Unknown":
-        # returns as dict, no need to convert from json
-        info = yelp_api.business_query(id=yelp_ID)
-
-        # makes an empty dictionary for attributes
-        business = Business()
-
-        # for search, add key ['businesses'] before these keys
-
-        business.yelp_id = yelp_ID
-
-        business.name = info['name']
-        address = info['location'].get('address')
-        # checks for an address and adds all applicable lines to information dictionary
-        if address:
-            business.address_line_1 = address[0]
-            if len(address) > 1:
-                business.address_line_2 = address[1]
-
-        business.city = info['location']['city']
-
-        business.zipcode = info['location']['postal_code']
-
-        if info.get('phone'):
-            business.phone = info['phone']
-
-        # checks for coordinates and adds them to information dictionary if they exist
-        coordinates = info['location'].get('coordinate')
-        if coordinates:
-            business.latitude = coordinates['latitude']
-            business.longitude = coordinates['longitude']
-
-        # temporary debug
-        return business
+def yelp_by_id(yelp_ID):
+    """returns a dictionary of yelp information using the Yelp ID"""
+    return yelp_api.business_query(id=yelp_ID)
 
 
-#
-# sample:
-#
-# x = dict.get('key', None)
-#     if x:
-#         y = x[0]
+def add_business(info):
+    """adds business to local db by with yelp business dictionary"""
+    business = Business()
+
+    # for search, add key ['businesses'] before these keys
+
+    business.yelp_id = info['id']
+
+    business.name = info['name']
+    address = info['location'].get('address')
+    # checks for an address and adds all applicable lines to information dictionary
+    if address:
+        business.address_line_1 = address[0]
+        if len(address) > 1:
+            business.address_line_2 = address[1]
+
+    business.city = info['location']['city']
+
+    business.zipcode = info['location']['postal_code']
+
+    if info.get('phone'):
+        business.phone = info['phone']
+
+    # checks for coordinates and adds them to information dictionary if they exist
+    coordinates = info['location'].get('coordinate')
+    if coordinates:
+        business.latitude = coordinates['latitude']
+        business.longitude = coordinates['longitude']
+
+    # temporary debug
+    db.session.add(business)
+    db.session.commit()
+
+
+def find_bus_id(id_to_check):
+    """validates whether an ID is a business_id or a yelp_id and returns the business_id"""
+    try:
+        return int(id_to_check)
+    except ValueError:
+        result = Business.query.filter_by(yelp_id=id_to_check).first()
+        return result.business_id
+
+
+def add_rating(form_data, business_id):
+    """adds a rating form data and business_id"""
+#     todo add form data fields
+
+
 
     #
     #
