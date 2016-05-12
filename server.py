@@ -1,7 +1,8 @@
 from flask import Flask, render_template, redirect, request, flash, session
 from flask_debugtoolbar import DebugToolbarExtension
 from jinja2 import StrictUndefined
-from models import connect_to_db, db
+from models import connect_to_db, db, Business, Rating, User
+
 from yelpapi import YelpAPI
 import helper
 
@@ -46,6 +47,22 @@ def login():
     return render_template('construction.html', keys=helper.KEYS)
 
 
+@app.route('/create-account', methods=['GET'])
+def acct_creation():
+    """account creation page"""
+    return render_template("user-add.html")
+
+
+@app.route('/create-account', methods=['POST'])
+def post_account():
+    form_data = request.form
+
+    helper.add_user(form_data)
+#     todo add flash "your account has been created" & "you have been logged in"
+    return redirect('/')
+
+
+
 @app.route('/results')
 def results():
     """search results page"""
@@ -57,15 +74,18 @@ def explore():
     """explore page"""
     return render_template('construction.html', keys=helper.KEYS)
 
+
 @app.route('/:username')
 def user_account(username):
     """User account page"""
     return render_template('construction.html', keys=helper.KEYS)
 
+
 @app.route('/:username/favorites')
 def favorites(username):
     """user favorites"""
     return render_template('construction.html', keys=helper.KEYS)
+
 
 @app.route('/:username/ratings')
 def ratings(username):
@@ -76,10 +96,19 @@ def ratings(username):
 @app.route('/info/:business')
 def info(business):
     return render_template('construction.html', keys=helper.KEYS)
-    
+
+
 @app.route('/info/:business/rate', methods=['GET'])
 def rate(business):
-    return render_template('rating-form.html', keys=helper.KEYS)
+    """presents user with form to rate business"""
+    # converts id from yelp_id to business_id if applicable, then returns appropriate object
+    business_info = helper.return_business_object(helper.find_bus_id(business))
+
+    return render_template('rating-form.html',
+                           business_name=business_info.name,
+                           business_id=business
+                           )
+
 
 @app.route('/info/:business/rate', methods=['POST'])
 def submit_review(business):
@@ -87,16 +116,17 @@ def submit_review(business):
     # determines whether business in url is from yelp API or local only
     form_data = request.form
 
-    business_id = helper.find_bus_id(business)
+    helper.add_rating(form_data, business)
 
-    helper.add_rating(form_data, business_id)
-
+    # todo add flash "your rating has been submitted"
     return redirect("/info/:business")
+
 
 @app.route('/:username/manage')
 def account_manage(username):
     """allows update of user information. Requires new login"""
     return render_template('construction.html', keys=helper.KEYS)
+
 
 if __name__ == '__main__':
     # toggles debug mode on

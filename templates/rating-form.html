@@ -1,0 +1,20 @@
+{% body block %}
+    Please review {{ business_name }}
+    <form action="/info/{{ business_id }}/rate" method="POST">
+        <label>Score
+            <select name="score" required>
+                <!--keeps dropdown blank to prevent accidental scoring-->
+                <option selected disabled hidden style='display: none' value=''></option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+            </select>
+        </label>
+        <label><p>Review (500 chars max):</p></label>
+            <div id="review-box"><textarea name="review" maxlength="500"></textarea></div>
+        </label>
+        <input type="submit" value="Submit Rating">
+    </form>
+{% endblock %}

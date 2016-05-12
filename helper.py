@@ -1,7 +1,9 @@
 import requests
 from models import Business, Rating, User
 from yelpapi import YelpAPI
+from flask import session, request
 import os
+from datetime import datetime
 from models import connect_to_db, db
 
 
@@ -33,6 +35,8 @@ def yelp_by_id(yelp_ID):
     return yelp_api.business_query(id=yelp_ID)
 
 
+
+# is this even necessary? Should it be refactored for a non-yelp addition?
 def add_business(info):
     """adds business to local db by with yelp business dictionary"""
     business = Business()
@@ -50,7 +54,7 @@ def add_business(info):
             business.address_line_2 = address[1]
 
     business.city = info['location']['city']
-
+    business.state = info['location']['state_code']
     business.zipcode = info['location']['postal_code']
 
     if info.get('phone'):
@@ -61,6 +65,8 @@ def add_business(info):
     if coordinates:
         business.latitude = coordinates['latitude']
         business.longitude = coordinates['longitude']
+
+    # todo add categories
 
     # temporary debug
     db.session.add(business)
@@ -76,9 +82,29 @@ def find_bus_id(id_to_check):
         return result.business_id
 
 
-def add_rating(form_data, business_id):
+def return_business_object(business_id):
+    """returns the business object using the business_id. Often paired with find_bus_id(id_to_check)"""
+    return Business.query.get(business_id)
+
+
+def add_rating(form_data, business):
     """adds a rating form data and business_id"""
 #     todo add form data fields
+    user_id = session['user_id']
+    business_id = find_bus_id(business)
+    score = int(form_data.get("score"))
+    review = form_data.get("review")
+    created_at = datetime.now()
+
+    rating = Business(business_id=business_id,
+                      user_id=user_id,
+                      score=score,
+                      review=review,
+                      created_at=created_at)
+
+    db.session.add(rating)
+    db.session.commit()
+
 
 
 
