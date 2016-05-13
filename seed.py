@@ -69,7 +69,7 @@ def _add_to_businesses(params):
             cat_object = Category.query.filter_by(category_name=cat).first()
             catbus.category_id = cat_object.category_id
 
-            if not Business_category.query.filter_by(business_id= catbus.business_id, category_id = catbus.category_id):
+            if not Business_category.query.filter_by(business_id=catbus.business_id, category_id=catbus.category_id):
                 db.session.add(catbus)
         db.session.commit()
 

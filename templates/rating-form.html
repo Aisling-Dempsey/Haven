@@ -1,4 +1,5 @@
-{% body block %}
+{% extends 'base.html' %}
+{% block body %}
     Please review {{ business_name }}
     <form action="/info/{{ business_id }}/rate" method="POST">
         <label>Score

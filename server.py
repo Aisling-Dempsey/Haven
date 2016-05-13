@@ -139,4 +139,4 @@ if __name__ == '__main__':
     connect_to_db(app)
 
     # runs app
-    # app.run()
+    app.run()
