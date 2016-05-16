@@ -9,6 +9,11 @@
         <title>{%  block title %}Haven{% endblock %}</title>
     </head>
     <body>
+    <ul>
+        {% for message in get_flashed_messages() %}
+            <li>{{ message }}</li>
+        {% endfor %}
+    </ul>
         {%  block body %}
             Body goes here
         {% endblock %}

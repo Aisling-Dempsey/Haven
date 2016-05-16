@@ -19,18 +19,25 @@ def _add_to_businesses(params):
     print params
     if not Business.query.filter_by(yelp_id=params['yelp_id']).first():
         business = Business()
-        # tries to add to db. keeps fields without required fields out
-
         cat_list = []
         for key in params:
             # adds elements in category lists to category table if they don't already exist
             if key == "categories":
-                for group in params[key]:
-                    for subtype in group:
-                        if not Category.query.filter_by(category_name=subtype).first():
-                            category = Category(category_name=subtype)
-                            db.session.add(category)
-                        cat_list.append(subtype)
+                for cat in params[key]:
+                    cat_list.append(cat)
+                    if not Category.query.filter_by(category_name=cat).first():
+                        category = Category(category_name=cat)
+                        db.session.add(category)
+                # THROUGH LINE 40 REPLACED BY 30-34
+                # for group in params[key]:
+                #     print type(group)
+                #     for subtype in group:
+                #         print type(subtype)
+                #         if not Category.query.filter_by(category_name=subtype).first():
+                #             category = Category(category_name=subtype)
+                #             db.session.add(category)
+                #         cat_list.append(subtype)
+                #         print cat_list
             elif key == "yelp_id":
                 business.yelp_id = params[key]
             elif key == "name":
@@ -58,25 +65,26 @@ def _add_to_businesses(params):
             db.session.rollback()
             print business.name, "has insufficient information, skipping."
             return None
-
-
-        # creates rows in reference table
+    # creates rows in reference table
         for cat in cat_list:
             # creates row in reference table
+            business = Business.query.filter_by(yelp_id=params['yelp_id']).first()
             catbus = Business_category()
-
+            print business.business_id
             catbus.business_id = business.business_id
             cat_object = Category.query.filter_by(category_name=cat).first()
+            print cat_object.category_name
             catbus.category_id = cat_object.category_id
 
-            if not Business_category.query.filter_by(business_id=catbus.business_id, category_id=catbus.category_id):
+            if not Business_category.query.filter_by(business_id=catbus.business_id,
+                                                     category_id=catbus.category_id).first():
                 db.session.add(catbus)
         db.session.commit()
 
         print "added " + business.name + " to db"
 
     else:
-        print "Already in Dicionary"
+        print "Already in Dictionary"
         return None
 
 
@@ -169,7 +177,14 @@ def seed_yelp(filename):
         if row[9] != "":
             attributes['longitude'] = float(row[9])
         if row[10] != "":
-            attributes['categories'] = row[10]
+            elements=[]
+            for element in row[10:]:
+                elements.append(element)
+
+            # attributes['categories'] = row[10]
+            attributes['categories'] = elements
+        # debugging
+        print attributes['categories']
 
         linecount += 1
         print "adding line " + str(linecount)

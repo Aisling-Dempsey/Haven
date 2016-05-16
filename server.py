@@ -38,67 +38,112 @@ def hello_world():
 @app.route('/')
 def splash():
     """splash page"""
-    return render_template('splash.html', keys=helper.KEYS)
+    return render_template('splash.html',
+                           keys=helper.KEYS,
+                           user=session.get("user_name"))
 
 
-@app.route('/login')
-def login():
+@app.route('/login', methods=['GET'])
+def login_prompt():
     """Login page"""
-    return render_template('construction.html', keys=helper.KEYS)
+    return render_template('log-in.html',
+                           keys=helper.KEYS,
+                           user=session.get("user_name"))
 
+
+@app.route('/login', methods=['POST'])
+def login():
+    """logs in user"""
+    form_data = request.form
+
+    helper.login(form_data)
+    return redirect('/')
+
+@app.route('/logout')
+def logout():
+    """logs out user"""
+    session['user_name'] = None
+    session['user_id'] = None
+    # todo fix flash
+    flash("You are now logged out")
+    return redirect('/')
 
 @app.route('/create-account', methods=['GET'])
 def acct_creation():
     """account creation page"""
-    return render_template("user-add.html")
+    return render_template("user-add.html",
+                           keys=helper.KEYS,
+                           user=session.get("user_name"))
 
 
 @app.route('/create-account', methods=['POST'])
 def post_account():
+    """creates user account"""
     form_data = request.form
 
-    helper.add_user(form_data)
+    status = helper.add_user(form_data)
+    flash(status)
 #     todo add flash "your account has been created" & "you have been logged in"
-    return redirect('/')
+    if status == "That username already exists":
+        return render_template('user-add.html',
+                               keys=helper.Keys,
+                               user=session.get("user_name"))
 
+    else:
+        return redirect('/')
 
 
 @app.route('/results')
 def results():
+    # todo finish me
     """search results page"""
-    return render_template('construction.html', keys=helper.KEYS)
+    form_data = request.args
+
+    return render_template('construction.html',
+                           keys=helper.KEYS,
+                           user=session.get("user_name"))
 
 
 @app.route('/explore')
 def explore():
     """explore page"""
-    return render_template('construction.html', keys=helper.KEYS)
+    return render_template('construction.html',
+                           keys=helper.KEYS,
+                           user=session.get("user_name"))
 
 
-@app.route('/:username')
+@app.route('/<string:username>')
 def user_account(username):
     """User account page"""
-    return render_template('construction.html', keys=helper.KEYS)
+    return render_template('construction.html',
+                           keys=helper.KEYS,
+                           user=session.get("user_name"))
 
 
-@app.route('/:username/favorites')
+@app.route('/<string:username>/')
 def favorites(username):
     """user favorites"""
-    return render_template('construction.html', keys=helper.KEYS)
+    return render_template('construction.html',
+                           keys=helper.KEYS,
+                           user=session.get("user_name"))
 
 
-@app.route('/:username/ratings')
+@app.route('/<string:username>/ratings')
 def ratings(username):
     """user ratings"""
-    return render_template('construction.html', keys=helper.KEYS)
+    return render_template('construction.html',
+                           keys=helper.KEYS,
+                           user=session.get("user_name"))
 
 
-@app.route('/info/:business')
+@app.route('/info/<string:business>')
 def info(business):
-    return render_template('construction.html', keys=helper.KEYS)
+    return render_template('construction.html',
+                           keys=helper.KEYS,
+                           user=session.get("user_name"))
 
 
-@app.route('/info/:business/rate', methods=['GET'])
+@app.route('/info/<string:business>/rate', methods=['GET'])
 def rate(business):
     """presents user with form to rate business"""
     # converts id from yelp_id to business_id if applicable, then returns appropriate object
@@ -106,8 +151,8 @@ def rate(business):
 
     return render_template('rating-form.html',
                            business_name=business_info.name,
-                           business_id=business
-                           )
+                           business_id=business,
+                           user=session.get("user_name"))
 
 
 @app.route('/info/:business/rate', methods=['POST'])
@@ -125,7 +170,9 @@ def submit_review(business):
 @app.route('/:username/manage')
 def account_manage(username):
     """allows update of user information. Requires new login"""
-    return render_template('construction.html', keys=helper.KEYS)
+    return render_template('construction.html',
+                           keys=helper.KEYS,
+                           user=session.get("user_name"))
 
 
 if __name__ == '__main__':

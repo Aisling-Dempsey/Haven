@@ -23,20 +23,39 @@ yelp_api = YelpAPI(KEYS['YELP_CONSUMER_KEY'], KEYS['YELP_CONSUMER_SECRET'],
 
 ###### HELPER FUNCTIONS #####
 def login(payload):
+    """logs in user"""
     email = payload['email']
     password = payload['password']
     db_user = User.query.filter_by(email=email).first()
+
+    # checks if user exists and then compares passwords. if they match, logs in user and sets session variables
     if db_user:
         if password == db_user.password:
             # todo check if correct way to store session values, currently pseudocode
-            session['user'] = User.query.filter_by(email=email)
+            session['user_id'] = db_user.user_id
+            session['user_name'] = db_user.name
+
             return "Logged in as", db_user.name
+
         else:
             return "That password is incorrect, please try again"
 
     else:
         return "That username does not exist"
 
+
+def add_user(payload):
+    """Takes form information as a dictionary and creates user account if it doesn't already exist"""
+    email = payload['email']
+    password = payload['password']
+    name = payload['name']
+
+    if not User.query.filter_by(email=email).first():
+        user = User(email=email, name=name, password=password)
+        db.session.add(user)
+        db.session.commit()
+        session['user_id'] = user.user_id
+        session['user_name'] = user.name
 
 
 
@@ -56,7 +75,8 @@ def yelp_by_id(yelp_ID):
 
 def add_rating(info):
     """adds rating to business from payload of logged in user_id, (non_yelp)business_id, score, and review """
-    rating = Rating(user_id=info['user_id'], business_id=info['business_id'], score=info['score'])
+    rating = Rating(user_id=info['user_id'], business_id=info['business_id'],
+                    score=info['score'], created_at=datetime.now())
     if info.get('review'):
         rating.review = info['review']
     db.session.add(rating)
@@ -136,6 +156,11 @@ def return_business_object(business_id):
     """returns the business object using the business_id. Often paired with find_bus_id(id_to_check)"""
     return Business.query.get(business_id)
 
+def splash_query(form_data):
+    """takes user input and searches yelp"""
+#     todo build me
+
+
 
 def add_rating(form_data, business):
     """adds a rating form data and business_id"""
@@ -155,19 +180,54 @@ def add_rating(form_data, business):
     db.session.add(rating)
     db.session.commit()
 
+def example_data():
+    """Create some sample data."""
 
+    # In case this is run more than once, empty out existing data
+    Rating.query.delete()
+    Business_category.query.delete()
+    Business.query.delete()
+    Category.query.delete()
+    User.query.delete()
 
+    # Add sample businesses and users
+    hackbright = Business(business_id=999, yelp_id='hackbright-academy-san-francisco',
+                          name='Hackbright Academy', city='San Francisco', state='CA')
+    estellas = Business(business_id = 998, yelp_id='estelas-fresh-sandwiches-san-francisco',
+                        name='Estella\'s', city='San Francisco', state='CA')
+    # listing without yelp_id
+    piraat = Business(business_id = 997, name='Piraat', city='San Francisco', state='CA')
 
-    #
-    #
-    #
-    # return {'yelp id': yelp_id,
-    #         'name': name,
-    #         'Address line 1': address_line_1,
-    #         'Address line 2': address_line_2,
-    #         'City': city,
-    #         'Zip': zipcode,
-    #         'phone': phone,
-    #         'latitude': latitude,
-    #         'longitude': longitude}
-    #
+    liz = User(user_id=999, name='Liz', email='liz@liz.com', password='liz_pass')
+    leonard = User(user_id=998, name='Leonard', email='leonard@leonard.com', password='leonard_pass')
+    leslie= User(user_id=997, name='Leslie', email='leslie@leslie.com', password='leslie_pass')
+
+    db.session.add_all([hackbright, estellas, piraat, leonard, liz, leslie])
+    db.session.commit()
+
+    # add ratings and categories
+
+    liz_rate = Rating(rating_id=999, user_id=999, business_id=999,
+                      score=5, review="Awesome!", created_at=datetime.now())
+    lenny_rate = Rating(rating_id=998, user_id=998, business_id=998,
+                        score=3, created_at=datetime.now())
+
+    hackbright_cat_1 = Category(category_id=999, category_name='Vocational & Technical School')
+    hackbright_cat_2 = Category(category_id=998, category_name='vocation')
+
+    estellas_cat_1 = Category(category_id=997, category_name='Delis')
+    estellas_cat_2 = Category(category_id=996, category_name='delis')
+
+    db.session.add_all([liz_rate, lenny_rate, hackbright_cat_1, hackbright_cat_2, estellas_cat_1, estellas_cat_2])
+    db.session.commit()
+
+    # add links between categories and businesses to reference table
+
+    hackbright_link_1 = Business_category(cat_bus_id=999, business_id=999, category_id=999)
+    hackbright_link_2 = Business_category(cat_bus_id=998, business_id=999, category_id=998)
+
+    estellas_link_1 = Business_category(cat_bus_id=997, business_id=998, category_id=997)
+    estellas_link_2 = Business_category(cat_bus_id=996, business_id=998, category_id=996)
+
+    db.session.add_all([hackbright_link_1, hackbright_link_2, estellas_link_1, estellas_link_2])
+    db.session.commit()

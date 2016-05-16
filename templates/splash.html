@@ -1,4 +1,19 @@
 {% extends 'base.html' %}
 {%  block body %}
     <p>This is the splash page</p>
+    {% if user %}
+        <p>Hello {{  user }}</p>
+
+        <a href="/logout">Logout</a><
+    {% else %}
+        <a href="/login">Login</a>
+        <a href="/create-account">Create-account</a>
+    {% endif %}
+
+    <form action="/results" method="GET">
+        <!--todo figure out how to get required to ignore placeholder -->
+        <input type="search" name="term" placeholder="Enter a business name or category" required>
+        <input type="submit" value="Find me something good!">
+    </form>
+
 {% endblock %}

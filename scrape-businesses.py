@@ -70,7 +70,9 @@ def build_csv(city, state):
 
                         # list of categories
                         if business.get('categories'):
-                            info.append(str((business['categories'])))
+                            for group in business['categories']:
+                                for cat in group:
+                                    info.append(str(cat))
                         else:
                             info.append("")
                         # converts info list to pipe separated

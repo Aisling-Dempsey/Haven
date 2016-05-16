@@ -1,10 +1,9 @@
 {% extends 'base.html' %}
 {% block body %}
-    <form action="/create-account", method="POST">
-        <label>Name:<input type="text" name="name" required></label>
+    <form action="/login", method="POST">
         <!--todo examine how to do form validation for email format-->
         <label>Email:<input type="text" name="email" required></label>
         <label>Password:<input type="password" name="password" required></label>
-        <input type="submit" value="Create User">
+        <input type="submit" value="login">
     </form>
 {% endblock %}
