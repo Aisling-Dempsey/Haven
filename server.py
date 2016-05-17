@@ -2,6 +2,9 @@ from flask import Flask, render_template, redirect, request, flash, session
 from flask_debugtoolbar import DebugToolbarExtension
 from jinja2 import StrictUndefined
 from models import connect_to_db, db, Business, Rating, User
+import sys
+reload(sys)
+sys.setdefaultencoding('UTF8')
 
 from yelpapi import YelpAPI
 import helper
@@ -98,10 +101,49 @@ def results():
     # todo finish me
     """search results page"""
     form_data = request.args
+    location = helper.current_loc()
+    result = helper.splash_query(form_data, (location['city'], location['region_code']))
 
-    return render_template('construction.html',
+    businesses = result[0]
+    result_offset = result[1]
+    result_count = result[2]
+    print type(businesses)
+    print businesses
+    for business in businesses.values():
+        print type(business)
+        print business['name']
+    return render_template('results.html',
+                           form_data=form_data,
+                           location=location,
                            keys=helper.KEYS,
-                           user=session.get("user_name"))
+                           user=session.get("user_name"),
+                           businesses=businesses,
+                           offset=result_offset,
+                           total=result_count)
+
+
+@app.route('/results/<int:offset>')
+def more_results(offset):
+    form_data = request.args
+    location = helper.current_loc()
+    result = helper.splash_query(form_data, (location['city'], location['region_code']), offset)
+
+    businesses = result[0]
+    result_offset = result[1]
+    result_count = result[2]
+    print type(businesses)
+    print businesses
+    for business in businesses.values():
+        print type(business)
+        print business['name']
+    return render_template('results.html',
+                           form_data=form_data,
+                           location=location,
+                           keys=helper.KEYS,
+                           user=session.get("user_name"),
+                           businesses=businesses,
+                           offset=result_offset,
+                           total=result_count)
 
 
 @app.route('/explore')
@@ -160,8 +202,8 @@ def submit_review(business):
     """submits review and redirects back to the business page"""
     # determines whether business in url is from yelp API or local only
     form_data = request.form
-
-    helper.add_rating(form_data, business)
+    user_id = session['user_id']
+    helper.add_rating(form_data, business, user_id)
 
     # todo add flash "your rating has been submitted"
     return redirect("/info/:business")
@@ -185,5 +227,5 @@ if __name__ == '__main__':
     # connects to database
     connect_to_db(app)
 
-    # runs app
+    # # runs app
     app.run()

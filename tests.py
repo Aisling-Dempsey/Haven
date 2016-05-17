@@ -5,12 +5,12 @@ from models import db, Rating, User, Business, Business_category
 
 class TestCase(unittest.TestCase):
 
-    def test_current_lat_long(self):
+    def test_current_loc(self):
         """tests lat/long function"""
-        func = helper.current_lat_long()
-        self.assertTrue(type(func) is tuple)
-        self.assertTrue(type(func[0]) is float)
-        self.assertTrue(type(func[0]) is float)
+        func = helper.current_loc()
+        self.assertTrue(type(func) is dict)
+        self.assertTrue(type(func['latitude']) is float)
+        self.assertTrue(type(func['longitude']) is float)
 
     def test_yelp_by_id(self):
         """tests that yelp id query works"""
@@ -38,7 +38,7 @@ class FlaskTestsDatabase(TestCase):
         helper.example_data()
 
         app.config['TESTING'] = True
-        app.config['SECRET_KEY'] = True
+        app.config['SECRET_KEY'] = 'Aisling'
         self.client = app.test_client()
 
         # unsure of verbiage in larger context. Getting an
@@ -46,9 +46,11 @@ class FlaskTestsDatabase(TestCase):
         # test file. get "TypeError: object of type 'bool' has no len()"
         # error when I run
         #
-        with self.client as c:
-            with c.session_transaction() as session:
-                session['user'] = User.query.get(997)
+        # with self.client as c:
+        #     with c.session_transaction() as session:
+        #         session['user_id'] = 997
+
+        # print session['user_id']
 
     def tearDown(self):
         """Do at end of every test."""
@@ -58,13 +60,13 @@ class FlaskTestsDatabase(TestCase):
 
     def test_add_rating(self):
             form_data = {'score': 4}
-            helper.add_rating(form_data, 999)
+            helper.add_rating(form_data, 999, 997)
 
             rating = Rating.query.get(1)
 
-            self.assertEqual(rating.business_ID, 999)
+            self.assertEqual(rating.business_id, 999)
             self.assertEqual(rating.score, 4)
-            self.assertTrue(rating.user_id, 997)
+            self.assertEqual(rating.user_id, 997)
             self.assertFalse(rating.review)
 
 

@@ -1,0 +1,33 @@
+{% block body %}
+
+    {% for business in businesses %}
+        {% if businesses[business]['photo'] %}
+            <img src="{{ businesses[business]['photo'] }}">
+        {% endif %} }}
+        <p>{{ businesses[business]['name'] }}</p>
+        {% if businesses[business].get('address_1') %}
+            <p>{{ businesses[business]['address_1'] }}</p>
+        {%  endif %}
+        {% if businesses[business].get('address_2') %}
+            <p>{{ businesses[business]['address_2'] }}</p>
+        {% endif %}
+
+
+        <p>{{ businesses[business]['rating'] }}</p>
+        {%  if businesses[business].get('haven_score') %}
+            <p>{{ businesses[business]['haven_score'] }} over {{ businesses[business]['haven_count'] }} ratings</p>
+        {% endif %}
+        <ul>
+        {% for category in businesses[business]['categories'] %}
+            <li>{{ category }}</li>
+        {% endfor %}
+        </ul>
+    {% endfor %}
+
+    <p>Showing results {{ offset }} through {{ offset + 10 }} of {{ total }}</p>
+
+    <form action="/results/{{ offset + 10 }}">
+        <input type="hidden" name="term" value={{  form_data['term'] }}>
+        <input type="submit" value="Show me the next 10">
+    </form>
+{% endblock %}

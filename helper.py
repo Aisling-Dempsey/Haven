@@ -5,6 +5,9 @@ from flask import session, request
 import os
 from datetime import datetime
 from models import connect_to_db, db
+import sys
+reload(sys)
+sys.setdefaultencoding('UTF8')
 
 
 KEYS = {'maps': os.environ['MAPS_SECRET_KEY'],
@@ -58,29 +61,16 @@ def add_user(payload):
         session['user_name'] = user.name
 
 
-
-
-def current_lat_long():
+def current_loc():
     """outputs current lat/long estimate as a tuple based upon user ip"""
     r = requests.get("http://freegeoip.net/json/")
     location = r.json()
-    return (location['latitude'], location['longitude'])
+    return location
 
 
 def yelp_by_id(yelp_ID):
     """returns a dictionary of yelp information using the Yelp ID"""
     return yelp_api.business_query(id=yelp_ID)
-
-
-
-def add_rating(info):
-    """adds rating to business from payload of logged in user_id, (non_yelp)business_id, score, and review """
-    rating = Rating(user_id=info['user_id'], business_id=info['business_id'],
-                    score=info['score'], created_at=datetime.now())
-    if info.get('review'):
-        rating.review = info['review']
-    db.session.add(rating)
-    db.session.commit(rating)
 
 
 def add_business(info):
@@ -156,29 +146,116 @@ def return_business_object(business_id):
     """returns the business object using the business_id. Often paired with find_bus_id(id_to_check)"""
     return Business.query.get(business_id)
 
-def splash_query(form_data):
-    """takes user input and searches yelp"""
+
+def splash_query(form_data, location, offset=0):
+    """takes user input and tuple of (city, state code) and returns search"""
+
 #     todo build me
+    term = form_data['term']
+    location = location[0] + ", " + location[1]
+    print location
+    results = yelp_api.search_query(term=term, location=location, offset=offset, limit=10)
+    total_results = results['total']
+    data = {}
+
+    # loops through the displayed businesses and gives each one a sub dict with a key of the yelp id
+    for result in results['businesses']:
+        parent_key = result['id']
+        data[parent_key] = {}
+        # makes empty list for categories and appends the first element of each returned category list to it, then
+        # adds them as a key/value pair in the sub-dict for the business
+        cats = []
+        for category in result['categories']:
+            cats.append(category[0])
+
+        data[parent_key]['categories'] = cats
+
+        # adds address lines 1 and 2 as well as city to the sub-dict if they exist
+        address = result['location'].get('address')
+        if address:
+            if len(address) == 2:
+                address_1 = result['location']['address'][0]
+                data[parent_key]['address_1'] = address_1
+
+                address_2 = result['location']['address'][1]
+                data[parent_key]['address_2'] = address_2
+
+            elif len(address) == 1:
+                address_1 = result['location']['address'][0]
+                data[parent_key]['address_1'] = address_1
+
+
+        city = result['location'].get('city')
+        #
+        # if address_1:
+        #     data[parent_key]['address_1'] = address_1
+        #
+        # if address_2:
+        #     data[parent_key]['address_2'] = address_2
+
+        if city:
+            data[parent_key]['city'] = city
+
+        name = result.get('name')
+        data[parent_key]['name'] = name
+
+        # adds phone number to sub-dict if it exists
+        phone = result.get('display_phone')
+        if phone:
+            data[parent_key]['phone'] = phone
+
+        # adds yelp rating to sub-dict
+        data[parent_key]['rating'] = result['rating']
+
+        # provides average haven rating if it exists.
+
+        try:
+            haven_ratings = Business.query.filter_by(yelp_id=result['id']).first().ratings
+
+        except:
+            pass
+        scores = []
+
+        if haven_ratings:
+            # todo determine why this is erroring on w/offset 40 and a term of 'tacos'
+            for rating in haven_ratings:
+                scores.append(rating.score)
+            total_score = 0
+            score_count = 0
+            for score in scores:
+                total_score += score
+                score_count += 1
+
+            haven_score = total_score/float(score_count)
+
+            data[parent_key]['haven_score'] = haven_score
+            data[parent_key]['haven_count'] = score_count
+
+        # checks for photo and adds it if it exists
+        photo = result.get('image_url')
+        if photo:
+            data[parent_key]['photo'] = photo
+
+    return [data, offset, total_results]
 
 
 
-def add_rating(form_data, business):
+def add_rating(form_data, business, user_id):
     """adds a rating form data and business_id"""
-#     todo add form data fields
-    user_id = session['user_id']
     business_id = find_bus_id(business)
     score = int(form_data.get("score"))
     review = form_data.get("review")
     created_at = datetime.now()
 
-    rating = Business(business_id=business_id,
-                      user_id=user_id,
-                      score=score,
-                      review=review,
-                      created_at=created_at)
+    rating = Rating(business_id=business_id,
+                    user_id=user_id,
+                    score=score,
+                    review=review,
+                    created_at=created_at)
 
     db.session.add(rating)
     db.session.commit()
+
 
 def example_data():
     """Create some sample data."""
