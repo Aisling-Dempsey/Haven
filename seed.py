@@ -194,6 +194,12 @@ def seed_yelp(filename):
     print "Complete"
     f.close()
 
+def santize_businesses():
+    """sanitizes db of all businesses without ratings from users"""
+    businesses = Business.query.filter(Business.ratings == None)
+    for business in businesses:
+        db.session.delete(business)
+    db.session.commit()
 
 
 

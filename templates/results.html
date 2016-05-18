@@ -1,33 +1,33 @@
+{% extends 'base.html' %}
 {% block body %}
-
-    {% for business in businesses %}
-        {% if businesses[business]['photo'] %}
-            <img src="{{ businesses[business]['photo'] }}">
-        {% endif %} }}
-        <p>{{ businesses[business]['name'] }}</p>
-        {% if businesses[business].get('address_1') %}
-            <p>{{ businesses[business]['address_1'] }}</p>
+    <div id="search-results">
+    {% for yelp_id in businesses %}
+    <a href="/info/{{ yelp_id }}"><div class="result">
+        {% if businesses[yelp_id].get('photo') %}
+            <img src="{{ businesses[yelp_id]['photo'] }}">
+        {% endif %}
+        <p>{{ businesses[yelp_id]['name'] }}</p>
+        {% if businesses[yelp_id].get('address_line_1') %}
+            <p>{{ businesses[yelp_id]['address_line_1'] }}</p>
         {%  endif %}
-        {% if businesses[business].get('address_2') %}
-            <p>{{ businesses[business]['address_2'] }}</p>
+        {% if businesses[yelp_id].get('address_line_2') %}
+            <p>{{ businesses[yelp_id]['address_)line_2'] }}</p>
         {% endif %}
 
 
-        <p>{{ businesses[business]['rating'] }}</p>
-        {%  if businesses[business].get('haven_score') %}
-            <p>{{ businesses[business]['haven_score'] }} over {{ businesses[business]['haven_count'] }} ratings</p>
-        {% endif %}
-        <ul>
-        {% for category in businesses[business]['categories'] %}
-            <li>{{ category }}</li>
-        {% endfor %}
-        </ul>
+        <p>{{ businesses[yelp_id]['yelp_score'] }}</p>
+
+        <p>{{ businesses[yelp_id]['score'] }} over {{ businesses[yelp_id]['total_ratings'] }} ratings</p>
+
+        <p>{{ businesses[yelp_id]['category']}}</p>
+
+    </div></a>
     {% endfor %}
 
-    <p>Showing results {{ offset }} through {{ offset + 10 }} of {{ total }}</p>
 
-    <form action="/results/{{ offset + 10 }}">
-        <input type="hidden" name="term" value={{  form_data['term'] }}>
-        <input type="submit" value="Show me the next 10">
-    </form>
+
+     <button class="search-more-btn"
+            data-term="{{ term }}"
+            data-offset="{{ offset }}">More results</button>
+    </div>
 {% endblock %}

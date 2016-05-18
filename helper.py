@@ -1,7 +1,7 @@
 import requests
-from models import Business, Rating, User, Category, Business_category
+from models import Business, Rating, User, Category
 from yelpapi import YelpAPI
-from flask import session, request
+from flask import session, request, jsonify
 import os
 from datetime import datetime
 from models import connect_to_db, db
@@ -61,8 +61,21 @@ def add_user(payload):
         session['user_name'] = user.name
 
 
+def get_ratings(user_id):
+    """returns a dictionary of all of users ratings with sub-dicts of info about the ratings under the yelp_id"""
+    ratings=User.query.get(user_id).ratings
+    rating_info = {}
+    for rating in ratings:
+        date = rating.created_at.strftime("%B %d, %Y at %I:%M %p")
+        rating_info[rating.business.yelp_id] = {'score': rating.score,
+                                                'review': rating.review,
+                                                'created_at': date,
+                                                'business_name': rating.business.name}
+
+    return rating_info
+
 def current_loc():
-    """outputs current lat/long estimate as a tuple based upon user ip"""
+    """outputs locational json based upon user ip"""
     r = requests.get("http://freegeoip.net/json/")
     location = r.json()
     return location
@@ -71,6 +84,7 @@ def current_loc():
 def yelp_by_id(yelp_ID):
     """returns a dictionary of yelp information using the Yelp ID"""
     return yelp_api.business_query(id=yelp_ID)
+
 
 
 def add_business(info):
@@ -147,98 +161,67 @@ def return_business_object(business_id):
     return Business.query.get(business_id)
 
 
-def splash_query(form_data, location, offset=0):
-    """takes user input and tuple of (city, state code) and returns search"""
+def splash_query(term, location, offset):
+    """takes search term, location (in city, state format) and offset.
+        returns a tuple in the format (term, offset, company_info, total results) where
+        company_info is a dict}
+    """
 
-#     todo build me
-    term = form_data['term']
-    location = location[0] + ", " + location[1]
-    print location
-    results = yelp_api.search_query(term=term, location=location, offset=offset, limit=10)
+    results = yelp_api.search_query(term=term, location=location, offset=offset)
     total_results = results['total']
-    data = {}
-
     # loops through the displayed businesses and gives each one a sub dict with a key of the yelp id
-    for result in results['businesses']:
-        parent_key = result['id']
-        data[parent_key] = {}
-        # makes empty list for categories and appends the first element of each returned category list to it, then
-        # adds them as a key/value pair in the sub-dict for the business
-        cats = []
-        for category in result['categories']:
-            cats.append(category[0])
+    # while there are less than 10 results with an entry in the local db, loops through results and adds
+    # any businesses with a haven review to a list by yelp_ids.
+    company_info = {}
+    # tries to build dict of 10 buesinesses, if less than 10, outputs availbable businesses.
+    while len(company_info) < 10 and offset < total_results:
+        # loops through yelp results to see if they exist in db, checking if there are less than 10 matching
+        # results so far.
+        for result in results['businesses']:
+            if len(company_info) < 10:
+                yelp_id = result['id']
+                offset += 1
+                print "\n"
+                print "looping through", offset
 
-        data[parent_key]['categories'] = cats
+                business = Business.query.filter_by(yelp_id=yelp_id).first()
+                if business:
+                    name = business.name
+                    photo = result['image_url']
+                    category = business.categories[0].category_name
+                    yelp_rating = result['rating']
+                    haven_ratings = business.ratings
 
-        # adds address lines 1 and 2 as well as city to the sub-dict if they exist
-        address = result['location'].get('address')
-        if address:
-            if len(address) == 2:
-                address_1 = result['location']['address'][0]
-                data[parent_key]['address_1'] = address_1
+                    scores = []
+                    for rating in haven_ratings:
+                        scores.append(rating.score)
+                    total_score = 0
+                    score_count = 0
+                    for score in scores:
+                        total_score += score
+                        score_count += 1
 
-                address_2 = result['location']['address'][1]
-                data[parent_key]['address_2'] = address_2
+                    haven_score = total_score / float(score_count)
 
-            elif len(address) == 1:
-                address_1 = result['location']['address'][0]
-                data[parent_key]['address_1'] = address_1
+                    company_info[yelp_id] = {'photo': photo,
+                                             'yelp_score': yelp_rating,
+                                             'score': round(haven_score, 2)
+                                             'total_ratings': score_count,
+                                             'name': name,
+                                             'category': category}
 
+                    if business.address_line_1:
+                        company_info[yelp_id]['address_line_1'] = business.address_line_1
 
-        city = result['location'].get('city')
-        #
-        # if address_1:
-        #     data[parent_key]['address_1'] = address_1
-        #
-        # if address_2:
-        #     data[parent_key]['address_2'] = address_2
+                    if business.address_line_2:
+                        company_info[yelp_id]['address_line_2'] = business.address_line_2
 
-        if city:
-            data[parent_key]['city'] = city
+            else:
+                return term, offset, company_info, total_results
 
-        name = result.get('name')
-        data[parent_key]['name'] = name
+        results = yelp_api.search_query(term=term, location=location, offset=offset)
 
-        # adds phone number to sub-dict if it exists
-        phone = result.get('display_phone')
-        if phone:
-            data[parent_key]['phone'] = phone
-
-        # adds yelp rating to sub-dict
-        data[parent_key]['rating'] = result['rating']
-
-        # provides average haven rating if it exists.
-
-        try:
-            haven_ratings = Business.query.filter_by(yelp_id=result['id']).first().ratings
-
-        except:
-            pass
-        scores = []
-
-        if haven_ratings:
-            # todo determine why this is erroring on w/offset 40 and a term of 'tacos'
-            for rating in haven_ratings:
-                scores.append(rating.score)
-            total_score = 0
-            score_count = 0
-            for score in scores:
-                total_score += score
-                score_count += 1
-
-            haven_score = total_score/float(score_count)
-
-            data[parent_key]['haven_score'] = haven_score
-            data[parent_key]['haven_count'] = score_count
-
-        # checks for photo and adds it if it exists
-        photo = result.get('image_url')
-        if photo:
-            data[parent_key]['photo'] = photo
-
-    return [data, offset, total_results]
-
-
+    return term, offset, company_info, total_results
 
 def add_rating(form_data, business, user_id):
     """adds a rating form data and business_id"""
@@ -308,3 +291,12 @@ def example_data():
 
     db.session.add_all([hackbright_link_1, hackbright_link_2, estellas_link_1, estellas_link_2])
     db.session.commit()
+
+
+if __name__ == "__main__":
+    # if run interactively, this will allow access of the db
+
+    from server import app
+    connect_to_db(app)
+    db.create_all()
+    print "Connected to DB."

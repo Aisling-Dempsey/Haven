@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, request, flash, session
+from flask import Flask, render_template, redirect, request, flash, session, jsonify
 from flask_debugtoolbar import DebugToolbarExtension
 from jinja2 import StrictUndefined
 from models import connect_to_db, db, Business, Rating, User
@@ -98,52 +98,38 @@ def post_account():
 
 @app.route('/results')
 def results():
-    # todo finish me
     """search results page"""
-    form_data = request.args
-    location = helper.current_loc()
-    result = helper.splash_query(form_data, (location['city'], location['region_code']))
+    term = request.args['term']
+    location = ", ".join([helper.current_loc()['city'], helper.current_loc()['region_code']])
+    offset = 0
 
-    businesses = result[0]
-    result_offset = result[1]
-    result_count = result[2]
-    print type(businesses)
-    print businesses
-    for business in businesses.values():
-        print type(business)
-        print business['name']
+    result = helper.splash_query(term, location, offset)
+
+
     return render_template('results.html',
-                           form_data=form_data,
+                           term=term,
                            location=location,
                            keys=helper.KEYS,
                            user=session.get("user_name"),
-                           businesses=businesses,
-                           offset=result_offset,
-                           total=result_count)
+                           businesses=result[2],
+                           offset=result[1],
+                           total=result[3])
 
 
-@app.route('/results/<int:offset>')
-def more_results(offset):
-    form_data = request.args
-    location = helper.current_loc()
-    result = helper.splash_query(form_data, (location['city'], location['region_code']), offset)
+@app.route('/results.json')
+def more_results():
+    print request.args
+    term = request.args['term']
+    offset = int(request.args['offset'])
+    location = ", ".join([helper.current_loc()['city'], helper.current_loc()['region_code']])
+    result = helper.splash_query(term, location, offset)
+    output = {'term': result[0],
+              'offset': result[1],
+              'businesses': result[2],       # dictionary of objects not json serializable
+              'total_results': result[3]
+              }
 
-    businesses = result[0]
-    result_offset = result[1]
-    result_count = result[2]
-    print type(businesses)
-    print businesses
-    for business in businesses.values():
-        print type(business)
-        print business['name']
-    return render_template('results.html',
-                           form_data=form_data,
-                           location=location,
-                           keys=helper.KEYS,
-                           user=session.get("user_name"),
-                           businesses=businesses,
-                           offset=result_offset,
-                           total=result_count)
+    return jsonify(output)
 
 
 @app.route('/explore')
@@ -157,12 +143,12 @@ def explore():
 @app.route('/<string:username>')
 def user_account(username):
     """User account page"""
-    return render_template('construction.html',
+    return render_template('account.html',
                            keys=helper.KEYS,
                            user=session.get("user_name"))
 
 
-@app.route('/<string:username>/')
+@app.route('/<string:username>/favorites')
 def favorites(username):
     """user favorites"""
     return render_template('construction.html',
@@ -173,9 +159,13 @@ def favorites(username):
 @app.route('/<string:username>/ratings')
 def ratings(username):
     """user ratings"""
-    return render_template('construction.html',
+    user_id = session['user_id']
+    ratings = helper.get_ratings(user_id)
+
+    return render_template('user-ratings.html',
                            keys=helper.KEYS,
-                           user=session.get("user_name"))
+                           user=session.get("user_name"),
+                           ratings=ratings)
 
 
 @app.route('/info/<string:business>')

@@ -6,6 +6,7 @@ db = SQLAlchemy()
 ##############################################################################
 # DB Models
 
+
 class User(db.Model):
     __tablename__ = "users"
 
@@ -18,6 +19,7 @@ class User(db.Model):
         return "<user_id: %d, name: %s, email %s>" % (self.user_id,
                                                       self.name,
                                                       self.email)
+
 
 class Business(db.Model):
     __tablename__ = "businesses"
@@ -34,22 +36,27 @@ class Business(db.Model):
     latitude = db.Column(db.Float)
     longitude = db.Column(db.Float)
 
+    category = db.relationship("Category",
+                               secondary='business_categories',
+                               backref=db.backref("businesses", order_by=business_id))
+
     def __repr__(self):
         return "<business_id: %d, name: %s>" % (self.business_id,
                                                 self.name)
 
 
-class Business_category(db.Model):
+class BusinessCategory(db.Model):
     __tablename__ = "business_categories"
 
     cat_bus_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     business_id = db.Column(db.Integer, db.ForeignKey('businesses.business_id'))
     category_id = db.Column(db.Integer, db.ForeignKey('categories.category_id'))
 
-    business = db.relationship("Business",
-                               backref=db.backref("business_categories", order_by=cat_bus_id))
-    category = db.relationship("Category",
-                               backref=db.backref("business_categories", order_by=cat_bus_id))
+    # Unneccessary with "secondary" link?
+    # business = db.relationship("Business",
+    #                            backref=db.backref("business_categories", order_by=cat_bus_id))
+    # category = db.relationship("Category",
+    #                            backref=db.backref("business_categories", order_by=cat_bus_id))
 
     __table_args__ = (db.UniqueConstraint('business_id', 'category_id'),)
 
@@ -65,9 +72,14 @@ class Category(db.Model):
     category_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     category_name = db.Column(db.String(50), nullable=False)
 
+    business = db.relationship("Business",
+                               secondary='business_categories',
+                               backref=db.backref("categories", order_by=category_id))
+
     def __repr__(self):
         return "<category_id: %d, category_name: %s>" % (self.category_id,
                                                          self.category_name)
+
 
 class Rating(db.Model):
     __tablename__ = "ratings"
@@ -95,12 +107,10 @@ class Rating(db.Model):
 # Helper functions
 
 
-
-
 def connect_to_db(app):
     """Connect the database to our Flask app."""
 
-    # Configure to use our PstgreSQL database
+    # Configure to use our PostgreSQL database
     app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///haven'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     db.app = app
@@ -114,4 +124,3 @@ if __name__ == "__main__":
     connect_to_db(app)
     db.create_all()
     print "Connected to DB."
-
