@@ -175,57 +175,59 @@ def get_aggregate_rating(business):
     for score in scores:
         total_score += score
         score_count += 1
-    # TODO: check for divide by zero
+    # no need for check for 0 because nothing exists in db without a rating.
+    if score_count == 0:
     return round(total_score / float(score_count), 2), score_count
 
 
-def validate_db(yelp_object, haven_model):
+def validate_db(yelp_object, haven_model=None):
     """takes the result of a yelp query by businesses id and compares it to the database entry. If any information
-     on the local db is out of date, it is updated accordingly."""
+     on the local db is out of date, it is updated accordingly. Will also create new db if the haven_model is none"""
 
     # todo, check if exists, then set. commit all at the end.
     # todo try and refactor to use both for add and validation
     # idea: run query for haven_model inside and check if is none?
 
-    if haven_model.name != yelp_object['name']:
-        haven_model.name = yelp_object['name']
-        db.session.commit()
+    new = False
+
+    if haven_model is not None:
+        haven_model = Business()
+        new = True
+
+    haven_model.name = yelp_object['name']
 
     if yelp_object['location'].get('address'):
         if len(yelp_object['location']['address']) > 1:
-            if haven_model.address_line_2 != yelp_object['location']['address'][1]:
-                haven_model.address_line_2 = yelp_object['location']['address'][1]
-        if haven_model.address_line_1 != yelp_object['location']['address'][0]:
-            haven_model.address_line_1 = yelp_object['location']['address'][0]
-        db.session.commit()
+            haven_model.address_line_2 = yelp_object['location']['address'][1]
+
+        haven_model.address_line_1 = yelp_object['location']['address'][0]
+
 
     # nothing in local db should not have a city and state code but if for some reason yelp wiped them, it prevents it
     # from being cleared, protecting db integrity
-    if haven_model.city != yelp_object['location']['city'] and yelp_object['location'].get('city') is not None:
+    if yelp_object['location'].get('city'):
         haven_model.city = yelp_object['location']['city']
-        db.session.commit()
 
-    if haven_model.state != yelp_object['location']['state_code'] and yelp_object['location'].get('state_code') \
-            is not None:
+    if yelp_object['location'].get('state_code'):
         haven_model.state = yelp_object['location']['state_code']
-        db.session.commit()
 
     if yelp_object['location'].get('postal_code'):
-        if haven_model.zipcode != yelp_object['location']['postal_code']:
-            haven_model.zipcode = yelp_object['location']['postal_code']
-        db.session.commit()
+        haven_model.zipcode = yelp_object['location']['postal_code']
 
     if yelp_object.get('phone'):
-        if haven_model.phone != yelp_object['phone']:
-            haven_model.phone = yelp_object['phone']
-        db.session.commit()
+        haven_model.phone = yelp_object['phone']
 
     if yelp_object['location'].get('coordinate'):
-        if haven_model.latitude != yelp_object['location']['coordinate']['latitude']:
-            haven_model.latitude = yelp_object['location']['coordinate']['latitude']
-        if haven_model.longitude != yelp_object['location']['coordinate']['longitude']:
-            haven_model.longitude = yelp_object['location']['coordinate']['longitude']
-        db.session.commit()
+        haven_model.latitude = yelp_object['location']['coordinate']['latitude']
+        haven_model.longitude = yelp_object['location']['coordinate']['longitude']
+
+        try:
+            if new:
+                 db.session.add(haven_model)
+            db.session.commit()
+            return ""
+        except:
+            return None
 
 
 def splash_query(term, location, offset):
