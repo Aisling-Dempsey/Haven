@@ -1,5 +1,5 @@
 # yelp_id | name | address_1 | address_2 | city | state_code | zipcode | phone | lat | long | categories
-from models import Business, User, Category, Business_category, Rating
+from models import Business, User, Category, BusinessCategory, Rating
 from sys import argv
 from models import connect_to_db, db
 from datetime import datetime
@@ -69,14 +69,14 @@ def _add_to_businesses(params):
         for cat in cat_list:
             # creates row in reference table
             business = Business.query.filter_by(yelp_id=params['yelp_id']).first()
-            catbus = Business_category()
+            catbus = BusinessCategory()
             print business.business_id
             catbus.business_id = business.business_id
             cat_object = Category.query.filter_by(category_name=cat).first()
             print cat_object.category_name
             catbus.category_id = cat_object.category_id
 
-            if not Business_category.query.filter_by(business_id=catbus.business_id,
+            if not BusinessCategory.query.filter_by(business_id=catbus.business_id,
                                                      category_id=catbus.category_id).first():
                 db.session.add(catbus)
         db.session.commit()
@@ -196,33 +196,7 @@ def seed_yelp(filename):
 
 def santize_businesses():
     """sanitizes db of all businesses without ratings from users"""
-    businesses = Business.query.filter(Business.ratings == None)
+    businesses = Business.query.filter(Business.ratings is None)
     for business in businesses:
         db.session.delete(business)
     db.session.commit()
-
-
-
-
-
-
-
-        # debug printing
-        # print yelp_id
-        # print name
-        # print address_1
-        # try:
-        #     print type(address_2)
-        #     print address_2
-        # except:
-        #         pass
-        # print city
-        # print state_code
-        # print zipcode
-        # print phone
-        # print lat
-        # print long
-        # print categories + "\n" + "\n"
-
-
-    file.close(f)
