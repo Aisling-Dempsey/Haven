@@ -41,6 +41,8 @@ def hello_world():
 @app.route('/')
 def splash():
     """splash page"""
+
+    # todo add map
     return render_template('splash.html',
                            keys=helper.KEYS,
                            user=session.get("user_name"))
@@ -58,8 +60,8 @@ def login_prompt():
 def login():
     """logs in user"""
     form_data = request.form
-
-    helper.login(form_data)
+    # todo set up flash in base template
+    flash(helper.login(form_data))
     return redirect('/')
 
 @app.route('/logout')
@@ -132,26 +134,10 @@ def more_results():
     return jsonify(output)
 
 
-@app.route('/explore')
-def explore():
-    """explore page"""
-    return render_template('construction.html',
-                           keys=helper.KEYS,
-                           user=session.get("user_name"))
-
-
 @app.route('/<string:username>')
 def user_account(username):
     """User account page"""
     return render_template('account.html',
-                           keys=helper.KEYS,
-                           user=session.get("user_name"))
-
-
-@app.route('/<string:username>/favorites')
-def favorites(username):
-    """user favorites"""
-    return render_template('construction.html',
                            keys=helper.KEYS,
                            user=session.get("user_name"))
 
@@ -168,43 +154,81 @@ def ratings(username):
                            ratings=ratings)
 
 
-@app.route('/info/<string:business>')
-def info(business):
+@app.route('/explore')
+def explore():
+    """explore page"""
     return render_template('construction.html',
                            keys=helper.KEYS,
                            user=session.get("user_name"))
 
 
-@app.route('/info/<string:business>/rate', methods=['GET'])
-def rate(business):
-    """presents user with form to rate business"""
-    # converts id from yelp_id to business_id if applicable, then returns appropriate object
-    business_info = helper.return_business_object(helper.find_bus_id(business))
+@app.route('/info/<string:business_id>')
+def info(business_id):
+    validated_id = helper.find_bus_id(business_id)
+    haven_bus_data = Business.query.get(validated_id)
+    yelp_bus_data = helper.yelp_by_id(haven_bus_data.yelp_id)
 
-    return render_template('rating-form.html',
-                           business_name=business_info.name,
-                           business_id=business,
+    # updates local db with info from yelp
+    helper.validate_db(yelp_bus_data, haven_bus_data)
+
+    # gets new validated info
+    haven_bus_data = Business.query.get(validated_id)
+    haven_ratings = helper.get_aggregate_rating(haven_bus_data)
+
+    return render_template('business.html',
+                           score=haven_ratings[0],
+                           total_ratings=haven_ratings[1],
+                           yelp_bus_data=yelp_bus_data,
+                           keys=helper.KEYS,
                            user=session.get("user_name"))
 
 
-@app.route('/info/:business/rate', methods=['POST'])
-def submit_review(business):
+
+
+@app.route('/info/<string:business_id>/rate', methods=['GET'])
+def rate(business_id):
+    """presents user with form to rate business"""
+    # converts id from yelp_id to business_id if applicable, then returns appropriate object
+    validated_id = helper.find_bus_id(business_id)
+    business_model = helper.return_business_model(validated_id)
+    yelp_id = business_model.yelp_id
+
+    return render_template('rating-form.html',
+                           yelp_id=yelp_id or None,
+                           business_name=business_model.name,
+                           business_id=validated_id,
+                           user=session.get("user_name"),
+                           keys=helper.KEYS)
+
+
+@app.route('/info/<string:business_id>/rate', methods=['POST'])
+def submit_review(business_id):
     """submits review and redirects back to the business page"""
     # determines whether business in url is from yelp API or local only
     form_data = request.form
-    user_id = session['user_id']
-    helper.add_rating(form_data, business, user_id)
+    # flashes success messsage
+    flash(helper.add_rating(form_data, business_id))
 
     # todo add flash "your rating has been submitted"
-    return redirect("/info/:business")
+
+    return redirect("/info/" + business_id)
 
 
-@app.route('/:username/manage')
+@app.route('/<string:username>/manage')
 def account_manage(username):
     """allows update of user information. Requires new login"""
     return render_template('construction.html',
                            keys=helper.KEYS,
                            user=session.get("user_name"))
+
+
+@app.route('/<string:username>/favorites')
+def favorites(username):
+    """user favorites"""
+    return render_template('construction.html',
+                           keys=helper.KEYS,
+                           user=session.get("user_name"))
+
 
 
 if __name__ == '__main__':

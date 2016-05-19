@@ -1,0 +1,39 @@
+{#receives haven_bus_data and yelp_bus_data#}
+
+{% extends 'base.html'%}
+{% block body %}
+    <div id="info-bus">
+    <h1 id="info-bus-name">{{ yelp_bus_data['name'] }}</h1>
+    {% if yelp_bus_data['image_url'] %}
+        <img src={{ yelp_bus_data['image_url'] }}>
+    {% endif %}
+
+    {% if yelp_bus_data['location'].get('display_address') %}
+        <div id="info-bus-address">
+        {% for line in yelp_bus_data['location']['display_address'] %}
+            <p>{{ line }}</p>
+        {% endfor %}
+        </div>
+    {% endif %}
+    {% if yelp_bus_data.get('display_phone') %}
+        <p id="info-bus-address-1">{{ yelp_bus_data['display_phone'] }}</p>
+    {% endif %}
+    </div>
+    <div id="info-haven-details"></div>
+        <h2>Haven Says:</h2>
+        <p id="info-haven-score">Inclusivity score: {{ score }} out of {{ total_ratings }} ratings</p>
+        <p> Most recent review and GOES HERE</p>
+        <a href="/info/{{ yelp_bus_data['id'] }}/ratings"><button>More ratings</button></a>
+    </div>
+
+    <div id="info-yelp-ratings-detail">
+        <h2>Yelp Says:</h2>
+        <p id="info-yelp-aggr-score">Overall Rating:{{ yelp_bus_data['rating'] }}</p>
+        <div id="info-yelp-review">
+        <p id="info-yelp-ind-score">Score: {{ yelp_bus_data['reviews'][0]['rating'] }}</p>
+        <p id="info-yelp-snippet">Review: {{ yelp_bus_data['reviews'][0]['excerpt'] }}</p>
+        <a href={{ yelp_bus_data['url'] }}><button>See more at Yelp!</button></a>
+        </div>
+    </div>
+    <a href="/info/{{ yelp_bus_data['id'] }}/rate"><button id="rate-business-btn">Add a rating</button></a>
+{% endblock %}

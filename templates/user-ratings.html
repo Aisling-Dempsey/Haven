@@ -2,12 +2,12 @@
 {% block body %}
     <h1>Your reviews</h1>
     {% for rating in ratings %}
-        <a href="/info/{{ rating }}"{{ ratings[rating]['business_name'] }}
-        <p>{{ ratings[rating]['score'] }}</p>
+        <a href="/info/{{ rating }}">{{ ratings[rating]['business_name'] }}</a>
+        <p>Your Score:{{ ratings[rating]['score'] }}</p>
 
         {# todo: check this out once rating implementation exists#}
         {% if ratings[rating].get('review') %}
-            <p>{{ ratings[rating]['review'] }}</p>
+            <p>Your review:{{ ratings[rating]['review'] }}</p>
         {% endif %}
         <p>Reviewed at {{ ratings[rating]['created_at']}}</p>
 

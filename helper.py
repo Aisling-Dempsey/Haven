@@ -1,5 +1,5 @@
 import requests
-from models import Business, Rating, User, Category
+from models import Business, Rating, User, Category, BusinessCategory
 from yelpapi import YelpAPI
 from flask import session, request, jsonify
 import os
@@ -34,7 +34,6 @@ def login(payload):
     # checks if user exists and then compares passwords. if they match, logs in user and sets session variables
     if db_user:
         if password == db_user.password:
-            # todo check if correct way to store session values, currently pseudocode
             session['user_id'] = db_user.user_id
             session['user_name'] = db_user.name
 
@@ -45,7 +44,7 @@ def login(payload):
 
     else:
         return "That username does not exist"
-
+# todo fail quick
 
 def add_user(payload):
     """Takes form information as a dictionary and creates user account if it doesn't already exist"""
@@ -128,16 +127,16 @@ def add_business(info):
                     db.session.add(category)
             db.session.commit()
 
-    # addd categories and business id to reference tables
+    # adds categories and business id to reference tables
     for cat in cat_list:
         # creates row in reference table
-        catbus = Business_category()
+        catbus = BusinessCategory()
 
         catbus.business_id = business.business_id
         cat_object = Category.query.filter_by(category_name=cat).first()
         catbus.category_id = cat_object.category_id
 
-        if not Business_category.query.filter_by(business_id=catbus.business_id, category_id=catbus.category_id):
+        if not BusinessCategory.query.filter_by(business_id=catbus.business_id, category_id=catbus.category_id):
             db.session.add(catbus)
     db.session.commit()
 
@@ -156,9 +155,77 @@ def find_bus_id(id_to_check):
         return result.business_id
 
 
-def return_business_object(business_id):
-    """returns the business object using the business_id. Often paired with find_bus_id(id_to_check)"""
+def return_business_model(business_id):
+    """returns the business model using the business_id. Often paired with find_bus_id(id_to_check)"""
     return Business.query.get(business_id)
+
+
+def get_aggregate_rating(business):
+    """takes business model and returns aggregate score and number of ratings as a tuple"""
+
+    haven_ratings = business.ratings
+
+    # todo refactor to helper function
+    scores = []
+    # todo list comprehension
+    for rating in haven_ratings:
+        scores.append(rating.score)
+    total_score = 0
+    score_count = 0
+    for score in scores:
+        total_score += score
+        score_count += 1
+    # TODO: check for divide by zero
+    return round(total_score / float(score_count), 2), score_count
+
+
+def validate_db(yelp_object, haven_model):
+    """takes the result of a yelp query by businesses id and compares it to the database entry. If any information
+     on the local db is out of date, it is updated accordingly."""
+
+    # todo, check if exists, then set. commit all at the end.
+    # todo try and refactor to use both for add and validation
+    # idea: run query for haven_model inside and check if is none?
+
+    if haven_model.name != yelp_object['name']:
+        haven_model.name = yelp_object['name']
+        db.session.commit()
+
+    if yelp_object['location'].get('address'):
+        if len(yelp_object['location']['address']) > 1:
+            if haven_model.address_line_2 != yelp_object['location']['address'][1]:
+                haven_model.address_line_2 = yelp_object['location']['address'][1]
+        if haven_model.address_line_1 != yelp_object['location']['address'][0]:
+            haven_model.address_line_1 = yelp_object['location']['address'][0]
+        db.session.commit()
+
+    # nothing in local db should not have a city and state code but if for some reason yelp wiped them, it prevents it
+    # from being cleared, protecting db integrity
+    if haven_model.city != yelp_object['location']['city'] and yelp_object['location'].get('city') is not None:
+        haven_model.city = yelp_object['location']['city']
+        db.session.commit()
+
+    if haven_model.state != yelp_object['location']['state_code'] and yelp_object['location'].get('state_code') \
+            is not None:
+        haven_model.state = yelp_object['location']['state_code']
+        db.session.commit()
+
+    if yelp_object['location'].get('postal_code'):
+        if haven_model.zipcode != yelp_object['location']['postal_code']:
+            haven_model.zipcode = yelp_object['location']['postal_code']
+        db.session.commit()
+
+    if yelp_object.get('phone'):
+        if haven_model.phone != yelp_object['phone']:
+            haven_model.phone = yelp_object['phone']
+        db.session.commit()
+
+    if yelp_object['location'].get('coordinate'):
+        if haven_model.latitude != yelp_object['location']['coordinate']['latitude']:
+            haven_model.latitude = yelp_object['location']['coordinate']['latitude']
+        if haven_model.longitude != yelp_object['location']['coordinate']['longitude']:
+            haven_model.longitude = yelp_object['location']['coordinate']['longitude']
+        db.session.commit()
 
 
 def splash_query(term, location, offset):
@@ -178,6 +245,8 @@ def splash_query(term, location, offset):
         # loops through yelp results to see if they exist in db, checking if there are less than 10 matching
         # results so far.
         for result in results['businesses']:
+            # todo 'for result in yieldstuff, build stuff to handle exception'
+
             if len(company_info) < 10:
                 yelp_id = result['id']
                 offset += 1
@@ -190,23 +259,12 @@ def splash_query(term, location, offset):
                     photo = result['image_url']
                     category = business.categories[0].category_name
                     yelp_rating = result['rating']
-                    haven_ratings = business.ratings
-
-                    scores = []
-                    for rating in haven_ratings:
-                        scores.append(rating.score)
-                    total_score = 0
-                    score_count = 0
-                    for score in scores:
-                        total_score += score
-                        score_count += 1
-
-                    haven_score = total_score / float(score_count)
+                    ratings = get_aggregate_rating(business)
 
                     company_info[yelp_id] = {'photo': photo,
                                              'yelp_score': yelp_rating,
-                                             'score': round(haven_score, 2)
-                                             'total_ratings': score_count,
+                                             'score': ratings[0],
+                                             'total_ratings': ratings[1],
                                              'name': name,
                                              'category': category}
 
@@ -223,29 +281,39 @@ def splash_query(term, location, offset):
 
     return term, offset, company_info, total_results
 
-def add_rating(form_data, business, user_id):
+# todo look into me as a means of simplifying structure
+# def yieldstuff():
+#     while true:
+#         results = yelp_api.search_query(term=term, location=location, offset=offset)
+#         for
+
+def add_rating(form_data, unknown_id):
     """adds a rating form data and business_id"""
-    business_id = find_bus_id(business)
+    # sterilizes the id to return haven business_id regardless of whether it receives yelp_id or haven id
+    business_id = find_bus_id(unknown_id)
     score = int(form_data.get("score"))
     review = form_data.get("review")
     created_at = datetime.now()
 
     rating = Rating(business_id=business_id,
-                    user_id=user_id,
+                    user_id=session['user_id'],
                     score=score,
-                    review=review,
                     created_at=created_at)
+    if review:
+        rating.review = review
 
     db.session.add(rating)
     db.session.commit()
 
+    return "Your rating has been added!"
 
-def example_data():
+
+def _example_data():
     """Create some sample data."""
 
     # In case this is run more than once, empty out existing data
     Rating.query.delete()
-    Business_category.query.delete()
+    BusinessCategory.query.delete()
     Business.query.delete()
     Category.query.delete()
     User.query.delete()
@@ -260,7 +328,7 @@ def example_data():
 
     liz = User(user_id=999, name='Liz', email='liz@liz.com', password='liz_pass')
     leonard = User(user_id=998, name='Leonard', email='leonard@leonard.com', password='leonard_pass')
-    leslie= User(user_id=997, name='Leslie', email='leslie@leslie.com', password='leslie_pass')
+    leslie = User(user_id=997, name='Leslie', email='leslie@leslie.com', password='leslie_pass')
 
     db.session.add_all([hackbright, estellas, piraat, leonard, liz, leslie])
     db.session.commit()
@@ -283,11 +351,11 @@ def example_data():
 
     # add links between categories and businesses to reference table
 
-    hackbright_link_1 = Business_category(cat_bus_id=999, business_id=999, category_id=999)
-    hackbright_link_2 = Business_category(cat_bus_id=998, business_id=999, category_id=998)
+    hackbright_link_1 = BusinessCategory(cat_bus_id=999, business_id=999, category_id=999)
+    hackbright_link_2 = BusinessCategory(cat_bus_id=998, business_id=999, category_id=998)
 
-    estellas_link_1 = Business_category(cat_bus_id=997, business_id=998, category_id=997)
-    estellas_link_2 = Business_category(cat_bus_id=996, business_id=998, category_id=996)
+    estellas_link_1 = BusinessCategory(cat_bus_id=997, business_id=998, category_id=997)
+    estellas_link_2 = BusinessCategory(cat_bus_id=996, business_id=998, category_id=996)
 
     db.session.add_all([hackbright_link_1, hackbright_link_2, estellas_link_1, estellas_link_2])
     db.session.commit()

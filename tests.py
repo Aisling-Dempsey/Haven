@@ -35,7 +35,7 @@ class FlaskTestsDatabase(TestCase):
 
         # Create tables and add sample data
         db.create_all()
-        helper.example_data()
+        helper._example_data()
 
         app.config['TESTING'] = True
         app.config['SECRET_KEY'] = 'Aisling'
