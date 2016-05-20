@@ -2,7 +2,7 @@
 
 from helper import yelp_api
 from sys import argv
-from models import Business, Business_category, Category, db, connect_to_db
+from models import Business, BusinessCategory, Category, db, connect_to_db
 from flask_sqlalchemy import SQLAlchemy
 
 
@@ -79,7 +79,7 @@ def build_db(city, state):
 
                     for cat in cat_list:
                         # creates row in reference table
-                        catbus = Business_category()
+                        catbus = BusinessCategory()
 
                         catbus.business_id = bus_id
 

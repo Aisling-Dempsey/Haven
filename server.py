@@ -73,6 +73,7 @@ def logout():
     flash("You are now logged out")
     return redirect('/')
 
+
 @app.route('/create-account', methods=['GET'])
 def acct_creation():
     """account creation page"""
@@ -104,18 +105,21 @@ def results():
     term = request.args['term']
     location = ", ".join([helper.current_loc()['city'], helper.current_loc()['region_code']])
     offset = 0
+    sort = int(request.args['sort'])
+    print sort
 
-    result = helper.splash_query(term, location, offset)
-
+    cutoff = float(request.args['haven-cutoff'])
+    result = helper.build_results(term, location, offset, sort, cutoff)
 
     return render_template('results.html',
                            term=term,
                            location=location,
                            keys=helper.KEYS,
+                           cutoff=cutoff,
                            user=session.get("user_name"),
                            businesses=result[2],
                            offset=result[1],
-                           total=result[3])
+                           sort=sort)
 
 
 @app.route('/results.json')
@@ -123,12 +127,15 @@ def more_results():
     print request.args
     term = request.args['term']
     offset = int(request.args['offset'])
+    sort = int(request.args['sort'])
+    cutoff = float(request.args['cutoff'])
     location = ", ".join([helper.current_loc()['city'], helper.current_loc()['region_code']])
-    result = helper.splash_query(term, location, offset)
+    result = helper.build_results(term, location, offset, sort, cutoff)
     output = {'term': result[0],
               'offset': result[1],
               'businesses': result[2],       # dictionary of objects not json serializable
-              'total_results': result[3]
+              'cutoff': cutoff,
+              'sort': sort
               }
 
     return jsonify(output)

@@ -3,7 +3,7 @@
  */
 
 //this script relies on jquery
-function displayResults(result){
+function displayResults(result) {
     console.log('calling display results');
     var offset = result['offset'];
     // var total = result['total_results'];
@@ -11,50 +11,53 @@ function displayResults(result){
     var businesses = result['businesses'];
     console.log(businesses);
     var term = result['term'];
-    console.log($('#search-results'));
+    var sort = result['sort'];
+    var cutoff = result['cutoff'];
     $('#search-results').empty();
 
     //if something breaks, this is probably why
 
+    var resultNum = 0
     //todo add link to result
-    for (var yelp_id in businesses){
+    for (var yelp_id in businesses) {
         console.log(yelp_id);
         var name = businesses[yelp_id]['name'];
         var category = businesses[yelp_id]['category'];
 
         var address1 = businesses[yelp_id]['address_line_1'] || undefined;
-        var address2 = businesses[yelp_id]['address_line_2']  || undefined;
-        
+        var address2 = businesses[yelp_id]['address_line_2'] || undefined;
+
         var yelpRating = businesses[yelp_id]['yelp_score'];
         var havenRating = businesses[yelp_id]['score'];
         var havenCount = businesses[yelp_id]['total_ratings'];
-        console.log(havenCount)
+        console.log(havenCount);
         var photo = businesses[yelp_id]['photo'];
 
 
         var container = $("<div>");
-            container.attr(
-                "class", "result");
-            
+        container.attr(
+            "id", "result" + resultNum);
+        $('#search-results').append(container);
+
         var image = $("<img>");
-            image.attr({
-                src: photo,
-                class: "result-photos"
-            });
-        $('.result').append(image);
+        image.attr({
+            src: photo,
+            class: "result-photos"
+        });
+        $('#result'+resultNum).append(image);
 
         var result_name = $('<p>');
-            result_name.attr(
-                'class', "result-name")
-                .html(name);
-        $('.result').append(result_name);
+        result_name.attr(
+            'class', "result-name")
+            .html(name);
+        $('#result'+resultNum).append(result_name);
 
-        if (address1 !== undefined){
+        if (address1 !== undefined) {
             var streetAddress1 = $('<p>');
-                streetAddress1.attr(
-                    'class' ,"street-1")
-                    .html(address1);
-            $('.result').append(streetAddress1);
+            streetAddress1.attr(
+                'class', "street-1")
+                .html(address1);
+            $('#result'+resultNum).append(streetAddress1);
         }
 
         if (address2 !== undefined) {
@@ -63,31 +66,33 @@ function displayResults(result){
                 'class', "street-2")
                 .html(address2);
 
-            $('.result').append(streetAddress2);
+            $('#result'+resultNum).append(streetAddress2);
         }
 
-            var yelpScore = $('<p>');
-                yelpScore.attr(
-                    "class", 'yelp-score')
-                    .html(yelpRating);
-            $('.result').append(yelpScore);
+        var yelpScore = $('<p>');
+        yelpScore.attr(
+            "class", 'yelp-score')
+            .html(yelpRating);
+        $('#result'+resultNum).append(yelpScore);
 
         var haven = $('<p>');
-            haven.attr(
-                'class', 'haven-rating')
-                .html(havenRating + " out of " +  havenCount + " ratings");
+        haven.attr(
+            'class', 'haven-rating')
+            .html(havenRating + " out of " + havenCount + " ratings");
 
-        $('.result').append(haven);
+        $('#result'+resultNum).append(haven);
 
-        $('#search-results').append(container)
+
+
 
     }
-
     var btn = $('<button>');
         btn.attr({
             'class': 'search-more-btn',
             'data-term': term,
-            'data-offset': offset}).append("More results...");
+            'data-offset': offset,
+            'data-sort': sort,
+            'data-cutoff': cutoff}).append("More results...");
         $('#search-results').append(btn);
 
 
@@ -96,7 +101,9 @@ function displayResults(result){
 function moreResults(evt) {
     // console.log('yooooooo');
     var input = {'term': $(this).data("term"),
-                'offset': $(this).data("offset")
+                'offset': $(this).data("offset"),
+                'sort': $(this).data("sort"),
+                'cutoff': $(this).data("cutoff")
                 };
     $.get("/results.json", input, displayResults);
 

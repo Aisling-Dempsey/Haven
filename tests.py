@@ -3,6 +3,7 @@ import helper
 from server import app
 from models import db, Rating, User, Business, Business_category
 
+
 class TestCase(unittest.TestCase):
 
     def test_current_loc(self):
@@ -17,7 +18,6 @@ class TestCase(unittest.TestCase):
         func = helper.yelp_by_id('hackbright-academy-san-francisco')
         self.assertTrue(type(func) is dict)
         self.assertEqual(func['name'], 'Hackbright Academy')
-
 
 
 class FlaskTestsDatabase(TestCase):

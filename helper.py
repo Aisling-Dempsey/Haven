@@ -73,6 +73,7 @@ def get_ratings(user_id):
 
     return rating_info
 
+
 def current_loc():
     """outputs locational json based upon user ip"""
     r = requests.get("http://freegeoip.net/json/")
@@ -165,18 +166,11 @@ def get_aggregate_rating(business):
 
     haven_ratings = business.ratings
 
-    # todo refactor to helper function
-    scores = []
-    # todo list comprehension
-    for rating in haven_ratings:
-        scores.append(rating.score)
-    total_score = 0
-    score_count = 0
-    for score in scores:
-        total_score += score
-        score_count += 1
+    scores = [rating.score for rating in haven_ratings]
+    total_score = sum(scores)
+    score_count = len(scores)
     # no need for check for 0 because nothing exists in db without a rating.
-    if score_count == 0:
+    # if score_count == 0:
     return round(total_score / float(score_count), 2), score_count
 
 
@@ -201,7 +195,6 @@ def validate_db(yelp_object, haven_model=None):
             haven_model.address_line_2 = yelp_object['location']['address'][1]
 
         haven_model.address_line_1 = yelp_object['location']['address'][0]
-
 
     # nothing in local db should not have a city and state code but if for some reason yelp wiped them, it prevents it
     # from being cleared, protecting db integrity
@@ -230,64 +223,78 @@ def validate_db(yelp_object, haven_model=None):
             return None
 
 
-def splash_query(term, location, offset):
-    """takes search term, location (in city, state format) and offset.
-        returns a tuple in the format (term, offset, company_info, total results) where
+def yelp_generator(term, location, offset, sort):
+    results = yelp_api.search_query(term=term, location=location, offset=offset, sort=sort)
+    while offset < results['total']:
+        for result in results['businesses']:
+            offset += 1
+            yield result, offset
+        results = yelp_api.search_query(term=term, location=location, offset=offset, sort=sort)
+
+
+def build_results(term, location, offset, sort, cutoff):
+    """takes search term, location (in city, state format) and offset, sort method, and cutoff point.
+        returns a tuple in the format (term, offset, company_info, sort, cutoff) where
         company_info is a dict}
     """
-
-    results = yelp_api.search_query(term=term, location=location, offset=offset)
-    total_results = results['total']
+    result = yelp_generator(term, location, offset, sort)
     # loops through the displayed businesses and gives each one a sub dict with a key of the yelp id
     # while there are less than 10 results with an entry in the local db, loops through results and adds
     # any businesses with a haven review to a list by yelp_ids.
     company_info = {}
-    # tries to build dict of 10 buesinesses, if less than 10, outputs availbable businesses.
-    while len(company_info) < 10 and offset < total_results:
-        # loops through yelp results to see if they exist in db, checking if there are less than 10 matching
-        # results so far.
-        for result in results['businesses']:
-            # todo 'for result in yieldstuff, build stuff to handle exception'
+    # tries to build dict of 10 businesses, if less than 10, outputs available businesses.
 
-            if len(company_info) < 10:
-                yelp_id = result['id']
-                offset += 1
-                print "\n"
-                print "looping through", offset
+    while len(company_info) < 10:
+        print "\n"
+        print "cutoff:", cutoff
+        print "cutoff type:", type(cutoff)
+        next_up = next(result)
+        company = next_up[0]
+        yelp_id = company['id']
+        offset = next_up[1]
+        # debug console printing
+        print "looping through", offset
 
-                business = Business.query.filter_by(yelp_id=yelp_id).first()
-                if business:
-                    name = business.name
-                    photo = result['image_url']
-                    category = business.categories[0].category_name
-                    yelp_rating = result['rating']
-                    ratings = get_aggregate_rating(business)
+        business = Business.query.filter_by(yelp_id=yelp_id).first()
+        if business:
+            ratings = get_aggregate_rating(business)
+            print "rating: ", ratings[0]
+            if ratings[0] < cutoff:
+                continue
 
-                    company_info[yelp_id] = {'photo': photo,
-                                             'yelp_score': yelp_rating,
-                                             'score': ratings[0],
-                                             'total_ratings': ratings[1],
-                                             'name': name,
-                                             'category': category}
+            name = business.name
+            print "name:", name
+            photo = company['image_url']
+            category = business.categories[0].category_name
+            yelp_rating = company['rating']
+            ratings = get_aggregate_rating(business)
 
-                    if business.address_line_1:
-                        company_info[yelp_id]['address_line_1'] = business.address_line_1
+            company_info[yelp_id] = {'photo': photo,
+                                     'yelp_score': yelp_rating,
+                                     'score': ratings[0],
+                                     'total_ratings': ratings[1],
+                                     'name': name,
+                                     'category': category}
 
-                    if business.address_line_2:
-                        company_info[yelp_id]['address_line_2'] = business.address_line_2
+            if business.address_line_1:
+                company_info[yelp_id]['address_line_1'] = business.address_line_1
 
-            else:
-                return term, offset, company_info, total_results
+            if business.address_line_2:
+                company_info[yelp_id]['address_line_2'] = business.address_line_2
 
-        results = yelp_api.search_query(term=term, location=location, offset=offset)
+        print "businesses in dict:", len(company_info)
 
-    return term, offset, company_info, total_results
+    return term, offset, company_info, sort
+
+
+
 
 # todo look into me as a means of simplifying structure
-# def yieldstuff():
+# def next_business(results):
 #     while true:
 #         results = yelp_api.search_query(term=term, location=location, offset=offset)
 #         for
+
 
 def add_rating(form_data, unknown_id):
     """adds a rating form data and business_id"""
