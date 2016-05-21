@@ -46,6 +46,7 @@ def login(payload):
         return "That username does not exist"
 # todo fail quick
 
+
 def add_user(payload):
     """Takes form information as a dictionary and creates user account if it doesn't already exist"""
     email = payload['email']
@@ -81,10 +82,9 @@ def current_loc():
     return location
 
 
-def yelp_by_id(yelp_ID):
+def yelp_by_id(yelp_id):
     """returns a dictionary of yelp information using the Yelp ID"""
-    return yelp_api.business_query(id=yelp_ID)
-
+    return yelp_api.business_query(id=yelp_id)
 
 
 def add_business(info):
@@ -158,7 +158,7 @@ def find_bus_id(id_to_check):
 
 def return_business_model(business_id):
     """returns the business model using the business_id. Often paired with find_bus_id(id_to_check)"""
-    return Business.query.get(business_id)
+    return Business.query.filter_by(business_id=business_id).first()
 
 
 def get_aggregate_rating(business):
@@ -177,10 +177,6 @@ def get_aggregate_rating(business):
 def validate_db(yelp_object, haven_model=None):
     """takes the result of a yelp query by businesses id and compares it to the database entry. If any information
      on the local db is out of date, it is updated accordingly. Will also create new db if the haven_model is none"""
-
-    # todo, check if exists, then set. commit all at the end.
-    # todo try and refactor to use both for add and validation
-    # idea: run query for haven_model inside and check if is none?
 
     new = False
 
@@ -216,7 +212,7 @@ def validate_db(yelp_object, haven_model=None):
 
         try:
             if new:
-                 db.session.add(haven_model)
+                db.session.add(haven_model)
             db.session.commit()
             return ""
         except:
@@ -261,13 +257,13 @@ def build_results(term, location, offset, sort, cutoff):
             print "rating: ", ratings[0]
             if ratings[0] < cutoff:
                 continue
-
             name = business.name
             print "name:", name
             photo = company['image_url']
+            # todo use list comprehension to update both categories to a list of the first elements, then loop through
+            # while building element in html
             category = business.categories[0].category_name
             yelp_rating = company['rating']
-            ratings = get_aggregate_rating(business)
 
             company_info[yelp_id] = {'photo': photo,
                                      'yelp_score': yelp_rating,
@@ -281,19 +277,27 @@ def build_results(term, location, offset, sort, cutoff):
 
             if business.address_line_2:
                 company_info[yelp_id]['address_line_2'] = business.address_line_2
+        else:
+            name = company['name']
+            photo = company['image_url']
+            category = company['categories'][0][0]
+            yelp_rating = company['rating']
+
+
+            # todo able to refactor to only declare once and only add the score and total_ratings as part of prior if?
+            company_info[yelp_id] = {'photo': photo,
+                                     'yelp_score': yelp_rating,
+                                     'name': name,
+                                     'category': category}
+
+            if company['location'].get('address'):
+                company_info[yelp_id]['address_line_2'] = company['location']['address'][0]
+                if len(company['location']['address']) > 1:
+                    company_info[yelp_id]['address_line_2'] = company['location']['address'][1]
 
         print "businesses in dict:", len(company_info)
 
     return term, offset, company_info, sort
-
-
-
-
-# todo look into me as a means of simplifying structure
-# def next_business(results):
-#     while true:
-#         results = yelp_api.search_query(term=term, location=location, offset=offset)
-#         for
 
 
 def add_rating(form_data, unknown_id):
@@ -330,7 +334,7 @@ def _example_data():
     # Add sample businesses and users
     hackbright = Business(business_id=999, yelp_id='hackbright-academy-san-francisco',
                           name='Hackbright Academy', city='San Francisco', state='CA')
-    estellas = Business(business_id = 998, yelp_id='estelas-fresh-sandwiches-san-francisco',
+    estellas = Business(business_id=998, yelp_id='estelas-fresh-sandwiches-san-francisco',
                         name='Estella\'s', city='San Francisco', state='CA')
     # listing without yelp_id
     piraat = Business(business_id = 997, name='Piraat', city='San Francisco', state='CA')

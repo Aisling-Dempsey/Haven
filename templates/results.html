@@ -14,15 +14,17 @@
             <p>{{ businesses[yelp_id]['address_line_2'] }}</p>
         {% endif %}
 
-
         <p>{{ businesses[yelp_id]['yelp_score'] }}</p>
+        {% if businesses[yelp_id].get('score') %}
+            <p>{{ businesses[yelp_id]['score'] }} over {{ businesses[yelp_id]['total_ratings'] }} ratings</p>
+        {% else %}
+            <a>Nobody has rated this business, be the first!</a>
 
-        <p>{{ businesses[yelp_id]['score'] }} over {{ businesses[yelp_id]['total_ratings'] }} ratings</p>
-
+        {% endif %}
         <p>{{ businesses[yelp_id]['category']}}</p>
-
+        {% endfor %}
     </div></a>
-    {% endfor %}
+
 
 
 

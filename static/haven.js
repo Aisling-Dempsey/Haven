@@ -14,9 +14,7 @@ function displayResults(result) {
     var sort = result['sort'];
     var cutoff = result['cutoff'];
     $('#search-results').empty();
-
-    //if something breaks, this is probably why
-
+    
     var resultNum = 0
     //todo add link to result
     for (var yelp_id in businesses) {

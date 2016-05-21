@@ -122,6 +122,24 @@ def results():
                            sort=sort)
 
 
+# todo convert to ajax
+@app.route('/business-results')
+def yelp_only_results():
+    term = request.args['term']
+    location = ", ".join([helper.current_loc()['city'], helper.current_loc()['region_code']])
+    offset = 0
+    result = helper.build_results(term, location, offset, 0, 0)
+    return render_template('results.html',
+                           term=term,
+                           location=location,
+                               keys=helper.KEYS,
+                           cutoff=0,
+                           user=session.get("user_name"),
+                           businesses=result[2],
+                           offset=result[1],
+                           sort=0)
+
+
 @app.route('/results.json')
 def more_results():
     print request.args
@@ -171,16 +189,19 @@ def explore():
 
 @app.route('/info/<string:business_id>')
 def info(business_id):
-    validated_id = helper.find_bus_id(business_id)
-    haven_bus_data = Business.query.get(validated_id)
-    yelp_bus_data = helper.yelp_by_id(haven_bus_data.yelp_id)
+    # if it exists in local db, gets object, if not, returns none.
+    haven_bus_data = Business.query.filter_by(yelp_id=business_id).first()
+    yelp_bus_data = helper.yelp_by_id(business_id)
+    haven_ratings = [None, None]
 
-    # updates local db with info from yelp
-    helper.validate_db(yelp_bus_data, haven_bus_data)
+    # updates local db with info from yelp if it is in DB
+    if haven_bus_data is not None:
+        helper.validate_db(yelp_bus_data, haven_bus_data)
 
-    # gets new validated info
-    haven_bus_data = Business.query.get(validated_id)
-    haven_ratings = helper.get_aggregate_rating(haven_bus_data)
+        # gets new validated info
+        haven_bus_data = Business.query.filter_by(yelp_id=business_id).first()
+        haven_ratings = helper.get_aggregate_rating(haven_bus_data)
+    #     todo add haven review and score
 
     return render_template('business.html',
                            score=haven_ratings[0],
@@ -235,6 +256,15 @@ def favorites(username):
     return render_template('construction.html',
                            keys=helper.KEYS,
                            user=session.get("user_name"))
+
+
+@app.route('/add-ratings')
+def business_search_form():
+    """Form for searching for yelp businesses to add ratings"""
+    return render_template('business-search.html',
+                           keys=helper.KEYS,
+                           user=session.get("user_name"))
+
 
 
 

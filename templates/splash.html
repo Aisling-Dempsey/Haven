@@ -7,9 +7,9 @@
         <a href="/logout">Logout</a><
     {% else %}
         <a href="/login">Login</a>
-        <a href="/create-account">Create-account</a>
+        <button href="/create-account">Create-account</button>
     {% endif %}
-
+    <a href="/add-ratings"><button>Add a rating</button></a>
     <form action="/results" method="GET">
         <!--todo figure out how to get required to ignore placeholder -->
         <input type="search" id='search-field' name="term" placeholder="Enter a business name or category" required>
@@ -24,8 +24,7 @@
              <input type="range" name="haven-cutoff" min="-2" max="2" value="3" step=".5">
 
          </div>
-        <input type="submit" id='search-btn' data-offset=10
-                value="Find me something good!">
+        <input type="submit" id='search-btn' value="Find me something good!">
     </form>
     <div id="results">
     </div>
