@@ -128,12 +128,13 @@ def yelp_only_results():
     term = request.args['term']
     location = ", ".join([helper.current_loc()['city'], helper.current_loc()['region_code']])
     offset = 0
-    result = helper.build_results(term, location, offset, 0, 0)
+    cutoff = None
+    result = helper.build_results(term, location, offset, 0, cutoff)
     return render_template('results.html',
                            term=term,
                            location=location,
-                               keys=helper.KEYS,
-                           cutoff=0,
+                           keys=helper.KEYS,
+                           cutoff=cutoff,
                            user=session.get("user_name"),
                            businesses=result[2],
                            offset=result[1],
@@ -146,7 +147,10 @@ def more_results():
     term = request.args['term']
     offset = int(request.args['offset'])
     sort = int(request.args['sort'])
-    cutoff = float(request.args['cutoff'])
+    if request.args['cutoff'] != 'None':
+        cutoff = float(request.args['cutoff'])
+    else:
+        cutoff = None
     location = ", ".join([helper.current_loc()['city'], helper.current_loc()['region_code']])
     result = helper.build_results(term, location, offset, sort, cutoff)
     output = {'term': result[0],

@@ -20,9 +20,9 @@
     {% endif %}
     </div>
     <div id="info-haven-details"></div>
-        {% if score is not None %}
+        {% if score is not none %}
             <h2>Haven Says:</h2>
-            <p id="info-haven-score">Inclusivity score: {{ score }} out of {{ total_ratings }} ratings</p>
+            <p id="info-haven-score">Inclusivity score: {{ score +2 }} out of {{ total_ratings }} ratings</p>
             <p> Most recent review and GOES HERE</p>
             <a href="/info/{{ yelp_bus_data['id'] }}/ratings"><button>More ratings</button></a>
         {% else %}

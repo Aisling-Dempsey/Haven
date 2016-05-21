@@ -241,63 +241,86 @@ def build_results(term, location, offset, sort, cutoff):
     # tries to build dict of 10 businesses, if less than 10, outputs available businesses.
 
     while len(company_info) < 10:
-        print "\n"
-        print "cutoff:", cutoff
-        print "cutoff type:", type(cutoff)
-        next_up = next(result)
+        # print "\n"
+        # print "cutoff:", cutoff
+        # print "cutoff type:", type(cutoff)
+        try:
+            next_up = next(result)
+        except StopIteration:
+            break
+        # print next_up
         company = next_up[0]
-        yelp_id = company['id']
+        # yelp_id = company['id']
         offset = next_up[1]
         # debug console printing
         print "looping through", offset
+        # feeds
+        entry = build_query_result(company)
+        business = Business.query.filter_by(yelp_id=entry.keys()[0]).first()
+        yelp_id = entry.keys()[0]
+        print "\n"
+        print 'cutoff', cutoff
+        # checks if there is a cutoff and outputs results with local scores above cutoff.
+        if cutoff is not None:   #this doesn't work if you don't state "is not None"
+            print 'got past cutoff if'
+            if business:
+                # print business()
+                ratings = get_aggregate_rating(business)
+                print 'name:', business.name
+                if ratings[0] < cutoff:
 
-        business = Business.query.filter_by(yelp_id=yelp_id).first()
-        if business:
-            ratings = get_aggregate_rating(business)
-            print "rating: ", ratings[0]
-            if ratings[0] < cutoff:
+                    print 'rating:', ratings[0]
+                    print 'cutoff:', cutoff
+                    print "rating too low, skipping"
+                    continue
+
+                else:
+                    print "added to company info"
+                    company_info[yelp_id] = entry[yelp_id]
+                    company_info[yelp_id]['score'] = ratings[0]
+                    company_info[yelp_id]['total_ratings'] = ratings[1]
+                    print len(company_info)
+                    print company_info
+            else:
                 continue
-            name = business.name
-            print "name:", name
-            photo = company['image_url']
-            # todo use list comprehension to update both categories to a list of the first elements, then loop through
-            # while building element in html
-            category = business.categories[0].category_name
-            yelp_rating = company['rating']
 
-            company_info[yelp_id] = {'photo': photo,
-                                     'yelp_score': yelp_rating,
-                                     'score': ratings[0],
-                                     'total_ratings': ratings[1],
-                                     'name': name,
-                                     'category': category}
+        # for queries with no cutoff, shows local ratings
+        elif business:
+            print "triggered elif"
+            company_info[yelp_id] = entry[entry.keys()[0]]
+            ratings = get_aggregate_rating(business)
+            company_info[yelp_id]['score'] = ratings[0]
+            company_info[yelp_id]['total_ratings'] = ratings[1]
 
-            if business.address_line_1:
-                company_info[yelp_id]['address_line_1'] = business.address_line_1
-
-            if business.address_line_2:
-                company_info[yelp_id]['address_line_2'] = business.address_line_2
+        # for queries with no cutoff and no local ratings, just shows base information
         else:
-            name = company['name']
-            photo = company['image_url']
-            category = company['categories'][0][0]
-            yelp_rating = company['rating']
-
-
-            # todo able to refactor to only declare once and only add the score and total_ratings as part of prior if?
-            company_info[yelp_id] = {'photo': photo,
-                                     'yelp_score': yelp_rating,
-                                     'name': name,
-                                     'category': category}
-
-            if company['location'].get('address'):
-                company_info[yelp_id]['address_line_2'] = company['location']['address'][0]
-                if len(company['location']['address']) > 1:
-                    company_info[yelp_id]['address_line_2'] = company['location']['address'][1]
-
-        print "businesses in dict:", len(company_info)
+            print "no cutoff, displaying everything"
+            company_info[yelp_id] = entry[entry.keys()[0]]
+            print 'name:', company_info[yelp_id]['name']
+            print len(company_info)
 
     return term, offset, company_info, sort
+
+def build_query_result(company):
+    """takes result of yelp query and returns dict of attributes for display"""
+    name = company['name']
+    # todo make me list comprehension
+    categories = ", ".join([category[0] for category in company['categories']])
+    yelp_rating = company['rating']
+    yelp_id = company['id']
+
+    business_info = {yelp_id: {'yelp_score': yelp_rating,
+                               'name': name,
+                               'categories': categories}}
+    if company.get('image_url'):
+        business_info[yelp_id]['photo'] = company['image_url']
+
+    if company['location'].get('address'):
+        business_info[yelp_id]['address_line_1'] = company['location']['address'][0]
+        if len(company['location']['address']) > 1:
+            business_info[yelp_id]['address_line_2'] = company['location']['address'][1]
+
+    return business_info
 
 
 def add_rating(form_data, unknown_id):
