@@ -275,20 +275,6 @@ def view_haven_ratings(business_id):
                            user=session.get("user-name"))
 
 
-@app.route('/<string:username>/manage')
-def account_manage(username):
-    """allows update of user information. Requires new login"""
-    return render_template('construction.html',
-                           keys=helper.KEYS,
-                           user=session.get("user_name"))
-
-
-@app.route('/<string:username>/favorites')
-def favorites(username):
-    """user favorites"""
-    return render_template('construction.html',
-                           keys=helper.KEYS,
-                           user=session.get("user_name"))
 
 
 @app.route('/add-ratings')
@@ -297,6 +283,24 @@ def business_search_form():
     return render_template('business-search.html',
                            keys=helper.KEYS,
                            user=session.get("user_name"))
+
+
+#
+# @app.route('/<string:username>/manage')
+# def account_manage(username):
+#     """allows update of user information. Requires new login"""
+#     return render_template('construction.html',
+#                            keys=helper.KEYS,
+#                            user=session.get("user_name"))
+
+#
+# @app.route('/<string:username>/favorites')
+# def favorites(username):
+#     """user favorites"""
+#     return render_template('construction.html',
+#                            keys=helper.KEYS,
+#                            user=session.get("user_name"))
+
 
 
 if __name__ == '__main__':

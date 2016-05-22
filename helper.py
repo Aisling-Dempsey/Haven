@@ -205,15 +205,14 @@ def validate_db(yelp_object, haven_model=None):
     if yelp_object['location'].get('coordinate'):
         haven_model.latitude = yelp_object['location']['coordinate']['latitude']
         haven_model.longitude = yelp_object['location']['coordinate']['longitude']
-        # fixme not adding to db, new businesses return None with Business.query.filter_by(yelp_id=yelp_id).first()
-        try:
-            if new:
-                db.session.add(haven_model)
-            db.session.commit()
-            print 'successfully added'
+    try:
+        if new:
+            db.session.add(haven_model)
+        db.session.commit()
+        print 'successfully added'
 
-        except:
-            print 'ut-oh'
+    except:
+        print 'ut-oh'
 
 
 def yelp_generator(term, location, offset, sort):
