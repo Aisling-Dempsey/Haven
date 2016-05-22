@@ -205,12 +205,23 @@ def info(business_id):
         # gets new validated info
         haven_bus_data = Business.query.filter_by(yelp_id=business_id).first()
         haven_ratings = helper.get_aggregate_rating(haven_bus_data)
+        review_info = helper.most_recent_review(haven_bus_data)
+
+        recent_score = review_info[0]
+
+        # condenses review if necessary
+        if len(review_info[1]) > 50:
+            recent_review = review_info[1][:50], "..."
+        else:
+            recent_review= review_info[1]
     #     todo add haven review and score
 
     return render_template('business.html',
                            score=haven_ratings[0],
                            total_ratings=haven_ratings[1],
                            yelp_bus_data=yelp_bus_data,
+                           recent_score=recent_score,
+                           recent_review=recent_review,
                            keys=helper.KEYS,
                            user=session.get("user_name"))
 

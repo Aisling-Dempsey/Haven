@@ -16,7 +16,6 @@ function displayResults(result) {
     $('#search-results').empty();
     
     var resultNum = 1;
-    //todo add link to result
     for (var yelp_id in businesses) {
         console.log(yelp_id);
         var name = businesses[yelp_id]['name'];

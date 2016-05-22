@@ -5,7 +5,6 @@
         <a href="/info/{{ rating }}">{{ ratings[rating]['business_name'] }}</a>
         <p>Your Score:{{ ratings[rating]['score'] }}</p>
 
-        {# todo: check this out once rating implementation exists#}
         {% if ratings[rating].get('review') %}
             <p>Your review:{{ ratings[rating]['review'] }}</p>
         {% endif %}

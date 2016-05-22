@@ -304,7 +304,6 @@ def build_results(term, location, offset, sort, cutoff):
 def build_query_result(company):
     """takes result of yelp query and returns dict of attributes for display"""
     name = company['name']
-    # todo make me list comprehension
     categories = ", ".join([category[0] for category in company['categories']])
     yelp_rating = company['rating']
     yelp_id = company['id']
@@ -342,6 +341,20 @@ def add_rating(form_data, unknown_id):
     db.session.commit()
 
     return "Your rating has been added!"
+
+
+def most_recent_review(business):
+    """takes Business model from local db and returns a tuple of the most recent score with a written review, or
+     if there are no written reviews, a tuple with the most recent score and None"""
+    business.ratings.reverse()
+    for rating in business.ratings:
+        if rating.review:
+            return rating.score, rating.review
+        else:
+            pass
+    #     if no written review, returns most recent score
+    return business.ratings[0].score, None
+
 
 
 def _example_data():

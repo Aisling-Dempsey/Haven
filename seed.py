@@ -126,9 +126,9 @@ def seed_rating(filename):
         print time
         if not Rating.query.filter_by(user_id=row[0], business_id=row[1]).first():
             rating = Rating(user_id=row[0], business_id=row[1], score=row[2], created_at=time)
-            try:
+            if row[3] != '':
                 rating.review = row[3]
-            except:
+            else:
                 pass
             try:
                 db.session.add(rating)

@@ -23,7 +23,13 @@
         {% if score is not none %}
             <h2>Haven Says:</h2>
             <p id="info-haven-score">Inclusivity score: {{ score +2 }} out of {{ total_ratings }} ratings</p>
-            <p> Most recent review and GOES HERE</p>
+            {% if recent_review is not none  %}
+                <p>Most recent score with a review: {{ recent_score }}</p>
+{#                fixme outputting '(u'review')'#}
+                <p>Most recent ReviewL {{ recent_review }}</p>
+            {% else %}
+                <p>Most recent score: {{ recent_score }}</p>
+            {% endif %}
             <a href="/info/{{ yelp_bus_data['id'] }}/ratings"><button>More ratings</button></a>
         {% else %}
             <p>No ratings yet. Be the first!</p>

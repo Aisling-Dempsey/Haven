@@ -94,7 +94,7 @@ class Rating(db.Model):
     user = db.relationship("User",
                            backref=db.backref("ratings", order_by=rating_id))
     business = db.relationship("Business",
-                               backref=db.backref("ratings", order_by=rating_id))
+                               backref=db.backref("ratings", order_by=created_at))
 
     def __repr__(self):
         return "<rating_id: %d, user_id %d, business_id %d, score: %d>" % (self.rating_id,
