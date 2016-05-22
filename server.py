@@ -88,14 +88,15 @@ def post_account():
     form_data = request.form
 
     status = helper.add_user(form_data)
-    flash(status)
-#     todo add flash "your account has been created" & "you have been logged in"
+    # flash(status)
     if status == "That username already exists":
-        return render_template('user-add.html',
-                               keys=helper.Keys,
-                               user=session.get("user_name"))
+        return redirect('login')
 
     else:
+        todo
+        add
+        flash
+        "your account has been created" & "you have been logged in"
         return redirect('/')
 
 
@@ -175,7 +176,7 @@ def user_account(username):
 def ratings(username):
     """user ratings"""
     user_id = session['user_id']
-    ratings = helper.get_ratings(user_id)
+    ratings = (helper.get_ratings(user_id))
 
     return render_template('user-ratings.html',
                            keys=helper.KEYS,
@@ -183,12 +184,12 @@ def ratings(username):
                            ratings=ratings)
 
 
-@app.route('/explore')
-def explore():
-    """explore page"""
-    return render_template('construction.html',
-                           keys=helper.KEYS,
-                           user=session.get("user_name"))
+# @app.route('/explore')
+# def explore():
+#     """explore page"""
+#     return render_template('construction.html',
+#                            keys=helper.KEYS,
+#                            user=session.get("user_name"))
 
 
 @app.route('/info/<string:business_id>')
@@ -264,7 +265,7 @@ def submit_review(business_id):
 
 @app.route('/info/<business_id>/ratings')
 def view_haven_ratings(business_id):
-    rating_list = helper.get_business_ratings(business_id)
+    rating_list = reversed(helper.get_business_ratings(business_id))
     business = Business.query.filter_by(yelp_id=business_id).first()
     rating = helper.get_aggregate_rating(business)
     return render_template('business-ratings.html',

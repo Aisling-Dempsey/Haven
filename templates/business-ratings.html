@@ -1,12 +1,12 @@
 {% extends 'base.html' %}
 {% block body %}
     <h1>{{ business.name }}</h1>
-    <p>Average Score: {{ rating[0] + 2 }} out of {{ rating[1] }} ratings</p>
+    <p>Average Score: {{ rating[0] + 2 }} out of 5 over {{ rating[1] }} ratings</p>
     <table>
         {% for rating in ratings %}
             {% if rating.review %}
                 <tr>
-                    <td>Score :{{ rating.score }}</td>
+                    <td>Score :{{ rating.score + 2 }}</td>
                     <td>Review: {{ rating.review }}</td>
 {#                    todo fix me to be readable datetime#}
                     <td> Reviewed: {{ rating.created_at }}</td>
