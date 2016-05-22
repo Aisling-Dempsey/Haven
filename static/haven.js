@@ -25,7 +25,7 @@ function displayResults(result) {
         var address2 = businesses[yelp_id]['address_line_2'] || undefined;
 
         var yelpRating = businesses[yelp_id]['yelp_score'];
-        var havenRating = businesses[yelp_id]['score'] || undefined;
+        var havenRating = businesses[yelp_id]['score'] + 2|| undefined;
         var havenCount = businesses[yelp_id]['total_ratings'];
         console.log(havenCount);
         var photo = businesses[yelp_id]['photo'];

@@ -16,7 +16,7 @@
 
         <p>{{ businesses[yelp_id]['yelp_score'] }}</p>
         {% if businesses[yelp_id].get('score') %}
-            <p>{{ businesses[yelp_id]['score'] + 2 }} over {{ businesses[yelp_id]['total_ratings'] }} ratings</p>
+            <p>{{ businesses[yelp_id]['score'] +2 }} over {{ businesses[yelp_id]['total_ratings'] }} ratings</p>
         {% else %}
             <p>Nobody has rated this business, be the first!</p>
 

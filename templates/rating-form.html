@@ -1,11 +1,7 @@
 {% extends 'base.html' %}
 {% block body %}
     Please review {{ business_name }}
-    {% if yelp_id %}
-        <form action="/info/{{ yelp_id }}/rate" method="POST">
-    {% else %}
-        <form action="/info/{{ business_id }}/rate" method="POST">
-    {% endif %}
+    <form action="/info/{{ yelp_id }}/rate" method="POST">
         <label>Score
             <select name="score" required>
                 <!--keeps dropdown blank to prevent accidental scoring-->

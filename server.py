@@ -210,12 +210,20 @@ def info(business_id):
         recent_score = review_info[0]
 
         # condenses review if necessary
-        if len(review_info[1]) > 50:
-            recent_review = review_info[1][:50], "..."
+        if review_info[1]:
+            if len(review_info[1]) > 100:
+                recent_review = review_info[1][:100] + " ..."
+                print recent_review[1]
+            else:
+                recent_review = review_info[1]
         else:
-            recent_review= review_info[1]
-    #     todo add haven review and score
-
+            recent_review = review_info[1]
+    #  todo add haven review and score
+    # if business doesn't exist in db, populates ratings with None
+    else:
+        haven_ratings = None, None
+        recent_review = None
+        recent_score = None
     return render_template('business.html',
                            score=haven_ratings[0],
                            total_ratings=haven_ratings[1],
@@ -232,14 +240,10 @@ def info(business_id):
 def rate(business_id):
     """presents user with form to rate business"""
     # converts id from yelp_id to business_id if applicable, then returns appropriate object
-    validated_id = helper.find_bus_id(business_id)
-    business_model = helper.return_business_model(validated_id)
-    yelp_id = business_model.yelp_id
-
+    business = helper.yelp_by_id(business_id)
     return render_template('rating-form.html',
-                           yelp_id=yelp_id or None,
-                           business_name=business_model.name,
-                           business_id=validated_id,
+                           yelp_id=business_id,
+                           business_name=business['name'],
                            user=session.get("user_name"),
                            keys=helper.KEYS)
 
@@ -252,9 +256,23 @@ def submit_review(business_id):
     # flashes success messsage
     flash(helper.add_rating(form_data, business_id))
 
+
     # todo add flash "your rating has been submitted"
 
     return redirect("/info/" + business_id)
+
+
+@app.route('/info/<business_id>/ratings')
+def view_haven_ratings(business_id):
+    rating_list = helper.get_business_ratings(business_id)
+    business = Business.query.filter_by(yelp_id=business_id).first()
+    rating = helper.get_aggregate_rating(business)
+    return render_template('business-ratings.html',
+                           ratings=rating_list,
+                           keys=helper.KEYS,
+                           business=business,
+                           rating=rating,
+                           user=session.get("user-name"))
 
 
 @app.route('/<string:username>/manage')
@@ -279,8 +297,6 @@ def business_search_form():
     return render_template('business-search.html',
                            keys=helper.KEYS,
                            user=session.get("user_name"))
-
-
 
 
 if __name__ == '__main__':

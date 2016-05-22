@@ -63,7 +63,7 @@ def add_user(payload):
 
 def get_ratings(user_id):
     """returns a dictionary of all of users ratings with sub-dicts of info about the ratings under the yelp_id"""
-    ratings=User.query.get(user_id).ratings
+    ratings = User.query.get(user_id).ratings
     rating_info = {}
     for rating in ratings:
         date = rating.created_at.strftime("%B %d, %Y at %I:%M %p")
@@ -149,16 +149,12 @@ def add_business(info):
 
 def find_bus_id(id_to_check):
     """validates whether an ID is a business_id or a yelp_id and returns the business_id"""
+
     try:
         return int(id_to_check)
     except ValueError:
         result = Business.query.filter_by(yelp_id=id_to_check).first()
         return result.business_id
-
-
-def return_business_model(business_id):
-    """returns the business model using the business_id. Often paired with find_bus_id(id_to_check)"""
-    return Business.query.filter_by(business_id=business_id).first()
 
 
 def get_aggregate_rating(business):
@@ -180,7 +176,7 @@ def validate_db(yelp_object, haven_model=None):
 
     new = False
 
-    if haven_model is not None:
+    if haven_model is None:
         haven_model = Business()
         new = True
 
@@ -209,14 +205,15 @@ def validate_db(yelp_object, haven_model=None):
     if yelp_object['location'].get('coordinate'):
         haven_model.latitude = yelp_object['location']['coordinate']['latitude']
         haven_model.longitude = yelp_object['location']['coordinate']['longitude']
-
+        # fixme not adding to db, new businesses return None with Business.query.filter_by(yelp_id=yelp_id).first()
         try:
             if new:
                 db.session.add(haven_model)
             db.session.commit()
-            return ""
+            print 'successfully added'
+
         except:
-            return None
+            print 'ut-oh'
 
 
 def yelp_generator(term, location, offset, sort):
@@ -253,12 +250,12 @@ def build_results(term, location, offset, sort, cutoff):
         # yelp_id = company['id']
         offset = next_up[1]
         # debug console printing
+        print "\n"
         print "looping through", offset
         # feeds
         entry = build_query_result(company)
         business = Business.query.filter_by(yelp_id=entry.keys()[0]).first()
         yelp_id = entry.keys()[0]
-        print "\n"
         print 'cutoff', cutoff
         # checks if there is a cutoff and outputs results with local scores above cutoff.
         if cutoff is not None:   #this doesn't work if you don't state "is not None"
@@ -266,8 +263,12 @@ def build_results(term, location, offset, sort, cutoff):
             if business:
                 # print business()
                 ratings = get_aggregate_rating(business)
+                print "score: ", ratings[0]
                 print 'name:', business.name
-                if ratings[0] < cutoff:
+                score = ratings[0] + 2
+                adjusted_cutoff = cutoff +2
+                # uses adusted score and cutoff to allow for less than comparison with non-negative nums
+                if score < adjusted_cutoff:
 
                     print 'rating:', ratings[0]
                     print 'cutoff:', cutoff
@@ -277,7 +278,7 @@ def build_results(term, location, offset, sort, cutoff):
                 else:
                     print "added to company info"
                     company_info[yelp_id] = entry[yelp_id]
-                    company_info[yelp_id]['score'] = ratings[0]
+                    company_info[yelp_id]['score'] = score
                     company_info[yelp_id]['total_ratings'] = ratings[1]
                     print len(company_info)
                     print company_info
@@ -301,6 +302,7 @@ def build_results(term, location, offset, sort, cutoff):
 
     return term, offset, company_info, sort
 
+
 def build_query_result(company):
     """takes result of yelp query and returns dict of attributes for display"""
     name = company['name']
@@ -322,14 +324,16 @@ def build_query_result(company):
     return business_info
 
 
-def add_rating(form_data, unknown_id):
+def add_rating(form_data, business_id):
     """adds a rating form data and business_id"""
-    # sterilizes the id to return haven business_id regardless of whether it receives yelp_id or haven id
-    business_id = find_bus_id(unknown_id)
+    if Business.query.filter_by(yelp_id=business_id).first() is None:
+        validate_db(yelp_by_id(business_id))
     score = int(form_data.get("score"))
     review = form_data.get("review")
     created_at = datetime.now()
-
+    business = Business.query.filter_by(yelp_id=business_id).first()
+    print business
+    business_id = business.business_id
     rating = Rating(business_id=business_id,
                     user_id=session['user_id'],
                     score=score,
@@ -355,6 +359,11 @@ def most_recent_review(business):
     #     if no written review, returns most recent score
     return business.ratings[0].score, None
 
+
+def get_business_ratings(business_id):
+    """returns list of business rating models for business_id"""
+    business = Business.query.filter_by(yelp_id=business_id).first()
+    return business.ratings
 
 
 def _example_data():
