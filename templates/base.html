@@ -18,12 +18,14 @@
             Body goes here
         {% endblock %}
 
+    <!--google maps API script -->
         <script src="/static/jquery-2.2.3.min.js"></script>
+        <script async defer src="https://maps.googleapis.com/maps/api/js?key={{ keys['maps'] }}&callback=initMap"
+                type="text/javascript"></script>
+
         <script src="/static/bootstrap.min.js"></script>
         <script src="/static/haven.js"></script>
 
-        <!--google maps API script -->
-        <script async defer src="https://maps.googleapis.com/maps/api/js?key={{ keys['maps'] }}&callback=initMap"
-                type="text/javascript"></script>
+
     </body>
 </html>

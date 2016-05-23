@@ -132,4 +132,17 @@ function moreResults(evt) {
 }
 
 
+//event listener for rendering more results on searches
 $(document).on('click', '.search-more-btn', moreResults);
+
+function initMap() {
+    //sets default location to Hackbright in case html5 geolocation is not supported
+    var myLatLng= {lat: 37.788904, lng: -122.414244487882};
+
+    var map = new google.maps.Map(document.getElementById('splash-map'), {
+        center: myLatLng,
+        zoom: 10},
+        mapOption);
+    }
+
+google.maps.event.addDomListener(window, 'load', initMap);

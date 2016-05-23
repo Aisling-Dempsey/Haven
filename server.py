@@ -61,7 +61,10 @@ def login():
     """logs in user"""
     form_data = request.form
     # todo set up flash in base template
-    flash(helper.login(form_data))
+    results = helper.login(form_data)
+    flash(results[0])
+    session['user_name'] = results[1]
+    session['user_id'] = results[2]
     return redirect('/')
 
 @app.route('/logout')
@@ -88,15 +91,16 @@ def post_account():
     form_data = request.form
 
     status = helper.add_user(form_data)
+
     # flash(status)
+
     if status == "That username already exists":
         return redirect('login')
 
     else:
-        todo
-        add
-        flash
-        "your account has been created" & "you have been logged in"
+        # todo add flash "your account has been created" & "you have been logged in"
+        session['user_name'] = status[1]
+        session['user_id'] = status[0]
         return redirect('/')
 
 
@@ -254,8 +258,10 @@ def submit_review(business_id):
     """submits review and redirects back to the business page"""
     # determines whether business in url is from yelp API or local only
     form_data = request.form
+    user_id = session['user_id']
     # flashes success messsage
-    flash(helper.add_rating(form_data, business_id))
+
+    flash(helper.add_rating(form_data, business_id, user_id))
 
 
     # todo add flash "your rating has been submitted"

@@ -37,7 +37,7 @@ def login(payload):
             session['user_id'] = db_user.user_id
             session['user_name'] = db_user.name
 
-            return "Logged in as", db_user.name
+            return ("Logged in as", db_user.name), db_user.name, db_user.user_id
 
         else:
             return "That password is incorrect, please try again"
@@ -47,8 +47,9 @@ def login(payload):
 # todo fail quick
 
 
-def add_user(payload):
+def add_user(payload, session=session):
     """Takes form information as a dictionary and creates user account if it doesn't already exist"""
+    # import pdb; pdb.set_trace()
     email = payload['email']
     password = payload['password']
     name = payload['name']
@@ -57,8 +58,9 @@ def add_user(payload):
         user = User(email=email, name=name, password=password)
         db.session.add(user)
         db.session.commit()
-        session['user_id'] = user.user_id
-        session['user_name'] = user.name
+        user_id = user.user_id
+        user_name = user.name
+        return user_id, user_name
 
     else:
         return "That user already exists"
@@ -256,7 +258,7 @@ def build_query_result(company):
     return business_info
 
 
-def add_rating(form_data, business_id):
+def add_rating(form_data, business_id, user_id):
     """adds a rating form data and business_id"""
     if Business.query.filter_by(yelp_id=business_id).first() is None:
         validate_db(yelp_by_id(business_id))
@@ -267,7 +269,7 @@ def add_rating(form_data, business_id):
     print business
     business_id = business.business_id
     rating = Rating(business_id=business_id,
-                    user_id=session['user_id'],
+                    user_id=user_id,
                     score=score,
                     created_at=created_at)
     if review:

@@ -2,7 +2,6 @@ appnope==0.1.0
 backports.shutil-get-terminal-size==1.0.0
 blessings==1.6
 blinker==1.4
-bpython==0.15
 coverage==4.0.3
 curtsies==0.2.6
 decorator==4.0.9
@@ -11,8 +10,6 @@ Flask-DebugToolbar==0.10.0
 Flask-SQLAlchemy==2.1
 gnureadline==6.3.3
 greenlet==0.4.9
-ipython==4.2.0
-ipython-genutils==0.1.0
 itsdangerous==0.24
 Jinja2==2.8
 MarkupSafe==0.23

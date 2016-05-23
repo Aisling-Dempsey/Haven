@@ -40,10 +40,10 @@ class FlaskTestsDatabase(TestCase):
         app.config['TESTING'] = True
         app.config['SECRET_KEY'] = 'Aisling'
         self.client = app.test_client()
-
-        with self.client as c:
-            with c.session_transaction() as session:
-                session['user_id'] = 997
+        #
+        # with self.client as c:
+        #     with c.session_transaction() as session:
+        #         session['user_id'] = 997
 
 
 
@@ -89,8 +89,7 @@ class FlaskTestsDatabase(TestCase):
         self.assertEqual(piraat.longitude, -122.411736651251)
 
     # todo get help with session vars in testing
-
-    # def test_add_rating(self):
+    #
     #         form_data = {'score': 4}
     #         helper.add_rating(form_data, 999)
     #
@@ -101,26 +100,26 @@ class FlaskTestsDatabase(TestCase):
     #         self.assertEqual(rating.user_id, 997)
     #         self.assertFalse(rating.review)
 
-    # def test_add_user(self):
-    #     with self.client as c:
-    #
-    #             payload_1 = {'email': 'test_user@test.com',
-    #                          'password': 'testpass',
-    #                          'name': 'Tim'}
-    #             helper.add_user(payload_1)
-    #             user = User.query.filter_by(email='test_user@test.com')
-    #
-    #             self.assertEqual(user.name, 'Tim')
-    #             self.assertEqual(user.password, 'testpass')
-    #             self.assertEqual(user.email, 'test_user@test.com')
-    #             self.assertEqual(session['user_name'], 'Tim')
-    #             self.assertEqual(session['user_id'], user.user_id)
-    #             payload_2 = {'email': 'liz@liz.com',
-    #                        'password': 'liz_pass',
-    #                        'name': 'Liz'}
-    #             status = helper.add_user(payload_2)
-    #
-    #             self.assertEqual(status, "That username already exists")
+    def test_add_user(self):
+            with self.client as c:
+                    with c.session_transaction() as session:
+                        payload_1 = {'email': 'test_user@test.com',
+                                     'password': 'testpass',
+                                     'name': 'Tim'}
+                        helper.add_user(payload_1, session=session)
+                        user = User.query.filter_by(email='test_user@test.com').first()
+
+                        self.assertEqual(user.name, 'Tim')
+                        self.assertEqual(user.password, 'testpass')
+                        self.assertEqual(user.email, 'test_user@test.com')
+                        self.assertEqual(session['user_name'], 'Tim')
+                        self.assertEqual(session['user_id'], user.user_id)
+                        payload_2 = {'email': 'liz@liz.com',
+                                   'password': 'liz_pass',
+                                   'name': 'Liz'}
+                        status = helper.add_user(payload_2, session=session)
+
+                        self.assertEqual(status, "That user already exists")
 
     def test_yelp_generator(self):
         """tests yelp_generator(term,location, offset, sort)"""
@@ -147,6 +146,8 @@ class FlaskTestsDatabase(TestCase):
         self.assertIn('name', result_1[0])
         self.assertIn('id', result_2[0])
         self.assertIn('rating', result_3[0])
+
+    # def test_build_results(self):
 
 
 def _example_data():
