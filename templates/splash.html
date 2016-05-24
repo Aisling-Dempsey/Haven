@@ -1,14 +1,6 @@
 {% extends 'base.html' %}
 {%  block body %}
-    <p>This is the splash page</p>
-    {% if user %}
-        <p>Hello {{ user }}</p>
-        <a href="/{{ user }}">My account</a>
-        <a href="/logout">Logout</a><
-    {% else %}
-        <a href="/login">Login</a>
-        <a href="/create-account"><button>Create-account</button></a>
-    {% endif %}
+    <h1>Welcome to Haven</h1>
     <a href="/add-ratings"><button>Add a rating</button></a>
     <form action="/results" method="GET">
         <input type="search" id='search-field' name="term" placeholder="Enter a business name or category" required>

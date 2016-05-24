@@ -4,6 +4,9 @@ html, body {
     padding: 0;
 }
 
+body{
+    padding-top: 70px;
+}
 #splash-map{
     height: 60%;
 }

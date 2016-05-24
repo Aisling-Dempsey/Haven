@@ -346,7 +346,7 @@ def best_local_business(location, cutoff, term=None):
             else:
                 continue
 
-            best_businesses[yelp_business['id']] = business_info
+            best_businesses[yelp_business['id']] = business_info[yelp_id]
         except StopIteration:
             print '\n'
             print 'end reached, businesses:', best_businesses
