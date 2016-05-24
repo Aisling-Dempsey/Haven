@@ -65,6 +65,7 @@ def add_user(payload, session=session):
     else:
         return "That user already exists"
 
+
 def get_ratings(user_id):
     """returns a dictionary of all of users ratings with sub-dicts of info about the ratings under the yelp_id"""
     ratings = User.query.get(user_id).ratings
@@ -107,11 +108,13 @@ def get_aggregate_rating(business):
 def validate_db(yelp_object, haven_model=None):
     """takes the result of a yelp query by businesses id and compares it to the database entry. If any information
      on the local db is out of date, it is updated accordingly. Will also create new db if the haven_model is none"""
-
+    print "yelp object in validate_db:", yelp_object
+    print "haven_model in validate_db", haven_model
     new = False
 
     if haven_model is None:
         haven_model = Business()
+        haven_model.yelp_id = yelp_object['id']
         new = True
 
     haven_model.name = yelp_object['name']
@@ -142,8 +145,11 @@ def validate_db(yelp_object, haven_model=None):
     try:
         if new:
             db.session.add(haven_model)
+            print "successfully added"
         db.session.commit()
-        print 'successfully added'
+        print 'successfully committed'
+        print "committed business:", haven_model
+
 
     except:
         print 'ut-oh'
@@ -261,15 +267,16 @@ def build_query_result(company):
     return business_info
 
 
-def add_rating(form_data, business_id, user_id):
+def add_rating(form_data, yelp_id, user_id):
     """adds a rating form data and business_id"""
-    if Business.query.filter_by(yelp_id=business_id).first() is None:
-        validate_db(yelp_by_id(business_id))
+    print 'yelp_id in add_rating:', yelp_id
+    if Business.query.filter_by(yelp_id=yelp_id).first() is None:
+        validate_db(yelp_by_id(yelp_id))
     score = int(form_data.get("score"))
     review = form_data.get("review")
     created_at = datetime.now()
-    business = Business.query.filter_by(yelp_id=business_id).first()
-    print business
+    business = Business.query.filter_by(yelp_id=yelp_id).first()
+    print 'business in add_rating:', business
     business_id = business.business_id
     rating = Rating(business_id=business_id,
                     user_id=user_id,
