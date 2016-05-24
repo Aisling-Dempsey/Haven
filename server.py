@@ -48,6 +48,12 @@ def splash():
                            user=session.get("user_name"))
 
 
+@app.route('/local-best.json')
+def best_local(location):
+
+
+    helper.best_local_businesses(location)
+
 @app.route('/login', methods=['GET'])
 def login_prompt():
     """Login page"""
@@ -280,8 +286,6 @@ def view_haven_ratings(business_id):
                            business=business,
                            rating=rating,
                            user=session.get("user-name"))
-
-
 
 
 @app.route('/add-ratings')

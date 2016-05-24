@@ -300,6 +300,44 @@ def get_business_ratings(business_id):
     return business.ratings
 
 
+def best_local_business(location, cutoff, term=None):
+    offset = 0
+    result = yelp_generator(term, location, offset, 1)
+    best_businesses = {}
+    while True:
+        try:
+            # fixme Traceback (most recent call last):
+            # File "<stdin>", line 1, in <module>
+            #  File "helper.py", line 310, in best_local_business
+            #      yelp_business = (next(result))[0]
+            #     TypeError: dict object is not an iterator
+            yelp_business = (next(result))[0]
+            print '/n'
+            print type(yelp_business)
+            print 'yelp_business:', yelp_business
+            yelp_id = yelp_business ['id']
+            print 'yelp_id:', yelp_id
+            business = Business.query.filter_by(yelp_id=yelp_id).first()
+            print business
+            if business:
+                score = get_aggregate_rating(business)
+                print 'score:', score
+                print 'cutoff:', cutoff
+                if (score[0]+2) > cutoff:
+                    print 'calling build_query'
+                    result = build_query_result(yelp_business)
+                else:
+                    continue
+            else:
+                continue
+
+            best_businesses[yelp_business['id']] = result
+        except StopIteration:
+            return best_businesses
+
+
+
+
 if __name__ == "__main__":
     # if run interactively, this will allow access of the db
 

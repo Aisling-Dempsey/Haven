@@ -131,18 +131,77 @@ function moreResults(evt) {
 
 }
 
+function addLocalBest(result){
+//    function at add pins to map
+
+}
+
+
 
 //event listener for rendering more results on searches
 $(document).on('click', '.search-more-btn', moreResults);
 
-function initMap() {
+function initMap(evt) {
     //sets default location to Hackbright in case html5 geolocation is not supported
-    var myLatLng= {lat: 37.788904, lng: -122.414244487882};
+    var defaultLatLong = {lat: 37.788904, lng: -122.414244487882};
 
-    var map = new google.maps.Map(document.getElementById('splash-map'), {
-        center: myLatLng,
-        zoom: 10},
-        mapOption);
+    var myOptions = {zoom: 18,
+        mapTypeID: google.maps.MapTypeId.ROADMAP
+    };
+
+    var map = new google.maps.Map(document.getElementById('splash-map'), myOptions);
+    //checks if geolocation is supported by the browser and
+    if (navigator.geolocation) {
+        var browserSupportFlag = true;
+        navigator.geolocation.getCurrentPosition(function (position) {
+            var initialLocation = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+            // console.log(initialLocation);
+            map.setCenter(initialLocation);
+            var geocoder = new google.maps.Geocoder;
+            geocoder.geocode({location: initialLocation}, function(results){getLocalBest(results[0].formatted_address);
+            });
+            
+
+        }, function () {
+            handleNoGeolocation(browserSupportFlag)
+        });
     }
+    else {
+        var browserSupportFlag = false;
+        handleNoGeolocation(browserSupportFlag);
+    }
+
+    function handleNoGeolocation(errorFlag) {
+        if (errorFlag == true) {
+          alert("Geolocation service failed.");
+          var initialLocation = defaultLatLong;
+        } else {
+            alert("Your browser doesn't support geolocation, please enter an address");
+            var initialLocation = defaultLatLong
+        }
+        map.setCenter(initialLocation);
+    }
+
+
+}
+
+
+function getLocalBest(result){
+    $.get('/local-best.json', result, addLocalBest)
+}
+
+
+
+function handleLocationError(browserHasGeolocation, infoWindow, pos) {
+  infoWindow.setPosition(pos);
+  infoWindow.setContent(browserHasGeolocation ?
+                        'Error: The Geolocation service failed.' :
+                        'Error: Your browser doesn\'t support geolocation.');
+}
+
+
+    // $.get"maps.googleapis.com/maps/api/geocode/json?latlng="+myLatLng['lat']+","+myLatLng['lng']+"&key="+YOUR_API_KEY
+    //
+    // $.get"/local.json", address, addLocalBest
 
 google.maps.event.addDomListener(window, 'load', initMap);
