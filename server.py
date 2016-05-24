@@ -49,10 +49,13 @@ def splash():
 
 
 @app.route('/local-best.json')
-def best_local(location):
+def best_local():
+    location = request.args.get('location')
+    print location
+    print 'type:', type(location)
+    query = helper.best_local_business(location, 1)
+    return jsonify(query)
 
-
-    helper.best_local_businesses(location)
 
 @app.route('/login', methods=['GET'])
 def login_prompt():

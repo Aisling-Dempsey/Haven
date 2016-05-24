@@ -131,12 +131,6 @@ function moreResults(evt) {
 
 }
 
-function addLocalBest(result){
-//    function at add pins to map
-
-}
-
-
 
 //event listener for rendering more results on searches
 $(document).on('click', '.search-more-btn', moreResults);
@@ -187,7 +181,10 @@ function initMap(evt) {
 
 
 function getLocalBest(result){
-    $.get('/local-best.json', result, addLocalBest)
+    var location = {'location': result};
+    $.get('/local-best.json', location, function(results){
+        console.log(results)
+    })
 }
 
 

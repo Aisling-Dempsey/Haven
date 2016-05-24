@@ -255,6 +255,9 @@ def build_query_result(company):
         if len(company['location']['address']) > 1:
             business_info[yelp_id]['address_line_2'] = company['location']['address'][1]
 
+    if company['location'].get('coordinate'):
+        business_info[yelp_id]['longitude'] = company['location']['coordinate']['longitude']
+        business_info[yelp_id]['latitude'] = company['location']['coordinate']['latitude']
     return business_info
 
 
@@ -311,11 +314,16 @@ def best_local_business(location, cutoff, term=None):
             #  File "helper.py", line 310, in best_local_business
             #      yelp_business = (next(result))[0]
             #     TypeError: dict object is not an iterator
-            yelp_business = (next(result))[0]
+
             print '/n'
+            print 'type result:', type(result)
+            next_up = (next(result))
+            print 'type next_up:', type(next_up)
+            yelp_business = next_up[0]
+            print "offset:", next_up[1]
             print type(yelp_business)
             print 'yelp_business:', yelp_business
-            yelp_id = yelp_business ['id']
+            yelp_id = yelp_business['id']
             print 'yelp_id:', yelp_id
             business = Business.query.filter_by(yelp_id=yelp_id).first()
             print business
@@ -325,16 +333,17 @@ def best_local_business(location, cutoff, term=None):
                 print 'cutoff:', cutoff
                 if (score[0]+2) > cutoff:
                     print 'calling build_query'
-                    result = build_query_result(yelp_business)
+                    business_info = build_query_result(yelp_business)
                 else:
                     continue
             else:
                 continue
 
-            best_businesses[yelp_business['id']] = result
+            best_businesses[yelp_business['id']] = business_info
         except StopIteration:
+            print '\n'
+            print 'end reached, businesses:', best_businesses
             return best_businesses
-
 
 
 
