@@ -143,7 +143,7 @@ function initMap(evt) {
         mapTypeID: google.maps.MapTypeId.ROADMAP
     };
 
-    window.map = new google.maps.Map(document.getElementById('splash-map'), myOptions);
+    map = new google.maps.Map(document.getElementById('splash-map'), myOptions);
     //checks if geolocation is supported by the browser and
     if (navigator.geolocation) {
         var browserSupportFlag = true;
@@ -160,13 +160,14 @@ function initMap(evt) {
                 position: initialLocation
             });
 
-
+            //gets best local businesses near starting point
             var geocoder = new google.maps.Geocoder;
             geocoder.geocode({location: initialLocation}, function(results){
                 // console.log(results[0].formatted_address);
                 getLocalBest(results[0].formatted_address);
             });
 
+            //creates info window of geolocated address
             geocoder.geocode({location: initialLocation}, function(results){
                 var current_address = results[0].formatted_address;
                 var infoWindow = new google.maps.InfoWindow({
@@ -174,17 +175,16 @@ function initMap(evt) {
                 });
                 infoWindow.open(map, locGuess)
             });
-            console.log(current_address);
-            //
 
-
-
-            
 
         }, function () {
             handleNoGeolocation(browserSupportFlag)
         });
     }
+
+
+
+
     else {
         var browserSupportFlag = false;
         handleNoGeolocation(browserSupportFlag);
@@ -201,33 +201,96 @@ function initMap(evt) {
         map.setCenter(initialLocation);
     }
 
-
-}
-
-function addPins(businesses) {
+    //loops through json of business info and plots points on map.
+    function addPins(businesses) {
     // console.log (businesses);
-    for (var business in businesses) {
+
+        var markers = [];
+        for (var business in businesses) {
         // console.log(business);
         // console.log(businesses[business]);
         // console.log(businesses[business]['longitude']);
         // console.log(businesses[business]['latitude']);
-        var marker = new google.maps.Marker({
-            map: window.map,
-            draggable: true,
-            animation: google.maps.Animation.DROP,
-            position: {
-                lat: businesses[business]['latitude'],
-                lng: businesses[business]['longitude']
-            }
 
+
+            var businessInfo = '<div id="marker">' +
+                '<div id="Header">'+
+                    '<h3>'+
+                        businesses[business]['name'] +
+                    '</h3>'+
+                    '</div>';
+
+
+
+            var marker = new google.maps.Marker({
+                map: map,
+                draggable: false,
+                animation: google.maps.Animation.DROP,
+                position: {
+                    lat: businesses[business]['latitude'],
+                    lng: businesses[business]['longitude']
+                    },
+                html: businessInfo
+                });
+
+            markers.push(marker);
+
+
+
+
+            var infoWindow = new google.maps.InfoWindow({
+                content: "Loading..."});
+
+
+            //opens closes any open info windows and opens a new one for the marker being clicked
+            marker.addListener('click', function(){
+                infoWindow.setContent(this.html);
+                infoWindow.close();
+                infoWindow.open(map, this);
+            });
+
+        }
+        //instantiates the LatLngBounds class
+        var newBounds = new google.maps.LatLngBounds();
+        //for every marker in the markers list, extends the bounds
+        $.each(markers, function(index, marker){
+            newBounds.extend(marker.position)
         });
+
+        //updates the bounds of the map to fit the points
+        map.fitBounds(newBounds);
     }
+
+    function getLocalBest(result){
+        var location = {'location': result};
+        $.get('/local-best.json', location, addPins)
+    }
+
+
+
+
 }
 
-function getLocalBest(result){
-    var location = {'location': result};
-    $.get('/local-best.json', location, addPins)
-}
+// function addPins(businesses) {
+//     // console.log (businesses);
+//     for (var business in businesses) {
+//         // console.log(business);
+//         // console.log(businesses[business]);
+//         // console.log(businesses[business]['longitude']);
+//         // console.log(businesses[business]['latitude']);
+//         var marker = new google.maps.Marker({
+//             map: window.map,
+//             draggable: true,
+//             animation: google.maps.Animation.DROP,
+//             position: {
+//                 lat: businesses[business]['latitude'],
+//                 lng: businesses[business]['longitude']
+//             }
+//
+//         });
+//     }
+// }
+
 
 
 
