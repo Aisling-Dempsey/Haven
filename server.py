@@ -51,9 +51,12 @@ def splash():
 @app.route('/local-best.json')
 def best_local():
     location = request.args.get('location')
+    print type(request.args.get('cutoff'))
+    cutoff = float(request.args.get('cutoff'))
     print location
     print 'type:', type(location)
-    query = helper.best_local_business(location, 1)
+    query = helper.best_local_business(location, cutoff)
+    print jsonify(query)
     return jsonify(query)
 
 
@@ -197,12 +200,12 @@ def ratings(username):
                            ratings=ratings)
 
 
-# @app.route('/explore')
-# def explore():
-#     """explore page"""
-#     return render_template('construction.html',
-#                            keys=helper.KEYS,
-#                            user=session.get("user_name"))
+@app.route('/explore')
+def explore():
+    """explore page"""
+    return render_template('construction.html',
+                           keys=helper.KEYS,
+                           user=session.get("user_name"))
 
 
 @app.route('/info/<string:business_id>')

@@ -25,7 +25,7 @@ function displayResults(result) {
         var address2 = businesses[yelp_id]['address_line_2'] || undefined;
 
         var yelpRating = businesses[yelp_id]['yelp_score'];
-        var havenRating = businesses[yelp_id]['score'] + 2|| undefined;
+        var havenRating = businesses[yelp_id]['score'] + 3|| undefined;
         var havenCount = businesses[yelp_id]['total_ratings'];
         console.log(havenCount);
         var photo = businesses[yelp_id]['photo'];
@@ -135,11 +135,23 @@ function moreResults(evt) {
 //event listener for rendering more results on searches
 $(document).on('click', '.search-more-btn', moreResults);
 
+//global array of map markers
+var markers=[];
+
+function clearOverlays(){
+    //loops through global array of markers and sets the map to null, then resets markers to an empty list
+    for (var i=0; i < markers.length; i++){
+        markers[i].setMap(null)
+    }
+    markers.length = 0;
+}
+
 function initMap(evt) {
     //sets default location to Hackbright in case html5 geolocation is not supported
     var defaultLatLong = {lat: 37.788904, lng: -122.414244487882};
 
-    var myOptions = {zoom: 18,
+    var myOptions = {
+        zoom: 18,
         mapTypeID: google.maps.MapTypeId.ROADMAP
     };
 
@@ -149,42 +161,62 @@ function initMap(evt) {
         var browserSupportFlag = true;
         navigator.geolocation.getCurrentPosition(function (position) {
             var initialLocation = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
-            // console.log(initialLocation);
+            console.log(initialLocation);
             map.setCenter(initialLocation);
 
 
-            var locGuess = new google.maps.Marker({
-                map: map,
-                draggable: true,
-                animation: google.maps.Animation.DROP,
-                position: initialLocation
-            });
 
             //gets best local businesses near starting point
             var geocoder = new google.maps.Geocoder;
-            geocoder.geocode({location: initialLocation}, function(results){
+            geocoder.geocode({location: initialLocation}, function (results) {
                 // console.log(results[0].formatted_address);
-                getLocalBest(results[0].formatted_address);
+                var current_address = results[0].formatted_address;
+                var locGuess = new google.maps.Marker({
+                    map: map,
+                    draggable: true,
+                    animation: google.maps.Animation.DROP,
+                    position: initialLocation
+                });
+
+                var infoWindow = new google.maps.InfoWindow({
+                    content: locGuess
+                });
+
+                locGuess.addListener('click', function () {
+                    infoWindow.close();
+                    infoWindow.open(map, this);
+                });
+
+                
+                
+                
+                getLocalBest(current_address, $('#haven-cutoff').val());
+                alert("It looks like you're located at ".concat(current_address));
+                $('#haven-cutoff').change(function () {
+                    getLocalBest(current_address, $('#haven-cutoff').val())
+                })
             });
 
-            //creates info window of geolocated address
-            geocoder.geocode({location: initialLocation}, function(results){
-                var current_address = results[0].formatted_address;
-                var infoWindow = new google.maps.InfoWindow({
-                    content: "It looks like you're located at " + current_address
-                });
-                infoWindow.open(map, locGuess)
-            });
+            // //creates info window of geolocated address
+            // geocoder.geocode({location: initialLocation}, function(results){
+            //     var current_address = results[0].formatted_address;
+            //     // var infoWindow = new google.maps.InfoWindow({
+            //     //     content: "It looks like you're located at " + current_address
+            //     // });
+            //     // infoWindow.open(map, locGuess)
+            //     //convert to modal
+
+
+            // });
+            //
+            // var currentAddress = geocoder.geocode({location: initialLocation})[0].formatted_address;
+            // console.log(currentAddress)
 
 
         }, function () {
             handleNoGeolocation(browserSupportFlag)
         });
     }
-
-
-
-
     else {
         var browserSupportFlag = false;
         handleNoGeolocation(browserSupportFlag);
@@ -192,8 +224,8 @@ function initMap(evt) {
 
     function handleNoGeolocation(errorFlag) {
         if (errorFlag == true) {
-          alert("Geolocation service failed.");
-          var initialLocation = defaultLatLong;
+            alert("Geolocation service failed.");
+            var initialLocation = defaultLatLong;
         } else {
             alert("Your browser doesn't support geolocation, please enter an address");
             var initialLocation = defaultLatLong
@@ -202,24 +234,29 @@ function initMap(evt) {
     }
 
     //loops through json of business info and plots points on map.
-    function addPins(businesses) {
-    // console.log (businesses);
+    function addPins(location, businesses) {
+        // console.log (businesses);
 
-        var markers = [];
+        //add home pin
+        //home pin
+
+        clearOverlays();
+
+        //todo add info-window using location
+
         for (var business in businesses) {
-        // console.log(business);
-        // console.log(businesses[business]);
-        // console.log(businesses[business]['longitude']);
-        // console.log(businesses[business]['latitude']);
+            console.log(business);
+            console.log(businesses[business]);
+            console.log(businesses[business]['longitude']);
+            console.log(businesses[business]['latitude']);
 
 
             var businessInfo = '<div id="marker">' +
-                '<div id="Header">'+
-                    '<h3>'+
-                        businesses[business]['name'] +
-                    '</h3>'+
-                    '</div>';
-
+                '<div id="Header">' +
+                '<h3>' +
+                businesses[business]['name'] +
+                '</h3>' +
+                '</div>';
 
 
             var marker = new google.maps.Marker({
@@ -229,21 +266,20 @@ function initMap(evt) {
                 position: {
                     lat: businesses[business]['latitude'],
                     lng: businesses[business]['longitude']
-                    },
+                },
                 html: businessInfo
-                });
+            });
 
             markers.push(marker);
 
 
-
-
             var infoWindow = new google.maps.InfoWindow({
-                content: "Loading..."});
+                content: "Loading..."
+            });
 
 
             //opens closes any open info windows and opens a new one for the marker being clicked
-            marker.addListener('click', function(){
+            marker.addListener('click', function () {
                 infoWindow.setContent(this.html);
                 infoWindow.close();
                 infoWindow.open(map, this);
@@ -253,7 +289,8 @@ function initMap(evt) {
         //instantiates the LatLngBounds class
         var newBounds = new google.maps.LatLngBounds();
         //for every marker in the markers list, extends the bounds
-        $.each(markers, function(index, marker){
+
+        $.each(markers, function (index, marker) {
             newBounds.extend(marker.position)
         });
 
@@ -261,38 +298,25 @@ function initMap(evt) {
         map.fitBounds(newBounds);
     }
 
-    function getLocalBest(result){
-        var location = {'location': result};
-        $.get('/local-best.json', location, addPins)
+    function getLocalBest(location, cutoff) {
+        console.log('getLocalBest called');
+        var payload = {'location': location,
+            'cutoff': cutoff
+        };
+        $.get('/local-best.json', payload, function (data) {
+            addPins(location, data)
+        })
     }
-
-
-
-
 }
 
-// function addPins(businesses) {
-//     // console.log (businesses);
-//     for (var business in businesses) {
-//         // console.log(business);
-//         // console.log(businesses[business]);
-//         // console.log(businesses[business]['longitude']);
-//         // console.log(businesses[business]['latitude']);
-//         var marker = new google.maps.Marker({
-//             map: window.map,
-//             draggable: true,
-//             animation: google.maps.Animation.DROP,
-//             position: {
-//                 lat: businesses[business]['latitude'],
-//                 lng: businesses[business]['longitude']
-//             }
-//
-//         });
-//     }
-// }
+
+function updateCutoff(evt){
+    $('#cutoff-val').html("Don't show ratings below " + (parseFloat(this.value) + 3));
+    console.log("event triggered")
+}
 
 
-
+$('#haven-cutoff').change(updateCutoff);
 
 function handleLocationError(browserHasGeolocation, infoWindow, pos) {
   infoWindow.setPosition(pos);

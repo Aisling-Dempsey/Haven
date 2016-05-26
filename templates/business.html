@@ -22,9 +22,9 @@
     <div id="info-haven-details"></div>
         {% if score is not none %}
             <h2>Haven Says:</h2>
-            <p id="info-haven-score">Inclusivity score: {{ score + 2 }} out of 5 over {{ total_ratings }} ratings</p>
+            <p id="info-haven-score">Inclusivity score: {{ score + 3 }} out of 5 over {{ total_ratings }} ratings</p>
             {% if recent_review is not none  %}
-                <p>Most recent score with a review: {{ recent_score + 2 }}</p>
+                <p>Most recent score with a review: {{ recent_score + 3 }}</p>
                 <p>Most recent Review" {{ recent_review }}</p>
             {% else %}
                 <p>Most recent score: {{ recent_score }}</p>

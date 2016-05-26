@@ -316,30 +316,25 @@ def best_local_business(location, cutoff, term=None):
     best_businesses = {}
     while True:
         try:
-            # fixme Traceback (most recent call last):
-            # File "<stdin>", line 1, in <module>
-            #  File "helper.py", line 310, in best_local_business
-            #      yelp_business = (next(result))[0]
-            #     TypeError: dict object is not an iterator
 
-            print '/n'
-            print 'type result:', type(result)
+            # print '/n'
+            # print 'type result:', type(result)
             next_up = (next(result))
-            print 'type next_up:', type(next_up)
+            # print 'type next_up:', type(next_up)
             yelp_business = next_up[0]
-            print "offset:", next_up[1]
-            print type(yelp_business)
-            print 'yelp_business:', yelp_business
+            # print "offset:", next_up[1]
+            # print type(yelp_business)
+            # print 'yelp_business:', yelp_business
             yelp_id = yelp_business['id']
-            print 'yelp_id:', yelp_id
+            # print 'yelp_id:', yelp_id
             business = Business.query.filter_by(yelp_id=yelp_id).first()
-            print business
+            # print business
             if business:
                 score = get_aggregate_rating(business)
-                print 'score:', score
-                print 'cutoff:', cutoff
+                # print 'score:', score
+                # print 'cutoff:', cutoff
                 if (score[0]+2) > cutoff:
-                    print 'calling build_query'
+                    # print 'calling build_query'
                     business_info = build_query_result(yelp_business)
                 else:
                     continue
