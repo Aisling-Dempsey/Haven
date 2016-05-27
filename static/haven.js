@@ -14,7 +14,7 @@ function displayResults(result) {
     var sort = result['sort'];
     var cutoff = result['cutoff'];
     $('#search-results').empty();
-    
+
     var resultNum = 1;
     for (var yelp_id in businesses) {
         console.log(yelp_id);
@@ -135,7 +135,22 @@ function moreResults(evt) {
 //event listener for rendering more results on searches
 $(document).on('click', '.search-more-btn', moreResults);
 
+
+//GETS PARENT CATEGORY JAVASCRIPT OBJECT
+$.getJSON("/static/categories.json", function(json) {
+    window.parentCats = json
+});
+
+
+
+//*******************************
+//MAPS FUNCTIONS
+
+var subcategories={};
+
 //global array of map markers
+
+
 var markers=[];
 
 function clearOverlays(){
@@ -145,7 +160,7 @@ function clearOverlays(){
     }
     markers.length = 0;
 }
-
+//event handler to load map
 function initMap(evt) {
     //sets default location to Hackbright in case html5 geolocation is not supported
     var defaultLatLong = {lat: 37.788904, lng: -122.414244487882};
@@ -178,8 +193,9 @@ function initMap(evt) {
                     position: initialLocation
                 });
 
+                console.log(locGuess);
                 var infoWindow = new google.maps.InfoWindow({
-                    content: locGuess
+                    content: current_address
                 });
 
                 locGuess.addListener('click', function () {
@@ -187,11 +203,13 @@ function initMap(evt) {
                     infoWindow.open(map, this);
                 });
 
-                
-                
-                
+
+
+
                 getLocalBest(current_address, $('#haven-cutoff').val());
                 alert("It looks like you're located at ".concat(current_address));
+
+                //EVENT LISTNER TO GET NEW BUSINESS LIST USING NEW CUTOFF VALUE
                 $('#haven-cutoff').change(function () {
                     getLocalBest(current_address, $('#haven-cutoff').val())
                 })
@@ -235,14 +253,12 @@ function initMap(evt) {
 
     //loops through json of business info and plots points on map.
     function addPins(location, businesses) {
-        // console.log (businesses);
-
-        //add home pin
-        //home pin
 
         clearOverlays();
 
         //todo add info-window using location
+
+        // category
 
         for (var business in businesses) {
             console.log(business);
@@ -267,9 +283,21 @@ function initMap(evt) {
                     lat: businesses[business]['latitude'],
                     lng: businesses[business]['longitude']
                 },
-                html: businessInfo
+                html: businessInfo,
+                cats: businesses[business]['cat_list']
+
             });
 
+            var categories = [];
+
+            for (var i = 0; i < businesses[business]['cat_list']; i++){
+                var parent = parentCats[businesses[business]['cat_list'][i]];
+                categories.push(parent)
+            }
+
+            // marker.categories = for(subcategory of businesses[business]['cat_list']);
+
+            marker.pcats = categories;
             markers.push(marker);
 
 
@@ -277,9 +305,10 @@ function initMap(evt) {
                 content: "Loading..."
             });
 
-
+            console.log(businessInfo);
             //opens closes any open info windows and opens a new one for the marker being clicked
             marker.addListener('click', function () {
+                console.log(this.html);
                 infoWindow.setContent(this.html);
                 infoWindow.close();
                 infoWindow.open(map, this);
@@ -296,6 +325,7 @@ function initMap(evt) {
 
         //updates the bounds of the map to fit the points
         map.fitBounds(newBounds);
+        console.log(markers);
     }
 
     function getLocalBest(location, cutoff) {
@@ -309,14 +339,8 @@ function initMap(evt) {
     }
 }
 
-
-function updateCutoff(evt){
-    $('#cutoff-val').html("Don't show ratings below " + (parseFloat(this.value) + 3));
-    console.log("event triggered")
-}
-
-
-$('#haven-cutoff').change(updateCutoff);
+//event listener to load map on page load
+google.maps.event.addDomListener(window, 'load', initMap);
 
 function handleLocationError(browserHasGeolocation, infoWindow, pos) {
   infoWindow.setPosition(pos);
@@ -325,9 +349,32 @@ function handleLocationError(browserHasGeolocation, infoWindow, pos) {
                         'Error: Your browser doesn\'t support geolocation.');
 }
 
+function updateChart(businesses){
+//    loop through markers on click, generate dict of count
+
+}
+
+
+
+//*******************************
+//CUTOFF ADJUSTMENT FUNCTIONS
+
+//event handler to update displayed cutoff above fader
+function updateCutoff(evt){
+    $('#cutoff-val').html("Don't show ratings below " + (parseFloat(this.value) + 3));
+    console.log("event triggered")
+}
+
+//event listener to update the cutoff when the fader is changed
+$('#haven-cutoff').change(updateCutoff);
+
+
+
+
 
     // $.get"maps.googleapis.com/maps/api/geocode/json?latlng="+myLatLng['lat']+","+myLatLng['lng']+"&key="+YOUR_API_KEY
     //
     // $.get"/local.json", address, addLocalBest
 
-google.maps.event.addDomListener(window, 'load', initMap);
+
+

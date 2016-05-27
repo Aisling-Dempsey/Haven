@@ -5,6 +5,7 @@ def get_usable_pairings(categories):
         for category in categories:
                 print type(category['parents'])
                 print category['title']
+
                 if len(category['parents']) == 1:
                     cat_pairs[category['title']] = {'parent_cat': category['parents'][0]}
                     print cat_pairs[category['title']]
@@ -12,6 +13,9 @@ def get_usable_pairings(categories):
                 elif len(category['parents']) > 1:
                     cat_pairs[category['title']] = {'parent_cat': category['parents'][0]}
                     cat_pairs[category['title']]['second_parent_cat'] = category['parents'][1]
+
+        #         after creation of json,
+
 
         json_string = json.dumps(cat_pairs)
         f.write(json_string)

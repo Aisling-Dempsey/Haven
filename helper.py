@@ -39,6 +39,17 @@ def login(payload):
 
             return ("Logged in as", db_user.name), db_user.name, db_user.user_id
 
+        # todo
+        # RAISE EXCEPTION, NOT STRING
+
+        # make class that extends superclass exception
+        # class PassError(Exception):
+        #   function msg(self)
+        #   SOMETHING LIKE THIS, LOOK UP
+        #   __init__:
+        #       return errormessage
+        #   pass
+        # raise Error()
         else:
             return "That password is incorrect, please try again"
 
@@ -150,7 +161,6 @@ def validate_db(yelp_object, haven_model=None):
         print 'successfully committed'
         print "committed business:", haven_model
 
-
     except:
         print 'ut-oh'
 
@@ -247,12 +257,14 @@ def build_query_result(company):
     """takes result of yelp query and returns dict of attributes for display"""
     name = company['name']
     categories = ", ".join([category[0] for category in company['categories']])
+    cat_list = [category[0] for category in company['categories']]
     yelp_rating = company['rating']
     yelp_id = company['id']
 
     business_info = {yelp_id: {'yelp_score': yelp_rating,
                                'name': name,
-                               'categories': categories}}
+                               'categories': categories,
+                               'cat_list': cat_list}}
     if company.get('image_url'):
         business_info[yelp_id]['photo'] = company['image_url']
 

@@ -181,6 +181,7 @@ def more_results():
 
 
 @app.route('/<string:username>')
+# fixme
 def user_account(username):
     """User account page"""
     return render_template('account.html',
@@ -302,6 +303,11 @@ def business_search_form():
                            user=session.get("user_name"))
 
 
+# @app.route('catgeories.json')
+# def serve_categorise():
+#
+
+
 #
 # @app.route('/<string:username>/manage')
 # def account_manage(username):
@@ -310,7 +316,7 @@ def business_search_form():
 #                            keys=helper.KEYS,
 #                            user=session.get("user_name"))
 
-#
+
 # @app.route('/<string:username>/favorites')
 # def favorites(username):
 #     """user favorites"""
