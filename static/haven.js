@@ -136,11 +136,6 @@ function moreResults(evt) {
 $(document).on('click', '.search-more-btn', moreResults);
 
 
-//GETS PARENT CATEGORY JAVASCRIPT OBJECT
-$.getJSON("/static/categories.json", function(json) {
-    window.parentCats = json
-});
-
 
 
 //*******************************
@@ -230,6 +225,8 @@ function initMap(evt) {
             // var currentAddress = geocoder.geocode({location: initialLocation})[0].formatted_address;
             // console.log(currentAddress)
 
+        //    todo add (nested? ex: call one function to remove from list, then new one to update markers) event listener for chart click to draw new pins
+
 
         }, function () {
             handleNoGeolocation(browserSupportFlag)
@@ -252,7 +249,7 @@ function initMap(evt) {
     }
 
     //loops through json of business info and plots points on map.
-    function addPins(location, businesses) {
+    function addPins(businesses) {
 
         clearOverlays();
 
@@ -261,11 +258,11 @@ function initMap(evt) {
         // category
 
         for (var business in businesses) {
-            console.log(business);
-            console.log(businesses[business]);
-            console.log(businesses[business]['longitude']);
-            console.log(businesses[business]['latitude']);
-
+            // console.log(business);
+            // console.log(businesses[business]);
+            // console.log(businesses[business]['longitude']);
+            // console.log(businesses[business]['latitude']);
+            //
 
             var businessInfo = '<div id="marker">' +
                 '<div id="Header">' +
@@ -284,20 +281,28 @@ function initMap(evt) {
                     lng: businesses[business]['longitude']
                 },
                 html: businessInfo,
-                cats: businesses[business]['cat_list']
+                cats: businesses[business]['cat_list'],
+                pcats: []
 
             });
+            //
+            for (var i=0; i < marker.cats.length; i++)
+                if (parentCats[marker.cats[i]] !== undefined){
+                    console.log($.inArray(parentCats[marker.cats[i]], marker.pcats));
+                    if ($.inArray(parentCats[marker.cats[i]], marker.pcats) === parseInt(-1)){
+                        marker.pcats.push(parentCats[marker.cats[i]])}
+                }
 
-            var categories = [];
 
-            for (var i = 0; i < businesses[business]['cat_list']; i++){
-                var parent = parentCats[businesses[business]['cat_list'][i]];
-                categories.push(parent)
-            }
+
+            // for (var i = 0; i < businesses[business]['cat_list'].length; i++){
+            //     var parent = parentCats[businesses[business]['cat_list'][i]];
+            //     categories.push(parent)
+            // }
 
             // marker.categories = for(subcategory of businesses[business]['cat_list']);
 
-            marker.pcats = categories;
+            // marker.pcats = categories;
             markers.push(marker);
 
 
@@ -305,7 +310,7 @@ function initMap(evt) {
                 content: "Loading..."
             });
 
-            console.log(businessInfo);
+            // console.log(businessInfo);
             //opens closes any open info windows and opens a new one for the marker being clicked
             marker.addListener('click', function () {
                 console.log(this.html);
@@ -334,7 +339,7 @@ function initMap(evt) {
             'cutoff': cutoff
         };
         $.get('/local-best.json', payload, function (data) {
-            addPins(location, data)
+            addPins(data)
         })
     }
 }
