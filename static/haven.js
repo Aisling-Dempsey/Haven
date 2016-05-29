@@ -15,6 +15,13 @@ function displayResults(result) {
     var cutoff = result['cutoff'];
     $('#search-results').empty();
 
+    var map = $("<div>");
+    map.attr("id", "results-map");
+    $('#search-results').append(map);
+    
+    initMap();
+
+
     var resultNum = 1;
     for (var yelp_id in businesses) {
         console.log(yelp_id);
@@ -25,7 +32,7 @@ function displayResults(result) {
         var address2 = businesses[yelp_id]['address_line_2'] || undefined;
 
         var yelpRating = businesses[yelp_id]['yelp_score'];
-        var havenRating = businesses[yelp_id]['score'] + 3|| undefined;
+        var havenRating = businesses[yelp_id]['score']|| undefined;
         var havenCount = businesses[yelp_id]['total_ratings'];
         console.log(havenCount);
         var photo = businesses[yelp_id]['photo'];
@@ -121,12 +128,14 @@ function displayResults(result) {
 
 function moreResults(evt) {
     // console.log('yooooooo');
-    var input = {'term': $(this).data("term"),
-                'offset': $(this).data("offset"),
-                'sort': $(this).data("sort"),
-                'cutoff': $(this).data("cutoff")
+    evt.preventDefault();
+    var input = {'term': $(this).data("term")||$('#search-field').val(),
+                //todo convert this.data to a list
+                'offset': $(this).data("offset")||0,
+                'sort': $(this).data("sort")||$('.sort-type:checked').val(),
+                'cutoff': $(this).data("cutoff")||$('#haven-cutoff').val()
                 };
-    console.log('cutoff', $(this).data("cutoff"));
+    console.log('cutoff', input.cutoff);
     $.get("/results.json", input, displayResults);
 
 }
@@ -135,7 +144,7 @@ function moreResults(evt) {
 //event listener for rendering more results on searches
 $(document).on('click', '.search-more-btn', moreResults);
 
-
+$(document).on('click', '#search-btn', moreResults);
 
 
 //*******************************
@@ -165,7 +174,8 @@ function initMap(evt) {
         mapTypeID: google.maps.MapTypeId.ROADMAP
     };
 
-    map = new google.maps.Map(document.getElementById('splash-map'), myOptions);
+    //makes the map equal to the results map if it exists, if not, then the splash map
+    map = new google.maps.Map(document.getElementById('results-map')||document.getElementById('splash-map'), myOptions);
     //checks if geolocation is supported by the browser and
     if (navigator.geolocation) {
         var browserSupportFlag = true;
@@ -204,8 +214,9 @@ function initMap(evt) {
                 getLocalBest(current_address, $('#haven-cutoff').val());
                 alert("It looks like you're located at ".concat(current_address));
 
-                //EVENT LISTNER TO GET NEW BUSINESS LIST USING NEW CUTOFF VALUE
+                //EVENT LISTeNER TO GET NEW BUSINESS LIST USING NEW CUTOFF VALUE
                 $('#haven-cutoff').change(function () {
+                    updateCutoff(evt);
                     getLocalBest(current_address, $('#haven-cutoff').val())
                 })
             });
@@ -317,6 +328,8 @@ function initMap(evt) {
                 infoWindow.setContent(this.html);
                 infoWindow.close();
                 infoWindow.open(map, this);
+                // var image = '/static/pins/mm_20_yellow.png';
+                // this.icon = image
             });
 
         }
@@ -331,15 +344,73 @@ function initMap(evt) {
         //updates the bounds of the map to fit the points
         map.fitBounds(newBounds);
         console.log(markers);
+        //
+        // donut()
     }
 
+
+    // // CHART
+    // function donut(){
+    //     console.log('donuts called');
+    //     var parents = {};
+    //     var parentsArray = [];
+    //     for (var i = 0; i < markers.length; i++) {
+    //         for (var p = 0; p < markers[i].pcats.length; p++) {
+    //             console.log(markers[i].pcats.length);
+    //             console.log(markers[i]);
+    //             console.log(markers[i].pcats[p]);
+    //             parentsArray.push(markers[i].pcats[p]);
+    //             console.log("parentsArray:", parentsArray);
+    //             if (parents[markers[i].pcats[p]] !== undefined) {
+    //                 //intended behaviour: either append the marker to the parent, or mae it equal to an array of it.
+    //                 console.log('past the if');
+    //                 console.log(parents[markers[i].pcats[p]]);
+    //                 parents[markers[i].pcats[p]].push(markers[i])
+    //             } else {
+    //                 console.log('in the else');
+    //                 parents[markers[i].pcats[p]] = [markers[i]]}
+    //         }
+    //     }
+    //     console.log(parents);
+    //     for (var cat in parents){
+    //         parents[cat]['value'] = parents[cat].length;
+    //         console.log(parents[cat]['value']);
+    //         parents[cat]['label'] = cat
+    //     }
+    //
+    //     var options = {responsive: true};
+    //
+    //     var ctx_donut = $("#resultChart");
+    //
+    //
+    //
+    //     var myDonutChart = new Chart(ctx_donut, {type: 'doughnut', data: 'parents', options:'options'});
+    //     $('#donutLegend').html(myDonutChart.generateLegend());
+    //
+    // }
+
+
+
+    //gets best local businesses above cutoff
     function getLocalBest(location, cutoff) {
         console.log('getLocalBest called');
         var payload = {'location': location,
             'cutoff': cutoff
         };
         $.get('/local-best.json', payload, function (data) {
-            addPins(data)
+            console.log(typeof(data));
+            console.log(data);
+
+            //todo, check if the map breaks at hackbright, this is why
+            if($.isEmptyObject(data)) {
+                //replace with modal
+                console.log('There are no businesses in your area')
+
+            }
+            else{
+                console.log('adding pins');
+                addPins(data)
+            }
         })
     }
 }
@@ -354,10 +425,10 @@ function handleLocationError(browserHasGeolocation, infoWindow, pos) {
                         'Error: Your browser doesn\'t support geolocation.');
 }
 
-function updateChart(businesses){
+// function updateChart(businesses){
 //    loop through markers on click, generate dict of count
 
-}
+// }
 
 
 
@@ -366,8 +437,9 @@ function updateChart(businesses){
 
 //event handler to update displayed cutoff above fader
 function updateCutoff(evt){
-    $('#cutoff-val').html("Don't show ratings below " + (parseFloat(this.value) + 3));
-    console.log("event triggered")
+    console.log('update cutoff run')
+    $('#cutoff-val').html("Don't show ratings below " + (parseFloat($('#haven-cutoff').val()) + 3));
+
 }
 
 //event listener to update the cutoff when the fader is changed

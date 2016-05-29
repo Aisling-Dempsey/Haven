@@ -215,8 +215,8 @@ def build_results(term, location, offset, sort, cutoff):
                 ratings = get_aggregate_rating(business)
                 print "score: ", ratings[0]
                 print 'name:', business.name
-                score = ratings[0] + 2
-                adjusted_cutoff = cutoff +2
+                score = ratings[0] + 3
+                adjusted_cutoff = cutoff +3
                 # uses adusted score and cutoff to allow for less than comparison with non-negative nums
                 if score < adjusted_cutoff:
 
@@ -235,6 +235,7 @@ def build_results(term, location, offset, sort, cutoff):
             else:
                 continue
 
+
         # for queries with no cutoff, shows local ratings
         elif business:
             print "triggered elif"
@@ -249,6 +250,7 @@ def build_results(term, location, offset, sort, cutoff):
             company_info[yelp_id] = entry[entry.keys()[0]]
             print 'name:', company_info[yelp_id]['name']
             print len(company_info)
+
 
     return term, offset, company_info, sort
 

@@ -1,14 +1,13 @@
 {% extends 'base.html' %}
 {%  block body %}
     <h1>Welcome to Haven</h1>
-    <a href="/add-ratings"><button>Add a rating</button></a>
-    <form action="/results" method="GET">
+    <form>
         <input type="search" id='search-field' name="term" placeholder="Enter a business name or category" required>
-         <div id="search method">
+         <div id="search-method">
              <h2>Sort by:</h2>
-            <input type="radio" name="sort" value="0" checked="checked">Best Matched
-            <input type="radio" name="sort" value="1">Distance
-            <input type="radio" name="sort" value="2">Highest rated (Yelp)
+            <input class="sort-type" type="radio" name="sort" value="0" checked="checked">Best Matched
+            <input class="sort-type" type="radio" name="sort" value="1">Distance
+            <input class="sort-type" type="radio" name="sort" value="2">Highest rated (Yelp)
          </div>
          <div id="haven-filters">
              <p id="cutoff-val">Don't show businesses with inclusivity ratings below: 3</p>
@@ -20,19 +19,21 @@
     </div>
 
     <div class="container">
-        <div class="row">
-{#            <div class="col-xs-12 col-lg-8 col-lg-offset-2">#}
-                <div id="splash-map"></div>
-{#            </div>#}
-        </div>
-        <div class="row">
-            <div class="col-xs-12 col-lg-4 col-lg-offset-4">
-                <div class="results-chart">
-                    <canvas id="resultChart"></canvas>
-                    <div id="donutLegend" class="chart-legend"></div>
+        <div id="search-results">
+            <div class="row">
+                <div class="col-xs-12 col-med-12 col med-offset-2 col-lg-8 col-lg-offset-2 map">
+                    <div id="splash-map"></div>
                 </div>
             </div>
-        </div>
+            <div class="row">
+                <div class="col-xs-12 col-lg-4 col-lg-offset-4">
+                    <div class="results-chart">
+                        <canvas id="resultChart"></canvas>
+                        <div id="donutLegend" class="chart-legend"></div>
+                    </div>
+                </div>
+            </div>
+         </div>
     </div>
 
 
