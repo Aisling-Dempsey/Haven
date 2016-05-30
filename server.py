@@ -303,6 +303,12 @@ def business_search_form():
                            user=session.get("user_name"))
 
 
+@app.route('/set-address', methods=['POST'])
+def update_address():
+    session['user_address'] = request.form.get("current_address")
+    return redirect('/')
+
+
 # @app.route('catgeories.json')
 # def serve_categorise():
 #
