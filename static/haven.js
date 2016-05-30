@@ -146,7 +146,7 @@ function moreResults(evt) {
 //event listener for rendering more results on searches
 $(document).on('click', '.search-more-btn', moreResults);
 
-$(document).on('click', '#search-btn', moreResults);
+$('#search-btn').click(moreResults);
 
 
 //*******************************
@@ -480,6 +480,7 @@ $('#haven-cutoff').change(updateCutoff);
 
 
 function getLocation(evt) {
+    console.log('getLocation called');
     if (navigator.geolocation) {
         var browserSupportFlag = true;
         navigator.geolocation.getCurrentPosition(function (position) {
@@ -547,7 +548,11 @@ function setNewAddress (evt){
     $.post('/set-address', address, initMap);
 
 }
+$('#address-btn').click(getLocation);
+// $(document).on('click', '#random-fucking-btn', function(){console.log('button')});
 
+
+//todo add middle funtion to check for session var
 $(document).ready(getLocation);
 
 
