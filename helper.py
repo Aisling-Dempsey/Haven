@@ -251,7 +251,6 @@ def build_results(term, location, offset, sort, cutoff):
             print 'name:', company_info[yelp_id]['name']
             print len(company_info)
 
-
     return term, offset, company_info, sort
 
 

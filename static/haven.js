@@ -161,6 +161,8 @@ var markers=[];
 
 function clearOverlays(){
     //loops through global array of markers and sets the map to null, then resets markers to an empty list
+    //todo add comparison to filter-by list for what to clear
+
     for (var i=0; i < markers.length; i++){
         markers[i].setMap(null)
     }
@@ -175,15 +177,17 @@ function initMap(evt) {
         zoom: 18,
         mapTypeID: google.maps.MapTypeId.ROADMAP
     };
-
+    console.log('initial location', initialLocation);
     //makes the map equal to the results map if it exists, if not, then the splash map
-    map = new google.maps.Map(document.getElementById('results-map')||document.getElementById('splash-map'), myOptions);
-
+    var map = new google.maps.Map(document.getElementById('results-map')||document.getElementById('splash-map'), myOptions);
+    //todo get smaller pin
+    var image = '/static/pins/home-pin.png';
     var locGuess = new google.maps.Marker({
                     map: map,
                     draggable: true,
                     animation: google.maps.Animation.DROP,
-                    position: initialLocation
+                    position: initialLocation,
+                    icon: image
                 });
 
     console.log(locGuess);
@@ -483,17 +487,18 @@ function getLocation(evt) {
     console.log('getLocation called');
     if (navigator.geolocation) {
         var browserSupportFlag = true;
+        // todo build if statement to check whether location has been defined.
         navigator.geolocation.getCurrentPosition(function (position) {
             window.initialLocation = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
-            console.log(initialLocation);
+            // console.log(initialLocation);
 
             //gets best local businesses near starting point
             var geocoder = new google.maps.Geocoder;
             geocoder.geocode({location: initialLocation}, function (results) {
                 // console.log(results[0].formatted_address);
-                console.log(results[0].formatted_address);
+                // console.log(results[0].formatted_address);
                 window.currentAddress = results[0].formatted_address;
-                console.log(currentAddress);
+                // console.log(currentAddress);
                $('#myModal').modal({
                     keyboard: false
                 });
@@ -543,9 +548,14 @@ function getLocation(evt) {
 
 function setNewAddress (evt){
     window.currentAddress = $('#user-address').val();
-    var address = {'current_address': currentAddress};
-    console.log(address);
-    $.post('/set-address', address, initMap);
+    var address = {'address': currentAddress};
+    // console.log(address);
+    var geocoder = new google.maps.Geocoder();
+    geocoder.geocode(address, function(results){
+       window.initialLocation= results[0].geometry.location;
+        console.log('initial location within set address', initialLocation);
+        $.post('/set-address', address, initMap)
+    });
 
 }
 $('#address-btn').click(getLocation);

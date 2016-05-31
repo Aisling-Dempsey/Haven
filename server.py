@@ -50,7 +50,8 @@ def splash():
 
 @app.route('/local-best.json')
 def best_local():
-    location = request.args.get('location')
+    # location = request.args.get('location')
+    location = session['user_address']
     print type(request.args.get('cutoff'))
     cutoff = float(request.args.get('cutoff'))
     print location
@@ -120,7 +121,8 @@ def post_account():
 def results():
     """search results page"""
     term = request.args['term']
-    location = ", ".join([helper.current_loc()['city'], helper.current_loc()['region_code']])
+    # location = ", ".join([helper.current_loc()['city'], helper.current_loc()['region_code']])
+    location = session['user_address']
     offset = 0
     sort = int(request.args['sort'])
     print sort
@@ -143,7 +145,8 @@ def results():
 @app.route('/business-results')
 def yelp_only_results():
     term = request.args['term']
-    location = ", ".join([helper.current_loc()['city'], helper.current_loc()['region_code']])
+    location = session['user_address']
+    # location = ", ".join([helper.current_loc()['city'], helper.current_loc()['region_code']])
     offset = 0
     cutoff = None
     result = helper.build_results(term, location, offset, 0, cutoff)
@@ -168,7 +171,8 @@ def more_results():
         cutoff = float(request.args['cutoff'])
     else:
         cutoff = None
-    location = ", ".join([helper.current_loc()['city'], helper.current_loc()['region_code']])
+    location = session['user_address']
+    # location = ", ".join([helper.current_loc()['city'], helper.current_loc()['region_code']])
     result = helper.build_results(term, location, offset, sort, cutoff)
     output = {'term': result[0],
               'offset': result[1],
@@ -305,7 +309,7 @@ def business_search_form():
 
 @app.route('/set-address', methods=['POST'])
 def update_address():
-    session['user_address'] = request.form.get("current_address")
+    session['user_address'] = request.form.get("address")
     return redirect('/')
 
 
