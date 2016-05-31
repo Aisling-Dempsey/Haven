@@ -2,6 +2,8 @@
  * Created by aislingdempsey on 5/16/16.
  */
 
+var callStack = [];
+
 //this script relies on jquery
 function displayResults(result) {
     console.log('calling display results');
@@ -112,31 +114,48 @@ function displayResults(result) {
         resultNum ++
 
     }
+   if (callStack.length > 1){
+    var btn = $('<button>');
+        btn.attr({
+            'most-recent': callStack[-1],
+            'id': 'results-back-btn',
+            'class': 'nav-btn'
+        }).append("<< Go back");
+    $('#search-results').append(btn);
+      $('#results-back-btn').click(function(evt){
+        callStack.pop();
+        moreResults(evt, true)})
+    }
 
     console.log("length of results div", $(".query-result").length);
     if ($(".query-result").length ===10){
         console.log('make button called');
         var btn = $('<button>');
             btn.attr({
-                'class': 'search-more-btn',
+                'id': 'search-more-btn',
+                'class': 'nav-btn',
                 'data-term': term,
                 'data-offset': offset,
                 'data-sort': sort,
-                'data-cutoff': cutoff}).append("More results...");
+                'data-cutoff': cutoff}).append("More results >>");
             $('#search-results').append(btn);}
+
 
 
 }
 
-function moreResults(evt) {
+function moreResults(evt, back) {
     // console.log('yooooooo');
     evt.preventDefault();
+    var back  = back || false;
     var input = {'term': $(this).data("term")||$('#search-field').val(),
                 //todo convert this.data to a list
                 'offset': $(this).data("offset")||0,
                 'sort': $(this).data("sort")||$('.sort-type:checked').val(),
                 'cutoff': $(this).data("cutoff")||$('#haven-cutoff').val()
                 };
+
+    if (back === false){callStack.push(input)}
     console.log('cutoff', input.cutoff);
     $.get("/results.json", input, displayResults);
 
@@ -144,7 +163,7 @@ function moreResults(evt) {
 
 
 //event listener for rendering more results on searches
-$(document).on('click', '.search-more-btn', moreResults);
+$(document).on('click', '#search-more-btn', moreResults);
 
 $('#search-btn').click(moreResults);
 
