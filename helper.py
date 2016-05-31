@@ -91,11 +91,11 @@ def get_ratings(user_id):
     return rating_info
 
 
-def current_loc():
-    """outputs locational json based upon user ip"""
-    r = requests.get("http://freegeoip.net/json/")
-    location = r.json()
-    return location
+# def current_loc():
+#     """outputs locational json based upon user ip"""
+#     r = requests.get("http://freegeoip.net/json/")
+#     location = r.json()
+#     return location
 
 
 def yelp_by_id(yelp_id):
@@ -208,7 +208,7 @@ def build_results(term, location, offset, sort, cutoff):
         yelp_id = entry.keys()[0]
         print 'cutoff', cutoff
         # checks if there is a cutoff and outputs results with local scores above cutoff.
-        if cutoff is not None:   #this doesn't work if you don't state "is not None"
+        if cutoff != -3:   #this doesn't work if you don't state "is not None"
             print 'got past cutoff if'
             if business:
                 # print business()
@@ -241,7 +241,7 @@ def build_results(term, location, offset, sort, cutoff):
             print "triggered elif"
             company_info[yelp_id] = entry[entry.keys()[0]]
             ratings = get_aggregate_rating(business)
-            company_info[yelp_id]['score'] = ratings[0]
+            company_info[yelp_id]['score'] = ratings[0] + 3
             company_info[yelp_id]['total_ratings'] = ratings[1]
 
         # for queries with no cutoff and no local ratings, just shows base information
