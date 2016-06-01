@@ -21,12 +21,12 @@ function displayResults(result) {
     map.attr("id", "results-map");
     $('#search-results').append(map);
     
-    initMap();
+    // initMap();
 
 
     var resultNum = 1;
     for (var yelp_id in businesses) {
-        console.log(yelp_id);
+        // console.log(yelp_id);
         var name = businesses[yelp_id]['name'];
         var category = businesses[yelp_id]['category'];
 
@@ -36,7 +36,7 @@ function displayResults(result) {
         var yelpRating = businesses[yelp_id]['yelp_score'];
         var havenRating = businesses[yelp_id]['score']|| undefined;
         var havenCount = businesses[yelp_id]['total_ratings'];
-        console.log(havenCount);
+        // console.log(havenCount);
         var photo = businesses[yelp_id]['photo'];
 
 
@@ -115,21 +115,30 @@ function displayResults(result) {
 
     }
    if (callStack.length > 1){
-    var btn = $('<button>');
-        btn.attr({
-            'most-recent': callStack[-1],
+       var mostRecent = callStack.slice(-2,-1)[0];
+
+       var btn = $('<button>');
+       btn.attr({
             'id': 'results-back-btn',
-            'class': 'nav-btn'
-        }).append("<< Go back");
-    $('#search-results').append(btn);
-      $('#results-back-btn').click(function(evt){
-        callStack.pop();
-        moreResults(evt, true)})
+            'class': 'nav-btn',
+            'data-term': mostRecent.term,
+            'data-offset': mostRecent.offset,
+            'data-sort': mostRecent.sort,
+            'data-cutoff': mostRecent.cutoff
+       }).append("<< Go back");
+       $('#search-results').append(btn);
+       //
+       // $('#results-back-btn').click(function(evt){
+       //     callStack.pop();
+       //  //  todo fix always returning to first result
+       //
+       //     moreResults(evt)})
     }
 
-    console.log("length of results div", $(".query-result").length);
+    // console.log("length of results div", $(".query-result").length);
     if ($(".query-result").length ===10){
-        console.log('make button called');
+        // var nextValues = callStack.slice(-1)[0];
+        // console.log('make button called');
         var btn = $('<button>');
             btn.attr({
                 'id': 'search-more-btn',
@@ -137,26 +146,35 @@ function displayResults(result) {
                 'data-term': term,
                 'data-offset': offset,
                 'data-sort': sort,
-                'data-cutoff': cutoff}).append("More results >>");
+                'data-cutoff': cutoff
+            }).append("More results >>");
             $('#search-results').append(btn);}
+
 
 
 
 }
 
-function moreResults(evt, back) {
+function moreResults(evt) {
     // console.log('yooooooo');
+    //todo add scroll to return you to top
     evt.preventDefault();
-    var back  = back || false;
+
+    // if (back !== false){console.log('moreResults called correctly')}
+    console.log("'this' is equal to:", $(this));
     var input = {'term': $(this).data("term")||$('#search-field').val(),
                 //todo convert this.data to a list
                 'offset': $(this).data("offset")||0,
                 'sort': $(this).data("sort")||$('.sort-type:checked').val(),
                 'cutoff': $(this).data("cutoff")||$('#haven-cutoff').val()
                 };
+    //if the button being clicked is the more results button, adds to the call stack
+    if ($(this).attr('id') !== "results-back-btn"){callStack.push(input)}
+    //if the button being clicked is the back button, the topmost value is removed from the callstack
+    else if ($(this).attr('id') === "results-back-btn"){
+        callStack.pop()}
 
-    if (back === false){callStack.push(input)}
-    console.log('cutoff', input.cutoff);
+    console.log('offset', input.offset);
     $.get("/results.json", input, displayResults);
 
 }
@@ -164,8 +182,11 @@ function moreResults(evt, back) {
 
 //event listener for rendering more results on searches
 $(document).on('click', '#search-more-btn', moreResults);
-
-$('#search-btn').click(moreResults);
+$(document).on('click', '#results-back-btn', moreResults);
+$('#search-btn').click(function(evt){
+    callStack.length = 0;
+    moreResults(evt)
+});
 
 
 //*******************************
@@ -283,7 +304,7 @@ function initMap(data) {
             //
             for (var i=0; i < marker.cats.length; i++)
                 if (parentCats[marker.cats[i]] !== undefined){
-                    console.log($.inArray(parentCats[marker.cats[i]], marker.pcats));
+                    // console.log($.inArray(parentCats[marker.cats[i]], marker.pcats));
                     if ($.inArray(parentCats[marker.cats[i]], marker.pcats) === parseInt(-1)){
                         marker.pcats.push(parentCats[marker.cats[i]])}
                 }
@@ -377,13 +398,13 @@ function initMap(data) {
 
     //gets best local businesses above cutoff
 function getLocalBest(location, cutoff, callback) {
-    console.log('getLocalBest called');
+    // console.log('getLocalBest called');
     var payload = {'location': location,
         'cutoff': cutoff
     };
     $.get('/local-best.json', payload, function (data) {
-        console.log(typeof(data));
-        console.log(data);
+        // console.log(typeof(data));
+        // console.log(data);
 
         //todo, check if the map breaks at hackbright, this is why
         callback(data);
@@ -427,7 +448,7 @@ $('#haven-cutoff').change(updateCutoff);
 
 
 function getLocation(evt) {
-    console.log('getLocation called');
+    // console.log('getLocation called');
     if (navigator.geolocation) {
         var browserSupportFlag = true;
         // todo build if statement to check whether location has been defined.
@@ -497,7 +518,7 @@ function setNewAddress (evt){
     var cutoff = $('#haven-cutoff').val();
     geocoder.geocode(address, function(results){
        window.initialLocation= results[0].geometry.location;
-        console.log('initial location within set address', initialLocation);
+        // console.log('initial location within set address', initialLocation);
         $.post('/set-address', address, function(){getLocalBest(currentAddress, cutoff,
             function(data){initMap(data)})})
     });
