@@ -213,8 +213,9 @@ def explore():
                            user=session.get("user_name"))
 
 
-@app.route('/info/<string:business_id>')
+@app.route('/info/<string:business_id>.json')
 def info(business_id):
+    print 'route called successfully'
     # if it exists in local db, gets object, if not, returns none.
     haven_bus_data = Business.query.filter_by(yelp_id=business_id).first()
     yelp_bus_data = helper.yelp_by_id(business_id)
@@ -246,14 +247,23 @@ def info(business_id):
         haven_ratings = None, None
         recent_review = None
         recent_score = None
-    return render_template('business.html',
-                           score=haven_ratings[0],
-                           total_ratings=haven_ratings[1],
-                           yelp_bus_data=yelp_bus_data,
-                           recent_score=recent_score,
-                           recent_review=recent_review,
-                           keys=helper.KEYS,
-                           user=session.get("user_name"))
+    business = {'score': haven_ratings[0],
+                'total_ratings': haven_ratings[1],
+                'yelp_bus_data': yelp_bus_data,
+                'recent_score': recent_score,
+                'recent_review': recent_review,
+                'user': session.get("user_name")}
+    print "business:", business
+    print "business json", jsonify(business)
+    return jsonify(business)
+    # return render_template('business.html',
+    #                        score=haven_ratings[0],
+    #                        total_ratings=haven_ratings[1],
+    #                        yelp_bus_data=yelp_bus_data,
+    #                        recent_score=recent_score,
+    #                        recent_review=recent_review,
+    #                        keys=helper.KEYS,
+    #                        user=session.get("user_name"))
 
 
 

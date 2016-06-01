@@ -39,31 +39,32 @@ function displayResults(result) {
         // console.log(havenCount);
         var photo = businesses[yelp_id]['photo'];
 
-
+        
         var container = $("<div>");
         container.attr({
-            id: "result" + resultNum,
-            class: "query-result"});
+                id: "result" + resultNum,
+                class: "query-result"});
         $('#search-results').append(container);
 
         var image = $("<img>");
         image.attr({
-            src: photo,
-            class: "result-photos"
+                src: photo,
+                class: "result-photos"
         });
         $('#result'+resultNum).append(image);
 
         var link =$('<a>');
             link.attr({
-            href: "/info/"+yelp_id,
-            id: "bus-link"+resultNum
+                href: "/info/"+yelp_id+".json",
+                class: "bus-link",
+                id: "bus-link"+resultNum
         });
         $('#result'+resultNum).append(link);
 
         var result_name = $('<p>');
         result_name.attr(
-            'class', "result-name")
-            .html(name);
+                'class', "result-name")
+                .html(name);
         $('#bus-link'+resultNum).html(name);
 
         if (address1 !== undefined) {
@@ -133,9 +134,7 @@ function displayResults(result) {
        //  //  todo fix always returning to first result
        //
        //     moreResults(evt)})
-    }
-
-    // console.log("length of results div", $(".query-result").length);
+    } 
     if ($(".query-result").length ===10){
         // var nextValues = callStack.slice(-1)[0];
         // console.log('make button called');
@@ -149,11 +148,18 @@ function displayResults(result) {
                 'data-cutoff': cutoff
             }).append("More results >>");
             $('#search-results').append(btn);}
-
-
-
-
+    
+    
+    $('.bus-link').click(renderBusiness)
 }
+
+function renderBusiness(evt){
+    evt.preventDefault();
+    var link = $(this).attr('href');
+    console.log(link);
+    $.get(link, function(result){console.log(result)})
+}
+
 
 function moreResults(evt) {
     // console.log('yooooooo');
