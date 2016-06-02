@@ -114,12 +114,19 @@ function displayBusiness(result){
         });
     $('#bus-text-block').append(busTopRow);
 
+    var soloBusUrl= $('<a>');
+        soloBusUrl.attr({
+            class: 'col-lg-6',
+            id: 'solo-bus-url',
+            href: yelpUrl
+        });
+    $('#bus-top-row').append(soloBusUrl);
+
     var busName = $('<p>');
         busName.attr({
-            class: 'col-lg-6',
             id: 'solo-bus-name'
         }).append(name);
-    $('#bus-top-row').append(busName);
+    $('#solo-bus-url').append(busName);
 
     var busAggrRating = $('<p>');
         busAggrRating.attr({
@@ -164,6 +171,7 @@ function displayBusiness(result){
      $('#bus-text-block').append(bus3rdRow);
 
 
+
     var busAddress = $('<p>');
         busAddress.attr({
             class: 'col-lg-6',
@@ -174,7 +182,7 @@ function displayBusiness(result){
             formattedAddress += busAddressArray[i] + '<br>'
             }
         busAddress.append(formattedAddress);
-    $('#bus-2nd-row').append(busAddress);
+    $('#bus-3rd-row').append(busAddress);
     
     var reviewsBlockRow = $('<div>');
         reviewsBlockRow.attr({
@@ -235,6 +243,21 @@ function displayBusiness(result){
         });
     $('#haven-row-2').append(havenReviewsDiv);
 
+    // if (recentScore !== undefined){
+    //     var havenRecentScore = $('<p>');
+    //     havenRecentScore.attr({
+    //
+    //     })
+    // }
+    //
+    // if (recentReview !== undefined){
+    //     var recentReviewText = $('<p>');
+    //         recentReviewText.attr(
+    //             class: 'col-lg-12'
+    //             id: 'haven-review-text'
+    //         )
+    // }
+
 
 
     var havenRow3 = $('<div>');
@@ -254,13 +277,19 @@ function displayBusiness(result){
     var backBtn = $('<button>');
         backBtn.attr({
             class: 'col-lg-2 col-lg-offset-5',
-            id: 'return-to-query-btn'
+            id: 'return-to-query-btn',
+            'data-term': callStack.slice(-1)[0]['term'],
+            'data-offset': callStack.slice(-1)[0]['offset'],
+            'data-sort': callStack.slice(-1)[0]['sort'],
+            'data-cutoff': callStack.slice(-1)[0]['cutoff']
         }).append('Return to Business Results');
     $('#bus-block').append(backBtn);
 
 //    todo build event listener to handle click
-    
-    
+
+
+    $('#return-to-query-btn').click(moreResults)
+
 }
 
 
