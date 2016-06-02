@@ -222,8 +222,7 @@ def info(business_id):
     haven_ratings = [None, None]
     categories = [cat[0] for cat in yelp_bus_data['categories']]
     # updates local db with info from yelp if it is in DB
-    user = User.query.get(session['user_id'])
-    user_rating = [item for item in user.ratings if item.business_id ==business_id]
+    user_rating = helper.get_user_rating(session['user_id'], business_id)
     if haven_bus_data is not None:
         helper.validate_db(yelp_bus_data, haven_bus_data)
 
@@ -257,9 +256,20 @@ def info(business_id):
                 'recent_score': recent_score,
                 'recent_review': recent_review,
                 'user': session.get("user_name")}
+    print user_rating
+    if user_rating != []:
+        business['user_rating'] = {
+            'score': user_rating[0].score,
+            'created_at': user_rating[0].created_at,
+            'rating_id': user_rating[0].rating_id}
+        try:
+            user_review = user_rating[0].review
+        except AttributeError:
+            user_review = None
 
-    if user_rating is not []:
-        business['user_rating'] = user_rating
+        if user_review is not None:
+            business['user_rating']['review'] = user_review
+
     print "business:", business
     print "business json", jsonify(business)
     return jsonify(business)
@@ -291,16 +301,18 @@ def rate(business_id):
 def submit_review(business_id):
     """submits review and redirects back to the business page"""
     # determines whether business in url is from yelp API or local only
+    print 'submit review being called'
     form_data = request.form
+    rating_id = form_data.get('rating_id')
     user_id = session['user_id']
     # flashes success messsage
-
-    flash(helper.add_rating(form_data, business_id, user_id))
+    print business_id
+    flash(helper.add_rating(form_data, business_id, user_id, rating_id))
 
 
     # todo add flash "your rating has been submitted"
 
-    return redirect("/info/" + business_id)
+    return redirect("/")
 
 
 @app.route('/info/<business_id>/ratings')

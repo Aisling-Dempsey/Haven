@@ -5,7 +5,6 @@
 var callStack = [];
 
 function displayBusiness(result){
-
     var name = result.yelp_bus_data.name;
 
     var categories = result.categories;
@@ -33,12 +32,23 @@ function displayBusiness(result){
     var yelpUrl = result.yelp_bus_data.url;
 
     var userRating = result.user_rating || undefined;
+    console.log ('userRating:', userRating);
+    if (userRating != undefined) {
+        var userScore = userRating.score || undefined;
 
+        var createdAt = userRating.created_at || undefined;
+
+        var userReview = userRating.review || undefined;
+
+        var userRatingId = userRating.rating_id || undefined;
+    }
     var yelpScore = result.yelp_bus_data.rating || undefined;
 
     var yelpReviewImg = result.yelp_bus_data.snippet_image_url || undefined;
 
     var yelpReviewTxt = result.yelp_bus_data.snippet_text || undefined;
+
+    var yelpId = result.yelp_bus_data.id;
 
 
     //empties div
@@ -270,7 +280,13 @@ function displayBusiness(result){
     var havenModalReviewBtn = $('<button>');
         havenModalReviewBtn.attr({
            class: 'col-lg-8 col-lg-offset-2',
-            id: 'haven-review-modal-btn'
+            id: 'haven-review-modal-btn',
+            'data-name': name,
+            'data-userScore': userScore,
+            'data-userReview': userReview,
+            'data-created-at': createdAt,
+            'data-yelpID': yelpId,
+            'data-userRatingId': userRatingId
         }).append('Review Me');
     $('#haven-row-3').append(havenModalReviewBtn);
 
@@ -287,11 +303,109 @@ function displayBusiness(result){
 
 //    todo build event listener to handle click
 
-
+    $('#haven-review-modal-btn').click(reviewBox);
     $('#return-to-query-btn').click(moreResults)
 
 }
+//
+function reviewBox(evt){
+    $('#myModal').modal({
+        keyboard: false
+    });
+    var yelpId = $(this).data('yelpid');
+    var name = $(this).data('name');
+    var createdAt = $(this).data('created-at') || undefined;
+    var userScore = $(this).data('userscore') || undefined;
+    var userReview = $(this).data('userreview') || undefined;
+    var ratingId = $(this).data('userratingid') || undefined;
+    if (userScore == undefined){
+        var buttonText = "Submit Rating";
+        var headingText = "Rate " + name
+    }
+    else{
+        var buttonText = "Update your Rating";
+        var headingText = "Your review from " + createdAt
+    }
 
+
+    $('#modal-title').html(headingText);
+    $('.modal-body').html("" +
+        "<form> " +
+        "<label>Score" +
+            "<select name='score' id='user-score-selection' required> " +
+            "<!--keeps dropdown blank to prevent accidental scoring--> " +
+                "<option selected disabled hidden style='display: none' value=''>" +
+                "</option> <option value='-2'>1</option> " +
+                "<option value='-1'>2</option> " +
+                "<option value='0'>3</option> " +
+                "<option value='1'>4</option> " +
+                "<option value='2'>5</option> " +
+            "</select> " +
+        "</label> " +
+        "<label>" +
+            "<p>Review (500 chars max):</p>" +
+        "</label> " +
+            "<div id='review-box'>" +
+                "<textarea id='user-review-box' name='review' placeholder='Enter your review here' maxlength='500'>" +
+                "</textarea>" +
+            "</div>" +
+        "</label>" +
+        "</form>");
+
+    if (userReview != undefined){
+        console.log('review should be entered');
+        console.log(userReview);
+        $('#user-review-box').append(userReview)
+    }
+    if (userScore !== undefined){
+        console.log('score should be entered');
+        $('#user-score-selection').val(userScore)
+    }
+
+    $('.modal-footer').html('<button type="button" class="btn btn-primary" data-dismiss="modal" data-yelpID="' +yelpId +
+        '" data-rating-id="' + ratingId + '" id="review-submit-btn">'+ buttonText + '</button>');
+
+    $('#myModal').modal('show');
+
+    function updateReview(evt){
+        var yelpId = $(this).data('yelpid');
+        var score = $('#user-score-selection').val();
+        var review = $('#user-review-box').val();
+        var ratingId =$(this).data('rating-id');
+        console.log(yelpId)
+
+        var input = {'yelp_id': yelpId,
+                    'score': score};
+
+        console.log('event handler triggered');
+        if (review !== ''){
+            input['review'] = review;
+            console.log('has a review')
+        }
+
+        if (typeof(score) === 'string'){
+            //updates prior rating if it exists
+            if (ratingId !== 'undefined'){
+                input['rating_id'] = ratingId;
+                console.log('updated rating');}
+            $.post('/info/'+yelpId+'/rate', input, function(){console.log('review updated successfully')});
+
+            console.log('should post')
+        }
+
+        else{
+            console.log("no score, shouldn't post")
+        }
+
+    }
+
+
+    $('#review-submit-btn').click(updateReview)
+
+
+
+    ;
+}
 
 //this script relies on jquery
 function displayResults(result) {
@@ -773,11 +887,13 @@ function getLocation(evt) {
                     // console.log(results[0].formatted_address);
                     window.currentAddress = results[0].formatted_address;
                     // console.log(currentAddress);
+                    
+                    // address popup modal
                     $('#myModal').modal({
                         keyboard: false
                     });
-
-                    $('#address').html("<form><textarea id='user-address' name='initialLocation'></textarea></form>");
+                    $('#modal-title').html('Verify your Address');
+                    $('.modal-body').html("<form><textarea id='user-address' name='initialLocation'></textarea></form>");
                     $('#user-address').val(currentAddress);
 
                     $('#myModal').modal('show')

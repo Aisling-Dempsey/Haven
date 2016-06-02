@@ -280,28 +280,41 @@ def build_query_result(company):
     return business_info
 
 
-def add_rating(form_data, yelp_id, user_id):
+def add_rating(form_data, yelp_id, user_id, rating_id=None):
     """adds a rating form data and business_id"""
     print 'yelp_id in add_rating:', yelp_id
+
     if Business.query.filter_by(yelp_id=yelp_id).first() is None:
         validate_db(yelp_by_id(yelp_id))
     score = int(form_data.get("score"))
     review = form_data.get("review")
-    created_at = datetime.now()
-    business = Business.query.filter_by(yelp_id=yelp_id).first()
-    print 'business in add_rating:', business
-    business_id = business.business_id
-    rating = Rating(business_id=business_id,
-                    user_id=user_id,
-                    score=score,
-                    created_at=created_at)
-    if review:
-        rating.review = review
+    # if a rating already existed, updates the score and the review
+    print yelp_id
+    if rating_id:
+        rating = Rating.query.get(rating_id)
+        rating.score = score
+        if review:
+            rating.review = review
+        db.session.commit()
+        return "Your rating has been updated"
 
-    db.session.add(rating)
-    db.session.commit()
+    else:
+        business = Business.query.filter_by(yelp_id=yelp_id).first()
+        print 'business in add_rating:', business
+        business_id = business.business_id
+        created_at = datetime.now()
 
-    return "Your rating has been added!"
+        rating = Rating(business_id=business_id,
+                        user_id=user_id,
+                        score=score,
+                        created_at=created_at)
+        if review:
+            rating.review = review
+
+        db.session.add(rating)
+        db.session.commit()
+
+        return "Your rating has been added!"
 
 
 def most_recent_review(business):
@@ -365,6 +378,24 @@ def datetime_converter(ratings):
     """takes a list of datetime objects and converts to a list of strings"""
     timestamps = [rating.created_at.strftime('%B %d, %Y') for rating in ratings]
     return zip(ratings, timestamps)
+
+
+def find_bus_id(id_to_check):
+    """validates whether an ID is a business_id or a yelp_id and returns the business_id"""
+
+    try:
+        return int(id_to_check)
+    except ValueError:
+        result = Business.query.filter_by(yelp_id=id_to_check).first()
+        return result.business_id
+
+def get_user_rating(user_id, yelp_id):
+
+    user = User.query.get(user_id)
+    business_id = find_bus_id(yelp_id)
+    return [item for item in user.ratings if item.business_id == business_id]
+
+
 
 
 if __name__ == "__main__":
@@ -440,11 +471,3 @@ if __name__ == "__main__":
 #     db.session.commit()
 #
 #
-# def find_bus_id(id_to_check):
-#     """validates whether an ID is a business_id or a yelp_id and returns the business_id"""
-#
-#     try:
-#         return int(id_to_check)
-#     except ValueError:
-#         result = Business.query.filter_by(yelp_id=id_to_check).first()
-#         return result.business_id
