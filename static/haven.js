@@ -4,14 +4,276 @@
 
 var callStack = [];
 
+function displayBusiness(result){
+
+    var name = result.yelp_bus_data.name;
+
+    var categories = result.categories;
+
+    var busAddressArray = result.yelp_bus_data.location.display_address || undefined;
+
+    var coords ={};
+    coords.lat = result.yelp_bus_data.location.coordinate.latitide;
+    coords.lng = result.yelp_bus_data.location.coordinate.longitude;
+
+    var phone = result.yelp_bus_data.display_phone || undefined;
+
+    //replaces with larger version of image
+    var image = result.yelp_bus_data.image_url.replace('/ms.jpg', '/l.jpg')
+
+    var recentReview = result.recent_review || undefined;
+
+    var recentScore = result.recent_score || undefined;
+
+    var score = result.score + 3 || undefined;
+    console.log('result.score:', result.score);
+    console.log('score:', score);
+    var totalRatings = result.total_ratings || undefined;
+
+    var yelpUrl = result.yelp_bus_data.url;
+
+    var userRating = result.user_rating || undefined;
+
+    var yelpScore = result.yelp_bus_data.rating || undefined;
+
+    var yelpReviewImg = result.yelp_bus_data.snippet_image_url || undefined;
+
+    var yelpReviewTxt = result.yelp_bus_data.snippet_text || undefined;
+
+
+    //empties div
+    $('#search-results').empty();
+
+    var businessBlock = $('<div>');
+        businessBlock.attr({
+            class: 'row',
+            id: 'bus-block'
+        });
+    $('#search-results').append(businessBlock);
+
+    var busInfo = $('<div>');
+        busInfo.attr({
+            class: 'busInfo col-lg-10 col-lg-offset-1',
+            id: 'bus-info'});
+    $('#bus-block').append(busInfo);
+
+    var busRow = $('<div>');
+        busRow.attr({
+            class: 'row',
+            id: 'bus-row'
+        });
+    $('#bus-info').append(busRow);
+
+    var busInfoBlock = $('<div>');
+        busInfoBlock.attr({
+            class: 'col-lg-9',
+            id: 'bus-info-block'
+        });
+    $('#bus-row').append(busInfoBlock);
+
+    var mapBlock = $('<div>');
+        mapBlock.attr({
+            class: 'col-lg-3 map',
+            id: 'solo-bus-map'
+        });
+    $('#bus-row').append(mapBlock);
+    var busInfoRow = $('<div>');
+        busInfoRow.attr({
+            class: 'row',
+            id: 'bus-info-row'
+        });
+    $('#bus-info-block').append(busInfoRow);
+
+    var photoDiv = $('<div>');
+        photoDiv.attr({
+            class: 'col-lg-4',
+            id: "solo-bus-photo-div"
+        });
+    $('#bus-info-row').append(photoDiv);
+
+    var soloBusPhoto = $('<img>');
+        soloBusPhoto.attr({
+            src: image,
+            class: 'img-responsive',
+            id: 'solo-bus-photo'
+        });
+    $('#solo-bus-photo-div').append(soloBusPhoto);
+
+
+    var busTextBlock = $('<div>');
+        busTextBlock.attr({
+            class: 'col-lg-8',
+            id:"bus-text-block"
+        });
+    $('#bus-info-row').append(busTextBlock);
+
+    var busTopRow = $('<div>');
+        busTopRow.attr({
+            class: 'row',
+            id: 'bus-top-row'
+        });
+    $('#bus-text-block').append(busTopRow);
+
+    var busName = $('<p>');
+        busName.attr({
+            class: 'col-lg-6',
+            id: 'solo-bus-name'
+        }).append(name);
+    $('#bus-top-row').append(busName);
+
+    var busAggrRating = $('<p>');
+        busAggrRating.attr({
+            class: 'col-lg-6',
+            id: 'bus-aggr-rating'
+        });
+        if(score !== undefined){
+            busAggrRating.append('Haven score: '+ score)
+        }
+        else{
+            busAggrRating.append('Haven score: '+ 'No ratings yet')
+        }
+    $('#bus-top-row').append(busAggrRating);
+
+    var bus2ndRow = $('<div>');
+        busTopRow.attr({
+            class: 'row',
+            id: 'bus-2nd-row'
+        });
+    $('#bus-text-block').append(bus2ndRow);
+
+
+    var busPhone = $('<p>');
+        busPhone.attr({
+            class: 'col-lg-6',
+            id: "solo-bus-phone"
+        }).append(phone);
+    $('#bus-2nd-row').append(busPhone);
+
+    var soloYelpScore = $('<p>') ;
+        soloYelpScore.attr({
+            class: 'col-lg-6',
+            id: 'solo-yelp-rating'
+        }).append('Yelp score: ' + yelpScore);
+    $('#bus-2nd-row').append(soloYelpScore);
+
+    var bus3rdRow = $('<p>');
+        bus3rdRow.attr({
+            class: 'row',
+            id: 'bus-3rd-row'
+        });
+     $('#bus-text-block').append(bus3rdRow);
+
+
+    var busAddress = $('<p>');
+        busAddress.attr({
+            class: 'col-lg-6',
+            id: 'solo-bus-address'
+        });
+        var formattedAddress ='';
+        for(var i=0; i < busAddressArray.length; i++){
+            formattedAddress += busAddressArray[i] + '<br>'
+            }
+        busAddress.append(formattedAddress);
+    $('#bus-2nd-row').append(busAddress);
+    
+    var reviewsBlockRow = $('<div>');
+        reviewsBlockRow.attr({
+            class: 'row',
+            id: 'reviews-block-row'
+        });
+    $('#search-results').append(reviewsBlockRow);
+    
+    var havenReviewsBlock = $('<div>');
+        havenReviewsBlock.attr({
+            class: 'col-lg-6',
+            id: 'haven-review-block'
+        });
+    $('#reviews-block-row').append(havenReviewsBlock);
+
+
+
+    var yelpReviewsBlock = $('<div>');
+        yelpReviewsBlock.attr({
+            class: 'col-lg-6',
+            id: 'yelp-review-block'
+        });
+    $('#reviews-block-row').append(yelpReviewsBlock);
+    
+
+    
+    var havenRow1 = $('<div>');
+        havenRow1.attr({
+            class: 'row',
+            id: 'haven-row-1'
+        });
+    $('#haven-review-block').append(havenRow1);
+
+    var havenTitleDiv = $('<div>');
+        havenTitleDiv.attr({
+           class: 'col-lg-12',
+            id: 'haven-title-div'
+        });
+    $('#haven-row-1').append(havenTitleDiv);
+
+    var havenTitle = $('<h3>');
+        havenTitle.attr({
+            id: 'haven-title'
+        }).append('Haven says:');
+    $('#haven-title-div').append(havenTitle);
+
+    var havenRow2 = $('<div>');
+        havenRow2.attr({
+            class: 'row',
+            id: 'haven-row-2'
+        });
+    $('#haven-review-block').append(havenRow2);
+
+    var havenReviewsDiv = $('<h3>');
+        havenReviewsDiv.attr({
+            class: 'col-lg-12',
+            id: 'haven-reviews-div'
+        });
+    $('#haven-row-2').append(havenReviewsDiv);
+
+
+
+    var havenRow3 = $('<div>');
+        havenRow3.attr({
+            class: 'row',
+            id: 'haven-row-3'
+        });
+    $('#haven-review-block').append(havenRow3);
+
+    var havenModalReviewBtn = $('<button>');
+        havenModalReviewBtn.attr({
+           class: 'col-lg-8 col-lg-offset-2',
+            id: 'haven-review-modal-btn'
+        }).append('Review Me');
+    $('#haven-row-3').append(havenModalReviewBtn);
+
+    var backBtn = $('<button>');
+        backBtn.attr({
+            class: 'col-lg-2 col-lg-offset-5',
+            id: 'return-to-query-btn'
+        }).append('Return to Business Results');
+    $('#bus-block').append(backBtn);
+
+//    todo build event listener to handle click
+    
+    
+}
+
+
+
+
 //this script relies on jquery
 function displayResults(result) {
-    console.log('calling display results');
+    // console.log('calling display results');
     var offset = result['offset'];
     // var total = result['total_results'];
-    console.log(result);
+    // console.log(result);
     var businesses = result['businesses'];
-    console.log(businesses);
+    // console.log(businesses);
     var term = result['term'];
     var sort = result['sort'];
     var cutoff = result['cutoff'];
@@ -20,7 +282,7 @@ function displayResults(result) {
     var map = $("<div>");
     map.attr("id", "results-map");
     $('#search-results').append(map);
-    
+    $('#search-results').addClass('container');
     // initMap();
 
 
@@ -39,19 +301,26 @@ function displayResults(result) {
         // console.log(havenCount);
         var photo = businesses[yelp_id]['photo'];
 
-        
-        var container = $("<div>");
-        container.attr({
+
+        var result = $("<div>");
+        result.attr({
                 id: "result" + resultNum,
-                class: "query-result"});
-        $('#search-results').append(container);
+                class: "query-result row"});
+        $('#search-results').append(result);
+
+        var resultBlock = $("<div>");
+            resultBlock.attr({
+                class: "query-block col xs-12 l-8 l-offset-4",
+                id: "result-block" + resultNum});
+        $('#result'+resultNum).append(resultBlock);
+
 
         var image = $("<img>");
         image.attr({
                 src: photo,
-                class: "result-photos"
+                class: "result-photos col"
         });
-        $('#result'+resultNum).append(image);
+        $('#result-block'+resultNum).append(image);
 
         var link =$('<a>');
             link.attr({
@@ -59,7 +328,7 @@ function displayResults(result) {
                 class: "bus-link",
                 id: "bus-link"+resultNum
         });
-        $('#result'+resultNum).append(link);
+        $('#result-block'+resultNum).append(link);
 
         var result_name = $('<p>');
         result_name.attr(
@@ -72,7 +341,7 @@ function displayResults(result) {
             streetAddress1.attr(
                 'class', "street-1")
                 .html(address1);
-            $('#result'+resultNum).append(streetAddress1);
+            $('#result-block'+resultNum).append(streetAddress1);
         }
 
         if (address2 !== undefined) {
@@ -81,7 +350,7 @@ function displayResults(result) {
                 'class', "street-2")
                 .html(address2);
 
-            $('#result'+resultNum).append(streetAddress2);
+            $('#result-block'+resultNum).append(streetAddress2);
         }
 
 
@@ -89,7 +358,7 @@ function displayResults(result) {
         yelpScore.attr(
             "class", 'yelp-score')
             .html(yelpRating);
-        $('#result'+resultNum).append(yelpScore);
+        $('#result-block'+resultNum).append(yelpScore);
 
 
         if (havenRating !== undefined) {
@@ -99,7 +368,7 @@ function displayResults(result) {
                 'class', 'haven-rating')
                 .html(havenRating + " out of " + havenCount + " ratings");
 
-            $('#result' + resultNum).append(haven);
+            $('#result-block' + resultNum).append(haven);
         }
 
         if (havenRating == undefined) {
@@ -109,7 +378,7 @@ function displayResults(result) {
                 'class', 'haven-rating')
                 .html("Nobody has rated this business yet. Be the first!");
 
-            $('#result' + resultNum).append(haven);
+            $('#result-block' + resultNum).append(haven);
         }
 
         resultNum ++
@@ -134,7 +403,7 @@ function displayResults(result) {
        //  //  todo fix always returning to first result
        //
        //     moreResults(evt)})
-    } 
+    }
     if ($(".query-result").length ===10){
         // var nextValues = callStack.slice(-1)[0];
         // console.log('make button called');
@@ -148,8 +417,8 @@ function displayResults(result) {
                 'data-cutoff': cutoff
             }).append("More results >>");
             $('#search-results').append(btn);}
-    
-    
+
+
     $('.bus-link').click(renderBusiness)
 }
 
@@ -157,7 +426,7 @@ function renderBusiness(evt){
     evt.preventDefault();
     var link = $(this).attr('href');
     console.log(link);
-    $.get(link, function(result){console.log(result)})
+    $.get(link, function(result){displayBusiness(result)})
 }
 
 
@@ -259,7 +528,7 @@ function initMap(data) {
     //EVENT LISTeNER TO GET NEW BUSINESS LIST USING NEW CUTOFF VALUE
     $('#haven-cutoff').change(function (evt) {
         updateCutoff(evt);
-        cutoff = $('#haven-cutoff').val()
+        cutoff = $('#haven-cutoff').val();
         getLocalBest(currentAddress, cutoff, function(data){
             if($.isEmptyObject(data)){console.log('There are no businesses in your area')}
             else{
@@ -464,21 +733,25 @@ function getLocation(evt) {
 
             //gets best local businesses near starting point
             var geocoder = new google.maps.Geocoder;
-            geocoder.geocode({location: initialLocation}, function (results) {
-                // console.log(results[0].formatted_address);
-                // console.log(results[0].formatted_address);
-                window.currentAddress = results[0].formatted_address;
-                // console.log(currentAddress);
-               $('#myModal').modal({
-                    keyboard: false
-                });
+            // console.log('currentAddress inside getLocation', currentAddress);
+             // if (currentAddress === undefined) {
+                geocoder.geocode({location: initialLocation}, function (results) {
+                    // console.log(results[0].formatted_address);
+                    // console.log(results[0].formatted_address);
+                    window.currentAddress = results[0].formatted_address;
+                    // console.log(currentAddress);
+                    $('#myModal').modal({
+                        keyboard: false
+                    });
 
-            $('#address').html("<form><textarea id='user-address' name='initialLocation'></textarea></form>");
-            $('#user-address').val(currentAddress);
+                    $('#address').html("<form><textarea id='user-address' name='initialLocation'></textarea></form>");
+                    $('#user-address').val(currentAddress);
 
-            $('#myModal').modal('show')
+                    $('#myModal').modal('show')
+                    ;
+                })
+            // }
                 ;
-            });
 
             $('#save-address-btn').click(setNewAddress);
 
@@ -530,11 +803,22 @@ function setNewAddress (evt){
     });
 }
 
+function getSession(evt){
+    $.get('/get-session.json', function(results){
+        userAddress = results.user_address || undefined;
+        console.log(userAddress);
+        if (userAddress != undefined){
+            window.currentAddress = userAddress
+        }
+        getLocation(evt)
+    })
+}
+
 $('#address-btn').click(getLocation);
 // $(document).on('click', '#random-fucking-btn', function(){console.log('button')});
 
 
-//todo add middle funtion to check for session var
+//todo add middle function to check for session var
 $(document).ready(getLocation);
 
 

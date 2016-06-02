@@ -19,3 +19,37 @@ body{
     top: 20px;
     float: right;
 }
+
+/*.query-block{*/
+    /*background-color: antiquewhite;*/
+/*}*/
+
+/*#solo-bus-photo-div{*/
+    /*display: inline;*/
+    /*background-color: deeppink;*/
+/*}*/
+
+#solo-bus-photo{
+    height: 150px;
+    /*!*width: 100%*!*/
+/*}*/
+
+#bus-info{
+    background-color: antiquewhite;
+}
+
+#bus-text-block{
+    background-color: darkseagreen;
+}
+
+/*#bus-top-row{*/
+    /*background-color: #31708f;*/
+/*}*/
+
+/*#solo-bus-name{*/
+    /*background-color: purple;*/
+/*}*/
+
+#solo-bus-map{
+    background-color: #ac2925;
+}

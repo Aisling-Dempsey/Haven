@@ -361,6 +361,11 @@ def best_local_business(location, cutoff, term=None):
             return best_businesses
 
 
+def datetime_converter(ratings):
+    """takes a list of datetime objects and converts to a list of strings"""
+    timestamps = [rating.created_at.strftime('%B %d, %Y') for rating in ratings]
+    return zip(ratings, timestamps)
+
 
 if __name__ == "__main__":
     # if run interactively, this will allow access of the db

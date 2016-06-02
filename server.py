@@ -220,8 +220,10 @@ def info(business_id):
     haven_bus_data = Business.query.filter_by(yelp_id=business_id).first()
     yelp_bus_data = helper.yelp_by_id(business_id)
     haven_ratings = [None, None]
-
+    categories = [cat[0] for cat in yelp_bus_data['categories']]
     # updates local db with info from yelp if it is in DB
+    user = User.query.get(session['user_id'])
+    user_rating = [item for item in user.ratings if item.business_id ==business_id]
     if haven_bus_data is not None:
         helper.validate_db(yelp_bus_data, haven_bus_data)
 
@@ -243,16 +245,21 @@ def info(business_id):
             recent_review = review_info[1]
     #  todo add haven review and score
     # if business doesn't exist in db, populates ratings with None
+
     else:
         haven_ratings = None, None
         recent_review = None
         recent_score = None
     business = {'score': haven_ratings[0],
+                'categories': categories,
                 'total_ratings': haven_ratings[1],
                 'yelp_bus_data': yelp_bus_data,
                 'recent_score': recent_score,
                 'recent_review': recent_review,
                 'user': session.get("user_name")}
+
+    if user_rating is not []:
+        business['user_rating'] = user_rating
     print "business:", business
     print "business json", jsonify(business)
     return jsonify(business)
@@ -298,11 +305,12 @@ def submit_review(business_id):
 
 @app.route('/info/<business_id>/ratings')
 def view_haven_ratings(business_id):
-    rating_list = reversed(helper.get_business_ratings(business_id))
+    rating_list = helper.get_business_ratings(business_id).reversed
+    rating_date_pairs = helper.datetime_converter(rating_list)
     business = Business.query.filter_by(yelp_id=business_id).first()
     rating = helper.get_aggregate_rating(business)
     return render_template('business-ratings.html',
-                           ratings=rating_list,
+                           ratings=rating_date_pairs,
                            keys=helper.KEYS,
                            business=business,
                            rating=rating,
@@ -321,6 +329,11 @@ def business_search_form():
 def update_address():
     session['user_address'] = request.form.get("address")
     return redirect('/')
+
+
+@app.route('/get-session.json')
+def get_session():
+    return jsonify(session)
 
 
 # @app.route('catgeories.json')
