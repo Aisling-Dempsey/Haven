@@ -264,14 +264,12 @@ function displayBusiness(result){
 }
 
 
-
-
 //this script relies on jquery
 function displayResults(result) {
     // console.log('calling display results');
     var offset = result['offset'];
     // var total = result['total_results'];
-    // console.log(result);
+    console.log('result:', result);
     var businesses = result['businesses'];
     // console.log(businesses);
     var term = result['term'];
@@ -283,7 +281,8 @@ function displayResults(result) {
     map.attr("id", "results-map");
     $('#search-results').append(map);
     $('#search-results').addClass('container');
-    // initMap();
+
+    initMap(result['businesses']);
 
 
     var resultNum = 1;
@@ -485,6 +484,8 @@ function clearOverlays(){
 }
 //event handler to load map
 function initMap(data) {
+    console.log('data', data);
+    // businessList = businessList || undefined;
     //sets default location to Hackbright in case html5 geolocation is not supported
     var defaultLatLong = {lat: 37.788904, lng: -122.414244487882};
     console.log('generating map');
@@ -515,6 +516,9 @@ function initMap(data) {
         infoWindow.open(map, this);
     });
 
+    // if (businessList !== undefined){
+    //
+    // }
 
     if($.isEmptyObject(data)) {
             // todo replace with modal
