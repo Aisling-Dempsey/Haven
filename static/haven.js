@@ -482,7 +482,7 @@ function displayResults(result) {
             var streetAddress1 = $('<p>');
             streetAddress1.attr(
                 'class', "street-1")
-                .html(address1);
+                .html("Address: <br>"+ address1);
             $('#result-block'+resultNum).append(streetAddress1);
         }
 
@@ -499,7 +499,7 @@ function displayResults(result) {
         var yelpScore = $('<p>');
         yelpScore.attr(
             "class", 'yelp-score')
-            .html(yelpRating);
+            .html("Yelp has rated this as "+ yelpRating);
         $('#result-block'+resultNum).append(yelpScore);
 
 
@@ -508,7 +508,7 @@ function displayResults(result) {
 
             haven.attr(
                 'class', 'haven-rating')
-                .html(havenRating + " out of " + havenCount + " ratings");
+                .html("Haven users scored this as "+ havenRating + " out of 5 over " + havenCount + " ratings");
 
             $('#result-block' + resultNum).append(haven);
         }
@@ -614,7 +614,7 @@ var subcategories={};
 //global array of map markers
 
 
-var markers=[];
+window.markers=[];
 
 function clearOverlays(){
     //loops through global array of markers and sets the map to null, then resets markers to an empty list
@@ -638,15 +638,15 @@ function initMap(data) {
     };
     console.log('initial location', initialLocation);
     //makes the map equal to the results map if it exists, if not, then the splash map
-    var map = new google.maps.Map(document.getElementById('results-map')||document.getElementById('splash-map'), myOptions);
+    window.map = new google.maps.Map(document.getElementById('results-map')||document.getElementById('splash-map'), myOptions);
     //todo get smaller pin
     var image = '/static/pins/home-pin.png';
     var locGuess = new google.maps.Marker({
                     map: map,
                     draggable: true,
                     animation: google.maps.Animation.DROP,
-                    position: initialLocation,
-                    icon: image
+                    position: initialLocation
+                    // icon: image
                 });
 
     console.log(locGuess);
@@ -772,51 +772,462 @@ function initMap(data) {
         map.fitBounds(newBounds);
         console.log(markers);
         //
-        // donut()
+        donut()
     }
 
 
     // // CHART
-    // function donut(){
-    //     console.log('donuts called');
-    //     var parents = {};
-    //     var parentsArray = [];
-    //     for (var i = 0; i < markers.length; i++) {
-    //         for (var p = 0; p < markers[i].pcats.length; p++) {
-    //             console.log(markers[i].pcats.length);
-    //             console.log(markers[i]);
-    //             console.log(markers[i].pcats[p]);
-    //             parentsArray.push(markers[i].pcats[p]);
-    //             console.log("parentsArray:", parentsArray);
-    //             if (parents[markers[i].pcats[p]] !== undefined) {
-    //                 //intended behaviour: either append the marker to the parent, or mae it equal to an array of it.
-    //                 console.log('past the if');
-    //                 console.log(parents[markers[i].pcats[p]]);
-    //                 parents[markers[i].pcats[p]].push(markers[i])
-    //             } else {
-    //                 console.log('in the else');
-    //                 parents[markers[i].pcats[p]] = [markers[i]]}
-    //         }
-    //     }
-    //     console.log(parents);
-    //     for (var cat in parents){
-    //         parents[cat]['value'] = parents[cat].length;
-    //         console.log(parents[cat]['value']);
-    //         parents[cat]['label'] = cat
-    //     }
-    //
-    //     var options = {responsive: true};
-    //
-    //     var ctx_donut = $("#resultChart");
-    //
-    //
-    //
-    //     var myDonutChart = new Chart(ctx_donut, {type: 'doughnut', data: 'parents', options:'options'});
-    //     $('#donutLegend').html(myDonutChart.generateLegend());
-    //
-    // }
+    function donut(){
+        console.log('donuts called');
+        var parents = {};
+        var parentsArray = [];
+
+        //**************************************************************************************************************
+        //parents format=== {parent cat:{'value': number of markers, 'markers': array of markers, 'label': displayname}}
+        //**************************************************************************************************************
+
+        for (var m = 0; m < markers.length; m++) {
+            //loops through markers and adds all parent categories to an array
+            var marker = markers[m];
+
+            for (var p = 0; p < marker.pcats.length; p++) {
+                var parentCat = marker.pcats[p];
+
+
+                // console.log(markers[i].pcats.length);
+                console.log('marker:', marker);
+                console.log('marker pcat:', parentCat);
+                //pushes parent cat in marker pcat list to parents Array
+                // parentsArray.push(markers[marker].pcats[parentCat]);
+                // console.log("parentsArray:", parentsArray);
+
+
+
+
+                //if parents[parentCat] doesn't exist, adds marker:
+
+                if (parents[parentCat] === undefined) {
+                    parents[parentCat] = {
+                        'markers': [marker],
+                        'count': 1,
+                        'subCats': {}
+                    };
+                    console.log('Parent Category:', parentCat, "created");
+                    console.log(parents[parentCat])
+                }
+
+                else{
+                    parents[parentCat]['markers'].push(marker);
+                    parents[parentCat]['count'] += 1;
+                    console.log('Parent Category:', marker[parentCat], 'Updated') ;
+                    console.log(parents[marker[parentCat]])
+                }
+
+                console.log('Parent heading into subcats:', marker[parentCat]);
+                console.log('Parents OL heading into subcats:', parents);
+
+
+
+
+                //
+                //     //adds marker to marker array for the pcat
+                //     console.log('adding to parent marker array');
+                //     console.log('parent marker array:', parents[markers[marker].pcats[parentCat]]['markers']);
+                //     parents[markers[marker].pcats[parentCat]]['markers'].push(markers[marker]);
+                //     parents[markers[marker].pcats[parentCat]]['count'] += 1;
+                //
+                //
+                //
+                //     //makes the pcat object literal and adds a key of markers that is equal to an array of all makers
+                //     //that have it
+                //
+                // //    if parents[parentCat] does exist:
+                // } else {
+                //
+                //
+                //
+                //
+                //     console.log('creating parent object and marker array');
+                //     //parents[parentCat] = {'markers': [marker]
+                //     parents[markers[marker].pcats[parentCat]] = {'markers': [markers[marker]],
+                //                                                 'count': 1};
+                //
+                //
+                //
+                // }
+                // console.log('parents before subcats:', parents);
+
+                for (var s = 0; s < marker.cats.length; s++)
+                    var subCat = marker.cats[s]
+
+                    if (parents[parentCat]['subCats'][subCat] === undefined) {
+                        parents[parentCat]['subCats'][subCat] = {
+                            'markers': [marker],
+                            'count': 1
+                        };
+                    }
+
+                    else {
+                        parents[parentCat]['subCats'][subCat]['markers'].push(marker);
+                        parents[parentCat]['subCats'][subCat]['count'] += 1
+                    }
+
+                    //
+                    //     parents[markers[marker].pcats[parentCat]][markers[marker].cats[subCat]] = {
+                    //         'markers': [markers[marker]],
+                    //         'count': 1
+                    //     }
+                    // }
+                    // else{
+                    //     parents[markers[marker].pcats[parentCat]][markers[marker].cats[subCat]]['markers']
+                    //         .push(markers[marker]);
+                    //     parents[markers[marker].pcats[parentCat]][markers[marker].cats[subCat]]['count'] += 1
+                    // }
+            }
+        }
+        console.log('parents', parents);
+        // window.vals = [];
+        // window.labls = [];
+        //
+        // for (var cat in parents){
+        //     // console.log('parents[cat]', parents[cat]);
+        //     //sets pcat['value'] to the number of markers that have it and pushes to global array
+        //     parents[cat]['value'] = parents[cat]['markers'].length;
+        //     vals.push(parents[cat]['value']);
+        //
+        //     //sets pcat['label'] to the name of the pcat and pushes it to the global array
+        //     parents[cat]['label'] = cat;
+        //     labls.push(parents[cat]['label']);
+        //     // console.log('parents[cat].length:', parents[cat]['value']);
+        //
+        //     // console.log('subcat:', parents[cat]['value']);
+        //     parents[cat]['label'] = cat;
+        //     // console.log
+        // }
+
+        var parentSeries = [{
+            name: 'Business Types',
+            colorByPoint: true,
+            data:[]
+        }];
+
+        var parentDrilldown = {
+            series: []
+        };
+
+        for(var parentCat in parents) {
+            parentSeries[0]['data'].push({
+                'name': parentCat,
+                'y': parents[parentCat]['count'],
+                'drilldown': parentCat,
+                'markers': parentCat['markers']
+            });
+
+            var subData = [];
+            var cat = subCat
+            for(var sc in parents[parentCat]['subCats']) {
+                var subCat = parents[parentCat]['subCats'][sc];
+                subData.push([sc, subCat['count']]);
+
+
+                parentDrilldown['series'].push({
+                    'name': parentCat,
+                    'id': parentCat,
+                    'data': subData,
+                    'markers': subCat['markers']
+                })
+            }
+            console.log('parentSeries:', parentSeries);
+            console.log('parentDrilldown:', parentDrilldown);
+        }
+
+
+
+
+
+        $('#results-chart').highcharts({
+                chart: {
+                    type: 'pie'
+                },
+                title: {
+                    text: 'Best Businesses Near You'
+                },
+                subtitle: {
+                    text: 'Click the slices to view versions. Source: netmarketshare.com.'
+                },
+                plotOptions: {
+                    series: {
+                        dataLabels: {
+                            enabled: true,
+                            format: '{point.name}: {point.y}'
+                        }
+                    }
+                },
+
+                tooltip: {
+                    headerFormat: '<span style="font-size:11px">{series.name}</span><br>',
+                    pointFormat: '<span style="color:{point.color}">{point.name}</span>: <b>{point.y:.2f}%</b> of total<br/>'
+                },
+
+                series: parentSeries,
+                drilldown: parentDrilldown
+
+            });
+                //
+
+
+
+                //     data: [{
+                //         name: 'Microsoft Internet Explorer',
+                //         y: 56.33,
+                //         drilldown: 'Microsoft Internet Explorer'
+                //     }, {
+                //         name: 'Chrome',
+                //         y: 24.03,
+                //         drilldown: 'Chrome'
+                //     }, {
+                //         name: 'Firefox',
+                //         y: 10.38,
+                //         drilldown: 'Firefox'
+                //     }, {
+                //         name: 'Safari',
+                //         y: 4.77,
+                //         drilldown: 'Safari'
+                //     }, {
+                //         name: 'Opera',
+                //         y: 0.91,
+                //         drilldown: 'Opera'
+                //     }, {
+                //         name: 'Proprietary or Undetectable',
+                //         y: 0.2,
+                //         drilldown: null
+                //     }]
+                // }],
+                // drilldown: {
+                //     series: [{
+                //         name: 'Microsoft Internet Explorer',
+                //         id: 'Microsoft Internet Explorer',
+                //         data: [
+                //             ['v11.0', 24.13],
+                //             ['v8.0', 17.2],
+                //             ['v9.0', 8.11],
+                //             ['v10.0', 5.33],
+                //             ['v6.0', 1.06],
+                //             ['v7.0', 0.5]
+                //         ]
+                //     }, {
+                //         name: 'Chrome',
+                //         id: 'Chrome',
+                //         data: [
+                //             ['v40.0', 5],
+                //             ['v41.0', 4.32],
+                //             ['v42.0', 3.68],
+                //             ['v39.0', 2.96],
+                //             ['v36.0', 2.53],
+                //             ['v43.0', 1.45],
+                //             ['v31.0', 1.24],
+                //             ['v35.0', 0.85],
+                //             ['v38.0', 0.6],
+                //             ['v32.0', 0.55],
+                //             ['v37.0', 0.38],
+                //             ['v33.0', 0.19],
+                //             ['v34.0', 0.14],
+                //             ['v30.0', 0.14]
+                //         ]
+                //     }, {
+                //         name: 'Firefox',
+                //         id: 'Firefox',
+                //         data: [
+                //             ['v35', 2.76],
+                //             ['v36', 2.32],
+                //             ['v37', 2.31],
+                //             ['v34', 1.27],
+                //             ['v38', 1.02],
+                //             ['v31', 0.33],
+                //             ['v33', 0.22],
+                //             ['v32', 0.15]
+                //         ]
+                //     }, {
+                //         name: 'Safari',
+                //         id: 'Safari',
+                //         data: [
+                //             ['v8.0', 2.56],
+                //             ['v7.1', 0.77],
+                //             ['v5.1', 0.42],
+                //             ['v5.0', 0.3],
+                //             ['v6.1', 0.29],
+                //             ['v7.0', 0.26],
+                //             ['v6.2', 0.17]
+                //         ]
+                //     }, {
+                //         name: 'Opera',
+                //         id: 'Opera',
+                //         data: [
+                //             ['v12.x', 0.34],
+                //             ['v28', 0.24],
+                //             ['v27', 0.17],
+                //             ['v29', 0.16]
+                //         ]
+                //     }]
+                // }
+            // });
+
+
+        // var options = {responsive: true};
+        //
+        // var ctx = $("#resultChart");
+        //
+        // var chartData = {
+        //     labels: labls,
+        //     datasets: [
+        //         {data: vals,
+        //         backgroundColor: [
+        //             'rgba(255, 99, 132, 0.2)',
+        //             'rgba(54, 162, 235, 0.2)',
+        //             'rgba(255, 206, 86, 0.2)',
+        //             'rgba(75, 192, 192, 0.2)',
+        //             'rgba(153, 102, 255, 0.2)',
+        //             'rgba(255, 159, 64, 0.2)']
+        //     }]
+        //
+        // }
+        //
+        // var myDonutChart = new Chart(ctx, {
+        //     type: 'doughnut',
+        //     data= chartData,
+        //     options: options
+        // });
+        // $('#donutLegend').html(myDonutChart.generateLegend());
+
+    }
 
 }
+//
+// $(function () {
+//             // Create the chart
+//             $('#results-chart').highcharts({
+//                 chart: {
+//                     type: 'pie'
+//                 },
+//                 title: {
+//                     text: 'Browser market shares. January, 2015 to May, 2015'
+//                 },
+//                 subtitle: {
+//                     text: 'Click the slices to view versions. Source: netmarketshare.com.'
+//                 },
+//                 plotOptions: {
+//                     series: {
+//                         dataLabels: {
+//                             enabled: true,
+//                             format: '{point.name}: {point.y:.1f}%'
+//                         }
+//                     }
+//                 },
+//
+//                 tooltip: {
+//                     headerFormat: '<span style="font-size:11px">{series.name}</span><br>',
+//                     pointFormat: '<span style="color:{point.color}">{point.name}</span>: <b>{point.y:.2f}%</b> of total<br/>'
+//                 },
+//                 series: [{
+//                     name: 'Brands',
+//                     colorByPoint: true,
+//                     data: [{
+//                         name: 'Microsoft Internet Explorer',
+//                         y: 56.33,
+//                         drilldown: 'Microsoft Internet Explorer'
+//                     }, {
+//                         name: 'Chrome',
+//                         y: 24.03,
+//                         drilldown: 'Chrome'
+//                     }, {
+//                         name: 'Firefox',
+//                         y: 10.38,
+//                         drilldown: 'Firefox'
+//                     }, {
+//                         name: 'Safari',
+//                         y: 4.77,
+//                         drilldown: 'Safari'
+//                     }, {
+//                         name: 'Opera',
+//                         y: 0.91,
+//                         drilldown: 'Opera'
+//                     }, {
+//                         name: 'Proprietary or Undetectable',
+//                         y: 0.2,
+//                         drilldown: null
+//                     }]
+//                 }],
+//                 drilldown: {
+//                     series: [{
+//                         name: 'Microsoft Internet Explorer',
+//                         id: 'Microsoft Internet Explorer',
+//                         data: [
+//                             ['v11.0', 24.13],
+//                             ['v8.0', 17.2],
+//                             ['v9.0', 8.11],
+//                             ['v10.0', 5.33],
+//                             ['v6.0', 1.06],
+//                             ['v7.0', 0.5]
+//                         ]
+//                     }, {
+//                         name: 'Chrome',
+//                         id: 'Chrome',
+//                         data: [
+//                             ['v40.0', 5],
+//                             ['v41.0', 4.32],
+//                             ['v42.0', 3.68],
+//                             ['v39.0', 2.96],
+//                             ['v36.0', 2.53],
+//                             ['v43.0', 1.45],
+//                             ['v31.0', 1.24],
+//                             ['v35.0', 0.85],
+//                             ['v38.0', 0.6],
+//                             ['v32.0', 0.55],
+//                             ['v37.0', 0.38],
+//                             ['v33.0', 0.19],
+//                             ['v34.0', 0.14],
+//                             ['v30.0', 0.14]
+//                         ]
+//                     }, {
+//                         name: 'Firefox',
+//                         id: 'Firefox',
+//                         data: [
+//                             ['v35', 2.76],
+//                             ['v36', 2.32],
+//                             ['v37', 2.31],
+//                             ['v34', 1.27],
+//                             ['v38', 1.02],
+//                             ['v31', 0.33],
+//                             ['v33', 0.22],
+//                             ['v32', 0.15]
+//                         ]
+//                     }, {
+//                         name: 'Safari',
+//                         id: 'Safari',
+//                         data: [
+//                             ['v8.0', 2.56],
+//                             ['v7.1', 0.77],
+//                             ['v5.1', 0.42],
+//                             ['v5.0', 0.3],
+//                             ['v6.1', 0.29],
+//                             ['v7.0', 0.26],
+//                             ['v6.2', 0.17]
+//                         ]
+//                     }, {
+//                         name: 'Opera',
+//                         id: 'Opera',
+//                         data: [
+//                             ['v12.x', 0.34],
+//                             ['v28', 0.24],
+//                             ['v27', 0.17],
+//                             ['v29', 0.16]
+//                         ]
+//                     }]
+//                 }
+//             });
+// });
+
+
 
     //gets best local businesses above cutoff
 function getLocalBest(location, cutoff, callback) {

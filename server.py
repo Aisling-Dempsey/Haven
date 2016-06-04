@@ -373,7 +373,7 @@ def get_session():
 
 if __name__ == '__main__':
     # toggles debug mode on
-    app.debug = True
+    # app.debug = True
 
     # runs debug toolbar
     DebugToolbarExtension(app)
