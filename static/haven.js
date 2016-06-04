@@ -420,110 +420,136 @@ function displayResults(result) {
     var cutoff = result['cutoff'];
     $('#search-results').empty();
 
-    var map = $("<div>");
+    var map = $("#query-map");
     map.attr("id", "results-map");
-    $('#search-results').append(map);
-    $('#search-results').addClass('container');
 
     initMap(result['businesses']);
-    
+
+    var hashResults = {'results': []};
     var resultNum = 1;
+
     for (var yelp_id in businesses) {
         // console.log(yelp_id);
         var name = businesses[yelp_id]['name'];
         var category = businesses[yelp_id]['category'];
 
-        var address1 = businesses[yelp_id]['address_line_1'] || undefined;
-        var address2 = businesses[yelp_id]['address_line_2'] || undefined;
+        var address1 = businesses[yelp_id]['address_line_1'] || false;
+        var address2 = businesses[yelp_id]['address_line_2'] || false;
+
+        var phone = businesses[yelp_id]['phone'];
+
+        var url = businesses[yelp_id]['url'] || false;
+        var categories = businesses[yelp_id]['cat_list'] || false;
 
         var yelpRating = businesses[yelp_id]['yelp_score'];
-        var havenRating = businesses[yelp_id]['score']|| undefined;
+        var havenRating = businesses[yelp_id]['score']|| false;
         var havenCount = businesses[yelp_id]['total_ratings'];
         // console.log(havenCount);
         var photo = businesses[yelp_id]['photo'];
 
-
-
-        var result = $("<div>");
-        result.attr({
-                id: "result" + resultNum,
-                class: "query-result row"});
-        $('#search-results').append(result);
-
-        var resultBlock = $("<div>");
-            resultBlock.attr({
-                class: "query-block col xs-12 l-8 l-offset-4",
-                id: "result-block" + resultNum});
-        $('#result'+resultNum).append(resultBlock);
-
-
-        var image = $("<img>");
-        image.attr({
-                src: photo,
-                class: "result-photos col"
+        // console.log('photo', photo);
+        hashResults['results'].push({
+            'name': name,
+            'category': category,
+            'url': url,
+            'yelp-score': yelpRating,
+            'phone': phone,
+            'address1': address1,
+            'address2': address2,
+            'haven-score': havenRating,
+            'bus-id': yelp_id,
+            'photo': photo
         });
-        $('#result-block'+resultNum).append(image);
 
-        var link =$('<a>');
-            link.attr({
-                href: "/info/"+yelp_id+".json",
-                class: "bus-link",
-                id: "bus-link"+resultNum
-        });
-        $('#result-block'+resultNum).append(link);
+    console.log('hashResults:', hashResults);
+    var template = $('#business-results-template').html();
+    // console.log(template);
+    var displayedResults = Mustache.to_html(template, hashResults);
+    $('#search-results').html(displayedResults);
 
-        var result_name = $('<p>');
-        result_name.attr(
-                'class', "result-name")
-                .html(name);
-        $('#bus-link'+resultNum).html(name);
+        // var result = $("<div>");
+        // result.attr({
+        //         id: "result" + resultNum,
+        //         class: "query-result row"});
+        // $('#search-results').append(result);
+        //
+        // var resultBlock = $("<div>");
+        //     resultBlock.attr({
+        //         class: "query-block col xs-12 l-8 l-offset-4",
+        //         id: "result-block" + resultNum});
+        // $('#result'+resultNum).append(resultBlock);
+        //
+        //
+        // var image = $("<img>");
+        // image.attr({
+        //         src: photo,
+        //         class: "result-photos col"
+        // });
+        // $('#result-block'+resultNum).append(image);
+        //
+        // var link =$('<a>');
+        //     link.attr({
+        //         href: "/info/"+yelp_id+".json",
+        //         class: "bus-link",
+        //         id: "bus-link"+resultNum
+        // });
+        // $('#result-block'+resultNum).append(link);
+        //
+        // var result_name = $('<p>');
+        // result_name.attr(
+        //         'class', "result-name")
+        //         .html(name);
+        // $('#bus-link'+resultNum).html(name);
+        //
+        // if (address1 !== undefined) {
+        //     var streetAddress1 = $('<p>');
+        //     streetAddress1.attr(
+        //         'class', "street-1")
+        //         .html("Address: <br>"+ address1);
+        //     $('#result-block'+resultNum).append(streetAddress1);
+        // }
+        //
+        // if (address2 !== undefined) {
+        //     var streetAddress2 = $('<p>');
+        //     streetAddress2.attr(
+        //         'class', "street-2")
+        //         .html(address2);
+        //
+        //     $('#result-block'+resultNum).append(streetAddress2);
+        // }
+        //
+        //
+        // var yelpScore = $('<p>');
+        // yelpScore.attr(
+        //     "class", 'yelp-score')
+        //     .html("Yelp has rated this as "+ yelpRating);
+        // $('#result-block'+resultNum).append(yelpScore);
+        //
+        //
+        // if (havenRating !== undefined) {
+        //     var haven = $('<p>');
+        //
+        //     haven.attr(
+        //         'class', 'haven-rating')
+        //         .html("Haven users scored this as "+ havenRating + " out of 5 over " + havenCount + " ratings");
+        //
+        //     $('#result-block' + resultNum).append(haven);
+        // }
+        //
+        // if (havenRating == undefined) {
+        //     var haven = $('<p>');
+        //
+        //     haven.attr(
+        //         'class', 'haven-rating')
+        //         .html("Nobody has rated this business yet. Be the first!");
+        //
+        //     $('#result-block' + resultNum).append(haven);
+        // }
+        //
+        // resultNum ++
 
-        if (address1 !== undefined) {
-            var streetAddress1 = $('<p>');
-            streetAddress1.attr(
-                'class', "street-1")
-                .html("Address: <br>"+ address1);
-            $('#result-block'+resultNum).append(streetAddress1);
-        }
-
-        if (address2 !== undefined) {
-            var streetAddress2 = $('<p>');
-            streetAddress2.attr(
-                'class', "street-2")
-                .html(address2);
-
-            $('#result-block'+resultNum).append(streetAddress2);
-        }
 
 
-        var yelpScore = $('<p>');
-        yelpScore.attr(
-            "class", 'yelp-score')
-            .html("Yelp has rated this as "+ yelpRating);
-        $('#result-block'+resultNum).append(yelpScore);
-
-
-        if (havenRating !== undefined) {
-            var haven = $('<p>');
-
-            haven.attr(
-                'class', 'haven-rating')
-                .html("Haven users scored this as "+ havenRating + " out of 5 over " + havenCount + " ratings");
-
-            $('#result-block' + resultNum).append(haven);
-        }
-
-        if (havenRating == undefined) {
-            var haven = $('<p>');
-
-            haven.attr(
-                'class', 'haven-rating')
-                .html("Nobody has rated this business yet. Be the first!");
-
-            $('#result-block' + resultNum).append(haven);
-        }
-
-        resultNum ++
 
     }
    if (callStack.length > 1){

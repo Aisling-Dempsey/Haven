@@ -29,10 +29,11 @@ body{
     /*background-color: deeppink;*/
 /*}*/
 
-#solo-bus-photo{
+#solo-bus-photo {
     height: 150px;
     /*!*width: 100%*!*/
-/*}*/
+    /*}*/
+}
 
 #bus-info{
     background-color: antiquewhite;

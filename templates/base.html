@@ -9,8 +9,79 @@
         <!--bootstrap-->
         <link rel="stylesheet" href="/static/bootstrap.min.css">
         <link rel="stylesheet" href="/static/bootstrap-theme.min.css">
+        <!--mustache templates-->
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/2.2.1/mustache.min.js"></script>
+        {% raw %}
+        <script type='text/html' id="business-results-template">
+            "{{#results}}
+                 <div class="row query-result">
+                    <div class="col-l-9 col-xs-12">
+                        <div class="row">
+                            <div class="col-l-3 col-xs-3 bus-search-photo">
+                                {{#photo}}
+                                <img src="{{ photo }}">
+                                {{/photo}}
+                            </div>
+                            <div class="col-l-9 col-xs-9 bus-search-text">
+                                <div class="row">
+                                    <div class="col-l-9 col-xs-9 bus-search-info">
+                                        <div class="row">
+                                            <a class="bus-link" href="/info/{{bus-id}}.json">
+                                                <h3 class="bus-name">{{ name }}</h3>
+                                            </a>
+                                        </div>
+                                        <div class="row">
+                                            {{#phone}}
+                                                <p class="bus-phone">{{ phone }}</p>
+                                            {{/phone}}
+                                        </div>
+                                        <div class="row">
+                                            {{#address1}}
+                                                <p class="bus-address-1">{{address1}}</p>
+                                            {{/address1}}
+                                        </div>
+                                        <div class="row">
+                                            {{#address2}}
+                                                <p class="bus-address-2">{{adress2}}</p>
+                                            {{/address2}}
+                                        </div>
+                                        <div class="row">
+                                            {{#url}}
+                                                <a href="{{url}}">Website</a>
+                                            {{/url}}
+                                        </div>
+                                        <div class="row">
+                                            <p class="business-categories">
+                                                {{#category}}
+                                                    {{category}}
+                                                {{/category}}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="col-l-3 col-xs-3 bus-search-ratings">
+                                        <div class="row">
+                                            {{#haven-score}}
+                                                <p class="bus-haven-score"> Haven Score:{{haven-score}} out of 5 </p>
+                                            {{/haven-score}}
+                                            {{^haven-score}}
+                                                <p class="bus-haven-score">Nobody has rated this business yet. Be the first!</p>
+                                            {{/haven-score}}
+                                        </div>
+                                        <div class="row">
+                                            <p>Yelp score: {{yelp-score}}</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {{/results}}"
+        </script>
 
 
+        {% endraw %}
 
         <!--rateyo-->
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/rateYo/2.1.1/jquery.rateyo.min.css">
@@ -73,6 +144,7 @@
 
             </div>
         </nav>
+            <div id="query-map"></div>
     <ul>
         {% for message in get_flashed_messages() %}
             <li>{{ message }}</li>

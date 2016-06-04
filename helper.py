@@ -277,6 +277,12 @@ def build_query_result(company):
     if company['location'].get('coordinate'):
         business_info[yelp_id]['longitude'] = company['location']['coordinate']['longitude']
         business_info[yelp_id]['latitude'] = company['location']['coordinate']['latitude']
+
+    if company.get('url'):
+        business_info[yelp_id]['url'] = company['url']
+    if company.get('display_phone'):
+        business_info[yelp_id]['phone'] = company['display_phone']
+
     return business_info
 
 
