@@ -426,8 +426,7 @@ function displayResults(result) {
     $('#search-results').addClass('container');
 
     initMap(result['businesses']);
-
-
+    
     var resultNum = 1;
     for (var yelp_id in businesses) {
         // console.log(yelp_id);
@@ -442,6 +441,7 @@ function displayResults(result) {
         var havenCount = businesses[yelp_id]['total_ratings'];
         // console.log(havenCount);
         var photo = businesses[yelp_id]['photo'];
+
 
 
         var result = $("<div>");
