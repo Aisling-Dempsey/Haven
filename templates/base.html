@@ -13,52 +13,52 @@
         <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/2.2.1/mustache.min.js"></script>
         {% raw %}
         <script type='text/html' id="business-results-template">
-            "{{#results}}
+            {{#results}}
                  <div class="row query-result">
-                    <div class="col-l-9 col-xs-12">
+                    <div class="col-lg-8 col-lf-offset-2 col-xs-12">
                         <div class="row">
-                            <div class="col-l-3 col-xs-3 bus-search-photo">
+                            <div class="col-lg-3 col-xs-3 res-bus-photo">
                                 {{#photo}}
                                 <img src="{{ photo }}">
                                 {{/photo}}
                             </div>
-                            <div class="col-l-9 col-xs-9 bus-search-text">
+                            <div class="col-lg-9 col-xs-9 bus-search-text">
                                 <div class="row">
-                                    <div class="col-l-9 col-xs-9 bus-search-info">
+                                    <div class="col-lg-9 col-xs-9 bus-search-info">
                                         <div class="row">
-                                            <a class="bus-link" href="/info/{{bus-id}}.json">
-                                                <h3 class="bus-name">{{ name }}</h3>
+                                            <a class="res-bus-link" href="/info/{{bus-id}}.json">
+                                                <h3 class="res-bus-name">{{ name }}</h3>
                                             </a>
                                         </div>
                                         <div class="row">
                                             {{#phone}}
-                                                <p class="bus-phone">{{ phone }}</p>
+                                                <p class="res-bus-phone">{{ phone }}</p>
                                             {{/phone}}
                                         </div>
                                         <div class="row">
                                             {{#address1}}
-                                                <p class="bus-address-1">{{address1}}</p>
+                                                <p class="res-bus-address-1">{{address1}}</p>
                                             {{/address1}}
                                         </div>
                                         <div class="row">
                                             {{#address2}}
-                                                <p class="bus-address-2">{{adress2}}</p>
+                                                <p class="res-bus-address-2">{{adress2}}</p>
                                             {{/address2}}
                                         </div>
                                         <div class="row">
                                             {{#url}}
-                                                <a href="{{url}}">Website</a>
+                                                <a class="res-bus-url" href="{{url}}">Website</a>
                                             {{/url}}
                                         </div>
                                         <div class="row">
-                                            <p class="business-categories">
+                                            <p class="res-bus-categories">
                                                 {{#category}}
                                                     {{category}}
                                                 {{/category}}
                                             </p>
                                         </div>
                                     </div>
-                                    <div class="col-l-3 col-xs-3 bus-search-ratings">
+                                    <div class="col-lg-3 col-xs-3 bus-search-ratings">
                                         <div class="row">
                                             {{#haven-score}}
                                                 <p class="bus-haven-score"> Haven Score:{{haven-score}} out of 5 </p>
@@ -72,12 +72,11 @@
                                         </div>
                                     </div>
                                 </div>
-
                             </div>
                         </div>
                     </div>
                 </div>
-            {{/results}}"
+            {{/results}}
         </script>
 
 

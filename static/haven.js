@@ -426,7 +426,6 @@ function displayResults(result) {
     initMap(result['businesses']);
 
     var hashResults = {'results': []};
-    var resultNum = 1;
 
     for (var yelp_id in businesses) {
         // console.log(yelp_id);
@@ -466,89 +465,6 @@ function displayResults(result) {
     // console.log(template);
     var displayedResults = Mustache.to_html(template, hashResults);
     $('#search-results').html(displayedResults);
-
-        // var result = $("<div>");
-        // result.attr({
-        //         id: "result" + resultNum,
-        //         class: "query-result row"});
-        // $('#search-results').append(result);
-        //
-        // var resultBlock = $("<div>");
-        //     resultBlock.attr({
-        //         class: "query-block col xs-12 l-8 l-offset-4",
-        //         id: "result-block" + resultNum});
-        // $('#result'+resultNum).append(resultBlock);
-        //
-        //
-        // var image = $("<img>");
-        // image.attr({
-        //         src: photo,
-        //         class: "result-photos col"
-        // });
-        // $('#result-block'+resultNum).append(image);
-        //
-        // var link =$('<a>');
-        //     link.attr({
-        //         href: "/info/"+yelp_id+".json",
-        //         class: "bus-link",
-        //         id: "bus-link"+resultNum
-        // });
-        // $('#result-block'+resultNum).append(link);
-        //
-        // var result_name = $('<p>');
-        // result_name.attr(
-        //         'class', "result-name")
-        //         .html(name);
-        // $('#bus-link'+resultNum).html(name);
-        //
-        // if (address1 !== undefined) {
-        //     var streetAddress1 = $('<p>');
-        //     streetAddress1.attr(
-        //         'class', "street-1")
-        //         .html("Address: <br>"+ address1);
-        //     $('#result-block'+resultNum).append(streetAddress1);
-        // }
-        //
-        // if (address2 !== undefined) {
-        //     var streetAddress2 = $('<p>');
-        //     streetAddress2.attr(
-        //         'class', "street-2")
-        //         .html(address2);
-        //
-        //     $('#result-block'+resultNum).append(streetAddress2);
-        // }
-        //
-        //
-        // var yelpScore = $('<p>');
-        // yelpScore.attr(
-        //     "class", 'yelp-score')
-        //     .html("Yelp has rated this as "+ yelpRating);
-        // $('#result-block'+resultNum).append(yelpScore);
-        //
-        //
-        // if (havenRating !== undefined) {
-        //     var haven = $('<p>');
-        //
-        //     haven.attr(
-        //         'class', 'haven-rating')
-        //         .html("Haven users scored this as "+ havenRating + " out of 5 over " + havenCount + " ratings");
-        //
-        //     $('#result-block' + resultNum).append(haven);
-        // }
-        //
-        // if (havenRating == undefined) {
-        //     var haven = $('<p>');
-        //
-        //     haven.attr(
-        //         'class', 'haven-rating')
-        //         .html("Nobody has rated this business yet. Be the first!");
-        //
-        //     $('#result-block' + resultNum).append(haven);
-        // }
-        //
-        // resultNum ++
-
-
 
 
     }
@@ -612,10 +528,14 @@ function moreResults(evt) {
                 'cutoff': $(this).data("cutoff")||$('#haven-cutoff').val()
                 };
     //if the button being clicked is the more results button, adds to the call stack
-    if ($(this).attr('id') !== "results-back-btn"){callStack.push(input)}
-    //if the button being clicked is the back button, the topmost value is removed from the callstack
-    else if ($(this).attr('id') === "results-back-btn"){
+    if ($(this).attr('id') === "results-back-btn"){
         callStack.pop()}
+    // else if ($(this).attr('id') === "search-btn"){callStack.push(input)}
+    else if ($(this).attr('id') === "return-to-query-btn"){}
+    else {callStack.push(input)}
+    //if the button being clicked is the back button, the topmost value is removed from the callstack
+    // else if ($(this).attr('id') === "results-back-btn"){
+    //     callStack.pop()}
 
     console.log('offset', input.offset);
     $.get("/results.json", input, displayResults);

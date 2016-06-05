@@ -1,0 +1,64 @@
+<div class="row">
+    <div class="col-xs-12 col-lg-8 col-lg-offset-2">
+        <div class="row" id="bus-upper-block">
+            <div class="col-lg-2 col-xs-12" id="bus-photo-div">
+                {{#photo}}
+                    <img id="bus-photo" src="{{photo}}">
+                {{/photo}}
+            </div>
+            <div class="col-lg-8 col-xs-12" id="bus-info-div">
+                <div class="row">
+                    <h3 class="bus-name">{{ name }}</h3>
+                </div>
+                <div class="row">
+                    {{#phone}}
+                        <p class="bus-phone">{{ phone }}</p>
+                    {{/phone}}
+                </div>
+                <div class="row">
+                    {{#address1}}
+                        <p class="bus-address-1">{{address1}}</p>
+                    {{/address1}}
+                </div>
+                <div class="row">
+                    {{#address2}}
+                        <p class="bus-address-2">{{adress2}}</p>
+                    {{/address2}}
+                </div>
+                <div class="row">
+                    {{#url}}
+                        <a href="{{url}}">Website</a>
+                    {{/url}}
+                </div>
+                <div class="row">
+                    <p class="bus-categories">
+                        {{#category}}
+                            {{category}}
+                        {{/category}}
+                    </p>
+                </div>
+            </div>
+            <div class="col-log-2 hidden-xs map" id="bus-map-div">
+            </div>
+        </div>
+
+        <div class="row"></div>
+    </div>
+</div>
+
+
+
+
+<div class="col-lg-3 col-xs-3 bus-search-ratings">
+                <div class="row">
+                    {{#haven-score}}
+                        <p class="bus-haven-score"> Haven Score:{{haven-score}} out of 5 </p>
+                    {{/haven-score}}
+                    {{^haven-score}}
+                        <p class="bus-haven-score">Nobody has rated this business yet. Be the first!</p>
+                    {{/haven-score}}
+                </div>
+                <div class="row">
+                    <p>Yelp score: {{yelp-score}}</p>
+                </div>
+            </div>
