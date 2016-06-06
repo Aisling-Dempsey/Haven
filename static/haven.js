@@ -5,11 +5,16 @@
 var callStack = [];
 
 function displayBusiness(result){
+    $("#results-map").empty().attr('style', 'visibility: hidden');
     var name = result.yelp_bus_data.name;
 
     var categories = result.categories;
-
+    var formattedAddress="";
     var busAddressArray = result.yelp_bus_data.location.display_address || undefined;
+
+    for(var i=0; i < busAddressArray.length; i++){
+        formattedAddress += busAddressArray[i] + '<br>'
+        }
 
     var coords ={};
     coords.lat = result.yelp_bus_data.location.coordinate.latitide;
@@ -44,7 +49,7 @@ function displayBusiness(result){
     }
     var yelpScore = result.yelp_bus_data.rating || undefined;
 
-    var yelpReviewImg = result.yelp_bus_data.snippet_image_url || undefined;
+    var yelpReviewImg = result.yelp_bus_data.snippet_image_url.replace('/ms.jpg', '/l.jpg') || undefined;
 
     var yelpReviewTxt = result.yelp_bus_data.snippet_text || undefined;
 
@@ -54,204 +59,222 @@ function displayBusiness(result){
     //empties div
     $('#search-results').empty();
 
-    var businessBlock = $('<div>');
-        businessBlock.attr({
-            class: 'row',
-            id: 'bus-block'
-        });
-    $('#search-results').append(businessBlock);
-
-    var busInfo = $('<div>');
-        busInfo.attr({
-            class: 'busInfo col-lg-10 col-lg-offset-1',
-            id: 'bus-info'});
-    $('#bus-block').append(busInfo);
-
-    var busRow = $('<div>');
-        busRow.attr({
-            class: 'row',
-            id: 'bus-row'
-        });
-    $('#bus-info').append(busRow);
-
-    var busInfoBlock = $('<div>');
-        busInfoBlock.attr({
-            class: 'col-lg-9',
-            id: 'bus-info-block'
-        });
-    $('#bus-row').append(busInfoBlock);
-
-    var mapBlock = $('<div>');
-        mapBlock.attr({
-            class: 'col-lg-3 map',
-            id: 'solo-bus-map'
-        });
-    $('#bus-row').append(mapBlock);
-    var busInfoRow = $('<div>');
-        busInfoRow.attr({
-            class: 'row',
-            id: 'bus-info-row'
-        });
-    $('#bus-info-block').append(busInfoRow);
-
-    var photoDiv = $('<div>');
-        photoDiv.attr({
-            class: 'col-lg-4',
-            id: "solo-bus-photo-div"
-        });
-    $('#bus-info-row').append(photoDiv);
-
-    var soloBusPhoto = $('<img>');
-        soloBusPhoto.attr({
-            src: image,
-            class: 'img-responsive',
-            id: 'solo-bus-photo'
-        });
-    $('#solo-bus-photo-div').append(soloBusPhoto);
-
-
-    var busTextBlock = $('<div>');
-        busTextBlock.attr({
-            class: 'col-lg-8',
-            id:"bus-text-block"
-        });
-    $('#bus-info-row').append(busTextBlock);
-
-    var busTopRow = $('<div>');
-        busTopRow.attr({
-            class: 'row',
-            id: 'bus-top-row'
-        });
-    $('#bus-text-block').append(busTopRow);
-
-    var soloBusUrl= $('<a>');
-        soloBusUrl.attr({
-            class: 'col-lg-6',
-            id: 'solo-bus-url',
-            href: yelpUrl
-        });
-    $('#bus-top-row').append(soloBusUrl);
-
-    var busName = $('<p>');
-        busName.attr({
-            id: 'solo-bus-name'
-        }).append(name);
-    $('#solo-bus-url').append(busName);
-
-    var busAggrRating = $('<p>');
-        busAggrRating.attr({
-            class: 'col-lg-6',
-            id: 'bus-aggr-rating'
-        });
-        if(score !== undefined){
-            busAggrRating.append('Haven score: '+ score)
-        }
-        else{
-            busAggrRating.append('Haven score: '+ 'No ratings yet')
-        }
-    $('#bus-top-row').append(busAggrRating);
-
-    var bus2ndRow = $('<div>');
-        busTopRow.attr({
-            class: 'row',
-            id: 'bus-2nd-row'
-        });
-    $('#bus-text-block').append(bus2ndRow);
-
-
-    var busPhone = $('<p>');
-        busPhone.attr({
-            class: 'col-lg-6',
-            id: "solo-bus-phone"
-        }).append(phone);
-    $('#bus-2nd-row').append(busPhone);
-
-    var soloYelpScore = $('<p>') ;
-        soloYelpScore.attr({
-            class: 'col-lg-6',
-            id: 'solo-yelp-rating'
-        }).append('Yelp score: ' + yelpScore);
-    $('#bus-2nd-row').append(soloYelpScore);
-
-    var bus3rdRow = $('<p>');
-        bus3rdRow.attr({
-            class: 'row',
-            id: 'bus-3rd-row'
-        });
-     $('#bus-text-block').append(bus3rdRow);
+    var hashResults = {
+        'name': name,
+        'phone': phone,
+        'busAddress': formattedAddress,
+        'recentReview': recentReview,
+        'category': categories,
+        'photo': image,
+        'recentScore': recentScore,
+        'score': score,
+        'yelpUrl': yelpUrl,
+        'yelpScore': yelpScore,
+        'yelpReviewImg': yelpReviewImg,
+        'yelpReviewTxt': yelpReviewTxt
+    };
 
 
 
-    var busAddress = $('<p>');
-        busAddress.attr({
-            class: 'col-lg-6',
-            id: 'solo-bus-address'
-        });
-        var formattedAddress ='';
-        for(var i=0; i < busAddressArray.length; i++){
-            formattedAddress += busAddressArray[i] + '<br>'
-            }
-        busAddress.append(formattedAddress);
-    $('#bus-3rd-row').append(busAddress);
-    
-    var reviewsBlockRow = $('<div>');
-        reviewsBlockRow.attr({
-            class: 'row',
-            id: 'reviews-block-row'
-        });
-    $('#search-results').append(reviewsBlockRow);
-    
-    var havenReviewsBlock = $('<div>');
-        havenReviewsBlock.attr({
-            class: 'col-lg-6',
-            id: 'haven-review-block'
-        });
-    $('#reviews-block-row').append(havenReviewsBlock);
-
-
-
-    var yelpReviewsBlock = $('<div>');
-        yelpReviewsBlock.attr({
-            class: 'col-lg-6',
-            id: 'yelp-review-block'
-        });
-    $('#reviews-block-row').append(yelpReviewsBlock);
-    
-
-    
-    var havenRow1 = $('<div>');
-        havenRow1.attr({
-            class: 'row',
-            id: 'haven-row-1'
-        });
-    $('#haven-review-block').append(havenRow1);
-
-    var havenTitleDiv = $('<div>');
-        havenTitleDiv.attr({
-           class: 'col-lg-12',
-            id: 'haven-title-div'
-        });
-    $('#haven-row-1').append(havenTitleDiv);
-
-    var havenTitle = $('<h3>');
-        havenTitle.attr({
-            id: 'haven-title'
-        }).append('Haven says:');
-    $('#haven-title-div').append(havenTitle);
-
-    var havenRow2 = $('<div>');
-        havenRow2.attr({
-            class: 'row',
-            id: 'haven-row-2'
-        });
-    $('#haven-review-block').append(havenRow2);
-
-    var havenReviewsDiv = $('<h3>');
-        havenReviewsDiv.attr({
-            class: 'col-lg-12',
-            id: 'haven-reviews-div'
-        });
-    $('#haven-row-2').append(havenReviewsDiv);
+    //
+    // var businessBlock = $('<div>');
+    //     businessBlock.attr({
+    //         class: 'row',
+    //         id: 'bus-block'
+    //     });
+    // $('#search-results').append(businessBlock);
+    //
+    // var busInfo = $('<div>');
+    //     busInfo.attr({
+    //         class: 'busInfo col-lg-10 col-lg-offset-1',
+    //         id: 'bus-info'});
+    // $('#bus-block').append(busInfo);
+    //
+    // var busRow = $('<div>');
+    //     busRow.attr({
+    //         class: 'row',
+    //         id: 'bus-row'
+    //     });
+    // $('#bus-info').append(busRow);
+    //
+    // var busInfoBlock = $('<div>');
+    //     busInfoBlock.attr({
+    //         class: 'col-lg-9',
+    //         id: 'bus-info-block'
+    //     });
+    // $('#bus-row').append(busInfoBlock);
+    //
+    // var mapBlock = $('<div>');
+    //     mapBlock.attr({
+    //         class: 'col-lg-3 map',
+    //         id: 'solo-bus-map'
+    //     });
+    // $('#bus-row').append(mapBlock);
+    // var busInfoRow = $('<div>');
+    //     busInfoRow.attr({
+    //         class: 'row',
+    //         id: 'bus-info-row'
+    //     });
+    // $('#bus-info-block').append(busInfoRow);
+    //
+    // var photoDiv = $('<div>');
+    //     photoDiv.attr({
+    //         class: 'col-lg-4',
+    //         id: "solo-bus-photo-div"
+    //     });
+    // $('#bus-info-row').append(photoDiv);
+    //
+    // var soloBusPhoto = $('<img>');
+    //     soloBusPhoto.attr({
+    //         src: image,
+    //         class: 'img-responsive',
+    //         id: 'solo-bus-photo'
+    //     });
+    // $('#solo-bus-photo-div').append(soloBusPhoto);
+    //
+    //
+    // var busTextBlock = $('<div>');
+    //     busTextBlock.attr({
+    //         class: 'col-lg-8',
+    //         id:"bus-text-block"
+    //     });
+    // $('#bus-info-row').append(busTextBlock);
+    //
+    // var busTopRow = $('<div>');
+    //     busTopRow.attr({
+    //         class: 'row',
+    //         id: 'bus-top-row'
+    //     });
+    // $('#bus-text-block').append(busTopRow);
+    //
+    // var soloBusUrl= $('<a>');
+    //     soloBusUrl.attr({
+    //         class: 'col-lg-6',
+    //         id: 'solo-bus-url',
+    //         href: yelpUrl
+    //     });
+    // $('#bus-top-row').append(soloBusUrl);
+    //
+    // var busName = $('<p>');
+    //     busName.attr({
+    //         id: 'solo-bus-name'
+    //     }).append(name);
+    // $('#solo-bus-url').append(busName);
+    //
+    // var busAggrRating = $('<p>');
+    //     busAggrRating.attr({
+    //         class: 'col-lg-6',
+    //         id: 'bus-aggr-rating'
+    //     });
+    //     if(score !== undefined){
+    //         busAggrRating.append('Haven score: '+ score)
+    //     }
+    //     else{
+    //         busAggrRating.append('Haven score: '+ 'No ratings yet')
+    //     }
+    // $('#bus-top-row').append(busAggrRating);
+    //
+    // var bus2ndRow = $('<div>');
+    //     busTopRow.attr({
+    //         class: 'row',
+    //         id: 'bus-2nd-row'
+    //     });
+    // $('#bus-text-block').append(bus2ndRow);
+    //
+    //
+    // var busPhone = $('<p>');
+    //     busPhone.attr({
+    //         class: 'col-lg-6',
+    //         id: "solo-bus-phone"
+    //     }).append(phone);
+    // $('#bus-2nd-row').append(busPhone);
+    //
+    // var soloYelpScore = $('<p>') ;
+    //     soloYelpScore.attr({
+    //         class: 'col-lg-6',
+    //         id: 'solo-yelp-rating'
+    //     }).append('Yelp score: ' + yelpScore);
+    // $('#bus-2nd-row').append(soloYelpScore);
+    //
+    // var bus3rdRow = $('<p>');
+    //     bus3rdRow.attr({
+    //         class: 'row',
+    //         id: 'bus-3rd-row'
+    //     });
+    //  $('#bus-text-block').append(bus3rdRow);
+    //
+    //
+    //
+    // var busAddress = $('<p>');
+    //     busAddress.attr({
+    //         class: 'col-lg-6',
+    //         id: 'solo-bus-address'
+    //     });
+    //     var formattedAddress ='';
+    //     for(var i=0; i < busAddressArray.length; i++){
+    //         formattedAddress += busAddressArray[i] + '<br>'
+    //         }
+    //     busAddress.append(formattedAddress);
+    // $('#bus-3rd-row').append(busAddress);
+    //
+    // var reviewsBlockRow = $('<div>');
+    //     reviewsBlockRow.attr({
+    //         class: 'row',
+    //         id: 'reviews-block-row'
+    //     });
+    // $('#search-results').append(reviewsBlockRow);
+    //
+    // var havenReviewsBlock = $('<div>');
+    //     havenReviewsBlock.attr({
+    //         class: 'col-lg-6',
+    //         id: 'haven-review-block'
+    //     });
+    // $('#reviews-block-row').append(havenReviewsBlock);
+    //
+    //
+    //
+    // var yelpReviewsBlock = $('<div>');
+    //     yelpReviewsBlock.attr({
+    //         class: 'col-lg-6',
+    //         id: 'yelp-review-block'
+    //     });
+    // $('#reviews-block-row').append(yelpReviewsBlock);
+    //
+    //
+    //
+    // var havenRow1 = $('<div>');
+    //     havenRow1.attr({
+    //         class: 'row',
+    //         id: 'haven-row-1'
+    //     });
+    // $('#haven-review-block').append(havenRow1);
+    //
+    // var havenTitleDiv = $('<div>');
+    //     havenTitleDiv.attr({
+    //        class: 'col-lg-12',
+    //         id: 'haven-title-div'
+    //     });
+    // $('#haven-row-1').append(havenTitleDiv);
+    //
+    // var havenTitle = $('<h3>');
+    //     havenTitle.attr({
+    //         id: 'haven-title'
+    //     }).append('Haven says:');
+    // $('#haven-title-div').append(havenTitle);
+    //
+    // var havenRow2 = $('<div>');
+    //     havenRow2.attr({
+    //         class: 'row',
+    //         id: 'haven-row-2'
+    //     });
+    // $('#haven-review-block').append(havenRow2);
+    //
+    // var havenReviewsDiv = $('<h3>');
+    //     havenReviewsDiv.attr({
+    //         class: 'col-lg-12',
+    //         id: 'haven-reviews-div'
+    //     });
+    // $('#haven-row-2').append(havenReviewsDiv);
 
     // if (recentScore !== undefined){
     //     var havenRecentScore = $('<p>');
@@ -268,38 +291,38 @@ function displayBusiness(result){
     //         )
     // }
 
+    //
+    //
+    // var havenRow3 = $('<div>');
+    //     havenRow3.attr({
+    //         class: 'row',
+    //         id: 'haven-row-3'
+    //     });
+    // $('#haven-review-block').append(havenRow3);
 
+    var template = $('#business-template').html();
 
-    var havenRow3 = $('<div>');
-        havenRow3.attr({
-            class: 'row',
-            id: 'haven-row-3'
-        });
-    $('#haven-review-block').append(havenRow3);
+    var displayedResults = Mustache.to_html(template, hashResults);
+    $('#search-results').html(displayedResults);
 
-    var havenModalReviewBtn = $('<button>');
-        havenModalReviewBtn.attr({
-           class: 'col-lg-8 col-lg-offset-2',
-            id: 'haven-review-modal-btn',
+    // var havenModalReviewBtn = $('<button>');
+    //     havenModalReviewBtn.attr({
+    //        class: 'col-lg-8 col-lg-offset-2',
+    $('#haven-review-modal-btn').attr({
             'data-name': name,
             'data-userScore': userScore,
             'data-userReview': userReview,
             'data-created-at': createdAt,
             'data-yelpID': yelpId,
             'data-userRatingId': userRatingId
-        }).append('Review Me');
-    $('#haven-row-3').append(havenModalReviewBtn);
-
-    var backBtn = $('<button>');
-        backBtn.attr({
-            class: 'col-lg-2 col-lg-offset-5',
-            id: 'return-to-query-btn',
+        });
+    $('#return-to-query-btn').attr({
             'data-term': callStack.slice(-1)[0]['term'],
             'data-offset': callStack.slice(-1)[0]['offset'],
             'data-sort': callStack.slice(-1)[0]['sort'],
             'data-cutoff': callStack.slice(-1)[0]['cutoff']
-        }).append('Return to Business Results');
-    $('#bus-block').append(backBtn);
+        });
+    // $('#bus-block').append(backBtn);
 
 //    todo build event listener to handle click
 
@@ -487,7 +510,7 @@ function displayResults(result) {
        //  //  todo fix always returning to first result
        //
        //     moreResults(evt)})
-    }
+   }
     if ($(".query-result").length ===10){
         // var nextValues = callStack.slice(-1)[0];
         // console.log('make button called');
@@ -503,14 +526,15 @@ function displayResults(result) {
             $('#search-results').append(btn);}
 
 
-    $('.bus-link').click(renderBusiness)
+    $('.res-bus-link').click(renderBusiness)
 }
 
 function renderBusiness(evt){
     evt.preventDefault();
+    console.log('render business called');
     var link = $(this).attr('href');
     console.log(link);
-    $.get(link, function(result){displayBusiness(result)})
+    $.get(link, displayBusiness)
 }
 
 

@@ -17,13 +17,8 @@
                 </div>
                 <div class="row">
                     {{#address1}}
-                        <p class="bus-address-1">{{address1}}</p>
+                        <p class="bus-address-long">{{address}}</p>
                     {{/address1}}
-                </div>
-                <div class="row">
-                    {{#address2}}
-                        <p class="bus-address-2">{{adress2}}</p>
-                    {{/address2}}
                 </div>
                 <div class="row">
                     {{#url}}
@@ -41,24 +36,56 @@
             <div class="col-log-2 hidden-xs map" id="bus-map-div">
             </div>
         </div>
-
         <div class="row"></div>
-    </div>
-</div>
-
-
-
-
-<div class="col-lg-3 col-xs-3 bus-search-ratings">
-                <div class="row">
-                    {{#haven-score}}
-                        <p class="bus-haven-score"> Haven Score:{{haven-score}} out of 5 </p>
-                    {{/haven-score}}
-                    {{^haven-score}}
-                        <p class="bus-haven-score">Nobody has rated this business yet. Be the first!</p>
-                    {{/haven-score}}
-                </div>
-                <div class="row">
-                    <p>Yelp score: {{yelp-score}}</p>
+        <div class="row"></div>
+            <div class="col-xs-12 col-lg-6 haven-review-block">
+                {{#score}}
+                    <div class="row">
+                        <h3 class="col-xs-8 col-lg-8">Haven says:</h3>
+                        <h3 id="aggr-score" class="col-xs-4 col-lg-4">{{score}}</h3>
+                    </div>
+                    {{#recentScore}}
+                    <div class="row">
+                        <p class="col-xs-8 col-lg-8">Most Recent Score:</p>
+                        <p id="recent-score" class="col-xs-4 col-lg-4">{{recentScore}}</p>
+                    </div>
+                    {{/recentScore}}
+                    {{#recentReview}}
+                    <div class="row">
+                        <p class="col-xs-8 col-lg-8">Most Recent Review:</p>
+                        <p id="recent-review" class="col-xs-4 col-lg-4">{{recentReview}}</p>
+                    </div>
+                    {{/recentReview}}
+                    <div class="row">
+                        <button id="more-ratings-btn" class="col-xs-12 col-lg-8 col-lg-offset-2">More ratings:</button>
+                    </div>
+                {{/score}}
+                {{^score}}
+                    <div class="row">
+                        <p class="col-lg-12 col-xs-12">Nobody has rated this business yet.</p>
+                        <p class="col-lg-12 col-xs-12">Be the first!</p>
+                    </div>
+                {{/score}}
+                <div>class="row">
+                    <button id="haven-modal-review-btn" class="col-lg-6 col-lg-offset-3 col-xs-12">Add a rating</button>
                 </div>
             </div>
+            <div class="col-xs-12 col-lg-6 yelp-review-block">
+                <div class="row">
+                    <h3 class="col-xs-8 col-lg-8">Yelp says:</h3>
+                    <h3 id="aggr-score" class="col-xs-4 col-lg-4">{{yelpScore}}</h3>
+                </div>
+                <div class="row">
+                    <p col-xs-12 col-lg-12>Recent Review:<br>{{yelpReviewTxt}}</p>
+                </div>
+                <div class="row">
+                    <img class="col-xs-12 col-lg-12" src="{{yelpReviewImg}}">
+                </div>
+                <div clas="row">
+                    <a href="{{yelpUrl}}"><button class="col-lg-offset-3 col-lg-6 col-xs-12">See at Yelp</button></a>
+                </div>
+            </div>
+            <button id="return-to-query-btn" class="col-lg-8 col-lg-offset-2 col-xs-12">Back to Results</button>
+        </div>
+    </div>
+</div>

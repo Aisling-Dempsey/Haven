@@ -78,7 +78,99 @@
                 </div>
             {{/results}}
         </script>
-
+        <script type='text/html' id="business-template">
+            <div class="row">
+                <div class="col-xs-12 col-lg-8 col-lg-offset-2">
+                    <div class="row" id="bus-upper-block">
+                        <div class="col-lg-2 col-xs-12" id="bus-photo-div">
+                            {{#photo}}
+                                <img class=img-responsive" src="{{photo}}">
+                            {{/photo}}
+                        </div>
+                        <div class="col-lg-8 col-xs-12" id="bus-info-div">
+                            <div class="row">
+                                <h3 class="bus-name">{{ name }}</h3>
+                            </div>
+                            <div class="row">
+                                {{#phone}}
+                                    <p class="phone">{{ phone }}</p>
+                                {{/phone}}
+                            </div>
+                            <div class="row">
+                                {{#busAddress}}
+                                    <p class="busAddress">{{busAddress}}</p>
+                                {{/busAddress}}
+                            </div>
+                            <div class="row">
+                                {{#url}}
+                                    <a href="{{url}}">Website</a>
+                                {{/url}}
+                            </div>
+                            <div class="row">
+                                <p class="bus-categories">
+                                    {{#category}}
+                                        {{category}}
+                                    {{/category}}
+                                </p>
+                            </div>
+                        </div>
+                        <div class="col-log-2 hidden-xs map" id="bus-map-div">
+                        </div>
+                    </div>
+                    <div class="row"></div>
+                    <div class="row"></div>
+                        <div class="col-xs-12 col-lg-6 haven-review-block">
+                            {{#score}}
+                                <div class="row">
+                                    <h3 class="col-xs-8 col-lg-8">Haven says:</h3>
+                                    <h3 id="aggr-score" class="col-xs-4 col-lg-4">{{score}}</h3>
+                                </div>
+                                {{#recentScore}}
+                                <div class="row">
+                                    <p class="col-xs-8 col-lg-8">Most Recent Score:</p>
+                                    <p id="recent-score" class="col-xs-4 col-lg-4">{{recentScore}}</p>
+                                </div>
+                                {{/recentScore}}
+                                {{#recentReview}}
+                                <div class="row">
+                                    <p class="col-xs-8 col-lg-8">Most Recent Review:</p>
+                                    <p id="recent-review" class="col-xs-4 col-lg-4">{{recentReview}}</p>
+                                </div>
+                                {{/recentReview}}
+                                <div class="row">
+                                    <button id="more-ratings-btn" class="col-xs-12 col-lg-8 col-lg-offset-2">More ratings:</button>
+                                </div>
+                            {{/score}}
+                            {{^score}}
+                                <div class="row">
+                                    <p class="col-lg-12 col-xs-12">Nobody has rated this business yet.</p>
+                                    <p class="col-lg-12 col-xs-12">Be the first!</p>
+                                </div>
+                            {{/score}}
+                            <div class="row">
+                                <button id="haven-review-modal-btn" class="col-lg-6 col-lg-offset-3 col-xs-12">Add a rating</button>
+                            </div>
+                        </div>
+                        <div class="col-xs-12 col-lg-6 yelp-review-block">
+                            <div class="row">
+                                <h3 class="col-xs-8 col-lg-8">Yelp says:</h3>
+                                <h3 id="aggr-score" class="col-xs-4 col-lg-4">{{yelpScore}}</h3>
+                            </div>
+                            <div class="row">
+                                <p col-xs-12 col-lg-12>Recent Review:<br>{{yelpReviewTxt}}</p>
+                            </div>
+                            <div class="row">
+                                <img class="col-xs-12 col-lg-12 img-responsive" src="{{yelpReviewImg}}">
+                            </div>
+                            <div clas="row">
+                                <a href="{{yelpUrl}}"><button class="col-lg-offset-3 col-lg-6 col-xs-12">See at Yelp</button></a>
+                            </div>
+                        </div>
+                        <button id="return-to-query-btn" class="col-lg-8 col-lg-offset-2 col-xs-12">Back to Results</button>
+                    </div>
+                </div>
+            </div>
+        </script>
 
         {% endraw %}
 
