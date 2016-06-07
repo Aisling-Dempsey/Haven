@@ -1,21 +1,48 @@
 {% extends 'base.html' %}
 {%  block body %}
-    <h1>Welcome to Haven</h1>
-    <form>
-        <input type="search" id='search-field' name="term" placeholder="Enter a business name or category" required>
-        <div id="search-method">
-             <h2>Sort by:</h2>
-            <input class="sort-type" type="radio" name="sort" value="0" checked="checked">Best Matched
-            <input class="sort-type" type="radio" name="sort" value="1">Distance
-            <input class="sort-type" type="radio" name="sort" value="2">Highest rated (Yelp)
-         </div>
-         <div id="haven-filters">
-             <p id="cutoff-val">Don't show businesses with inclusivity ratings below: 3</p>
-             <input id="haven-cutoff" type="range" name="haven-cutoff" min="-3" max="1.5" value="0" step=".5">
-         </div>
-        <input type="submit" id='search-btn' value="Find me something good!">
-    </form>
-    <button id="address-btn">Change your Address</button>
+    <div class="container-fluid" id="search-div">
+        <div class="row">
+            <div class="col-lg-8 col-xs-12 col-lg-offset-2">
+                <div class="row">
+                    <div id="search-box-heading" class="col-lg-6 col-lg-offset-3 col-xs-12">
+                        <h1>Haven</h1>
+                        <p>Find your safe space.</p>
+                    </div>
+                </div>
+
+                <form>
+                    <div class="row">
+                        <div class="col-lg-8 col-lg-offset-2 col-xs-12 search">
+                            <input id='search-field'
+                                name="term" placeholder="Enter a business"><input type="submit" id='search-btn' value="Find"><button id="address-btn"><span class="glyphicon glyphicon-home" aria-hidden="true"></span></button>
+
+                        </div>
+                    </div>
+{#                    <div class="row">#}
+                        <div class="row" id="haven-filters">
+{#                            <div class="row">#}
+                                <input id="haven-cutoff" type="range" name="haven-cutoff" min="-3" max="1.5" value="0" step=".5">
+{#                            </div>#}
+{#                            <div class="row">#}
+                                <p id="cutoff-val">Don't show ratings below: 3</p>
+{#                            </div>#}
+
+                        </div>
+{#                    </div>#}
+
+                    <div class="row" id="search-method">
+                        <div class="col-lg-6 col-lg-offset-3 col-xs-12">
+                             <span>Sort by:</span>
+                                <input class="sort-type" type="radio" name="sort" value="0" checked="checked">Best Matched
+                                <input class="sort-type" type="radio" name="sort" value="1">Distance
+                                <input class="sort-type" type="radio" name="sort" value="2">Highest rated (Yelp)
+                        </div>
+
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 
 
     <div class="modal fade" id="myModal" tabindex="-1" role="dialog">
@@ -37,16 +64,14 @@
     <div id="results">
     </div>
 
+<!--  <div id="query-map"></div> -->
 
-
-    <div id="search-results" class="container">
+    <div id="search-results" class="container-fluid">
         <div class="row">
-            <div class="col-xs-12 col-med-12 col med-offset-2 col-lg-8 col-lg-offset-2 map">
+            <div class="col-xs-12 col-med-12 col-lg-8 map">
                 <div id="splash-map"></div>
             </div>
-        </div>
-        <div class="row">
-            <div class="col-xs-12 col-lg-4 col-lg-offset-4">
+            <div class="col-xs-12 col-lg-4">
                 <div id="results-chart">
                     <canvas id="resultChart"></canvas>
                     <div id="donutLegend" class="chart-legend"></div>

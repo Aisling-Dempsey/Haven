@@ -11,7 +11,11 @@ function displayBusiness(result){
     var categories = result.categories;
     var formattedAddress="";
     var busAddressArray = result.yelp_bus_data.location.display_address || undefined;
+    var displayAddress=[];
+    for (i=0; i < busAddressArray.length; i++){
+        displayAddress[i]={'line': busAddressArray[i]}
 
+    }
     for(var i=0; i < busAddressArray.length; i++){
         formattedAddress += busAddressArray[i] + '<br>'
         }
@@ -23,11 +27,11 @@ function displayBusiness(result){
     var phone = result.yelp_bus_data.display_phone || undefined;
 
     //replaces with larger version of image
-    var image = result.yelp_bus_data.image_url.replace('/ms.jpg', '/l.jpg')
+    var image = result.yelp_bus_data.image_url.replace('/ms.jpg', '/l.jpg');
 
     var recentReview = result.recent_review || undefined;
 
-    var recentScore = result.recent_score || undefined;
+    var recentScore = result.recent_score +3 || undefined;
 
     var score = result.score + 3 || undefined;
     console.log('result.score:', result.score);
@@ -54,7 +58,7 @@ function displayBusiness(result){
     var yelpReviewTxt = result.yelp_bus_data.snippet_text || undefined;
 
     var yelpId = result.yelp_bus_data.id;
-
+    console.log('busAddressArray:', busAddressArray);
 
     //empties div
     $('#search-results').empty();
@@ -62,7 +66,7 @@ function displayBusiness(result){
     var hashResults = {
         'name': name,
         'phone': phone,
-        'busAddress': formattedAddress,
+        'busAddress': displayAddress,
         'recentReview': recentReview,
         'category': categories,
         'photo': image,
@@ -73,232 +77,6 @@ function displayBusiness(result){
         'yelpReviewImg': yelpReviewImg,
         'yelpReviewTxt': yelpReviewTxt
     };
-
-
-
-    //
-    // var businessBlock = $('<div>');
-    //     businessBlock.attr({
-    //         class: 'row',
-    //         id: 'bus-block'
-    //     });
-    // $('#search-results').append(businessBlock);
-    //
-    // var busInfo = $('<div>');
-    //     busInfo.attr({
-    //         class: 'busInfo col-lg-10 col-lg-offset-1',
-    //         id: 'bus-info'});
-    // $('#bus-block').append(busInfo);
-    //
-    // var busRow = $('<div>');
-    //     busRow.attr({
-    //         class: 'row',
-    //         id: 'bus-row'
-    //     });
-    // $('#bus-info').append(busRow);
-    //
-    // var busInfoBlock = $('<div>');
-    //     busInfoBlock.attr({
-    //         class: 'col-lg-9',
-    //         id: 'bus-info-block'
-    //     });
-    // $('#bus-row').append(busInfoBlock);
-    //
-    // var mapBlock = $('<div>');
-    //     mapBlock.attr({
-    //         class: 'col-lg-3 map',
-    //         id: 'solo-bus-map'
-    //     });
-    // $('#bus-row').append(mapBlock);
-    // var busInfoRow = $('<div>');
-    //     busInfoRow.attr({
-    //         class: 'row',
-    //         id: 'bus-info-row'
-    //     });
-    // $('#bus-info-block').append(busInfoRow);
-    //
-    // var photoDiv = $('<div>');
-    //     photoDiv.attr({
-    //         class: 'col-lg-4',
-    //         id: "solo-bus-photo-div"
-    //     });
-    // $('#bus-info-row').append(photoDiv);
-    //
-    // var soloBusPhoto = $('<img>');
-    //     soloBusPhoto.attr({
-    //         src: image,
-    //         class: 'img-responsive',
-    //         id: 'solo-bus-photo'
-    //     });
-    // $('#solo-bus-photo-div').append(soloBusPhoto);
-    //
-    //
-    // var busTextBlock = $('<div>');
-    //     busTextBlock.attr({
-    //         class: 'col-lg-8',
-    //         id:"bus-text-block"
-    //     });
-    // $('#bus-info-row').append(busTextBlock);
-    //
-    // var busTopRow = $('<div>');
-    //     busTopRow.attr({
-    //         class: 'row',
-    //         id: 'bus-top-row'
-    //     });
-    // $('#bus-text-block').append(busTopRow);
-    //
-    // var soloBusUrl= $('<a>');
-    //     soloBusUrl.attr({
-    //         class: 'col-lg-6',
-    //         id: 'solo-bus-url',
-    //         href: yelpUrl
-    //     });
-    // $('#bus-top-row').append(soloBusUrl);
-    //
-    // var busName = $('<p>');
-    //     busName.attr({
-    //         id: 'solo-bus-name'
-    //     }).append(name);
-    // $('#solo-bus-url').append(busName);
-    //
-    // var busAggrRating = $('<p>');
-    //     busAggrRating.attr({
-    //         class: 'col-lg-6',
-    //         id: 'bus-aggr-rating'
-    //     });
-    //     if(score !== undefined){
-    //         busAggrRating.append('Haven score: '+ score)
-    //     }
-    //     else{
-    //         busAggrRating.append('Haven score: '+ 'No ratings yet')
-    //     }
-    // $('#bus-top-row').append(busAggrRating);
-    //
-    // var bus2ndRow = $('<div>');
-    //     busTopRow.attr({
-    //         class: 'row',
-    //         id: 'bus-2nd-row'
-    //     });
-    // $('#bus-text-block').append(bus2ndRow);
-    //
-    //
-    // var busPhone = $('<p>');
-    //     busPhone.attr({
-    //         class: 'col-lg-6',
-    //         id: "solo-bus-phone"
-    //     }).append(phone);
-    // $('#bus-2nd-row').append(busPhone);
-    //
-    // var soloYelpScore = $('<p>') ;
-    //     soloYelpScore.attr({
-    //         class: 'col-lg-6',
-    //         id: 'solo-yelp-rating'
-    //     }).append('Yelp score: ' + yelpScore);
-    // $('#bus-2nd-row').append(soloYelpScore);
-    //
-    // var bus3rdRow = $('<p>');
-    //     bus3rdRow.attr({
-    //         class: 'row',
-    //         id: 'bus-3rd-row'
-    //     });
-    //  $('#bus-text-block').append(bus3rdRow);
-    //
-    //
-    //
-    // var busAddress = $('<p>');
-    //     busAddress.attr({
-    //         class: 'col-lg-6',
-    //         id: 'solo-bus-address'
-    //     });
-    //     var formattedAddress ='';
-    //     for(var i=0; i < busAddressArray.length; i++){
-    //         formattedAddress += busAddressArray[i] + '<br>'
-    //         }
-    //     busAddress.append(formattedAddress);
-    // $('#bus-3rd-row').append(busAddress);
-    //
-    // var reviewsBlockRow = $('<div>');
-    //     reviewsBlockRow.attr({
-    //         class: 'row',
-    //         id: 'reviews-block-row'
-    //     });
-    // $('#search-results').append(reviewsBlockRow);
-    //
-    // var havenReviewsBlock = $('<div>');
-    //     havenReviewsBlock.attr({
-    //         class: 'col-lg-6',
-    //         id: 'haven-review-block'
-    //     });
-    // $('#reviews-block-row').append(havenReviewsBlock);
-    //
-    //
-    //
-    // var yelpReviewsBlock = $('<div>');
-    //     yelpReviewsBlock.attr({
-    //         class: 'col-lg-6',
-    //         id: 'yelp-review-block'
-    //     });
-    // $('#reviews-block-row').append(yelpReviewsBlock);
-    //
-    //
-    //
-    // var havenRow1 = $('<div>');
-    //     havenRow1.attr({
-    //         class: 'row',
-    //         id: 'haven-row-1'
-    //     });
-    // $('#haven-review-block').append(havenRow1);
-    //
-    // var havenTitleDiv = $('<div>');
-    //     havenTitleDiv.attr({
-    //        class: 'col-lg-12',
-    //         id: 'haven-title-div'
-    //     });
-    // $('#haven-row-1').append(havenTitleDiv);
-    //
-    // var havenTitle = $('<h3>');
-    //     havenTitle.attr({
-    //         id: 'haven-title'
-    //     }).append('Haven says:');
-    // $('#haven-title-div').append(havenTitle);
-    //
-    // var havenRow2 = $('<div>');
-    //     havenRow2.attr({
-    //         class: 'row',
-    //         id: 'haven-row-2'
-    //     });
-    // $('#haven-review-block').append(havenRow2);
-    //
-    // var havenReviewsDiv = $('<h3>');
-    //     havenReviewsDiv.attr({
-    //         class: 'col-lg-12',
-    //         id: 'haven-reviews-div'
-    //     });
-    // $('#haven-row-2').append(havenReviewsDiv);
-
-    // if (recentScore !== undefined){
-    //     var havenRecentScore = $('<p>');
-    //     havenRecentScore.attr({
-    //
-    //     })
-    // }
-    //
-    // if (recentReview !== undefined){
-    //     var recentReviewText = $('<p>');
-    //         recentReviewText.attr(
-    //             class: 'col-lg-12'
-    //             id: 'haven-review-text'
-    //         )
-    // }
-
-    //
-    //
-    // var havenRow3 = $('<div>');
-    //     havenRow3.attr({
-    //         class: 'row',
-    //         id: 'haven-row-3'
-    //     });
-    // $('#haven-review-block').append(havenRow3);
 
     var template = $('#business-template').html();
 
@@ -446,7 +224,7 @@ function displayResults(result) {
     var map = $("#query-map");
     map.attr("id", "results-map");
 
-    initMap(result['businesses']);
+    // initMap(result['businesses']);
 
     var hashResults = {'results': []};
 
@@ -467,7 +245,7 @@ function displayResults(result) {
         var havenRating = businesses[yelp_id]['score']|| false;
         var havenCount = businesses[yelp_id]['total_ratings'];
         // console.log(havenCount);
-        var photo = businesses[yelp_id]['photo'];
+        var photo = businesses[yelp_id]['photo'].replace('/ms.jpg', '/l.jpg');
 
         // console.log('photo', photo);
         hashResults['results'].push({
@@ -491,6 +269,10 @@ function displayResults(result) {
 
 
     }
+    var row = $('<div>');
+    row.attr('class', 'row');
+    row.html('<div class="col-lg-6 col-lg-offset-3 query-btns">');
+    $('#search-results').append(row);
    if (callStack.length > 1){
        var mostRecent = callStack.slice(-2,-1)[0];
 
@@ -503,7 +285,8 @@ function displayResults(result) {
             'data-sort': mostRecent.sort,
             'data-cutoff': mostRecent.cutoff
        }).append("<< Go back");
-       $('#search-results').append(btn);
+       // $('#search-results').append(btn);
+       $('.query-btns').append(btn);
        //
        // $('#results-back-btn').click(function(evt){
        //     callStack.pop();
@@ -523,7 +306,8 @@ function displayResults(result) {
                 'data-sort': sort,
                 'data-cutoff': cutoff
             }).append("More results >>");
-            $('#search-results').append(btn);}
+            // $('#search-results').append(btn);
+            $('.query-btns').append(btn);}
 
 
     $('.res-bus-link').click(renderBusiness)
@@ -610,7 +394,7 @@ function initMap(data) {
     //makes the map equal to the results map if it exists, if not, then the splash map
     window.map = new google.maps.Map(document.getElementById('results-map')||document.getElementById('splash-map'), myOptions);
     //todo get smaller pin
-    var image = '/static/pins/home-pin.png';
+    // var image = '/static/home-pin.png';
     var locGuess = new google.maps.Marker({
                     map: map,
                     draggable: true,
@@ -671,14 +455,19 @@ function initMap(data) {
             // console.log(businesses[business]['longitude']);
             // console.log(businesses[business]['latitude']);
             //
-
+            console.log('business in add_Pins:', businesses[business]);
             var businessInfo = '<div id="marker">' +
                 '<div id="Header">' +
-                '<h3>' +
+                '<h3 id="info-name">' +
                 businesses[business]['name'] +
                 '</h3>' +
+                '<p id="info-address">' +
+                businesses[business]['address_line_1'] +
+                '</p>'+
+                '<p>'+businesses[business]['categories']+'</p>' +
                 '</div>';
 
+            // var image = '/static/bus-pin.png';
 
             var marker = new google.maps.Marker({
                 map: map,
@@ -691,6 +480,7 @@ function initMap(data) {
                 html: businessInfo,
                 cats: businesses[business]['cat_list'],
                 pcats: []
+                // icon: image
 
             });
             //
@@ -752,6 +542,10 @@ function initMap(data) {
         var parents = {};
         var parentsArray = [];
 
+        
+
+
+
         //**************************************************************************************************************
         //parents format=== {parent cat:{'value': number of markers, 'markers': array of markers, 'label': displayname}}
         //**************************************************************************************************************
@@ -797,36 +591,6 @@ function initMap(data) {
                 console.log('Parents OL heading into subcats:', parents);
 
 
-
-
-                //
-                //     //adds marker to marker array for the pcat
-                //     console.log('adding to parent marker array');
-                //     console.log('parent marker array:', parents[markers[marker].pcats[parentCat]]['markers']);
-                //     parents[markers[marker].pcats[parentCat]]['markers'].push(markers[marker]);
-                //     parents[markers[marker].pcats[parentCat]]['count'] += 1;
-                //
-                //
-                //
-                //     //makes the pcat object literal and adds a key of markers that is equal to an array of all makers
-                //     //that have it
-                //
-                // //    if parents[parentCat] does exist:
-                // } else {
-                //
-                //
-                //
-                //
-                //     console.log('creating parent object and marker array');
-                //     //parents[parentCat] = {'markers': [marker]
-                //     parents[markers[marker].pcats[parentCat]] = {'markers': [markers[marker]],
-                //                                                 'count': 1};
-                //
-                //
-                //
-                // }
-                // console.log('parents before subcats:', parents);
-
                 for (var s = 0; s < marker.cats.length; s++)
                     var subCat = marker.cats[s]
 
@@ -841,39 +605,9 @@ function initMap(data) {
                         parents[parentCat]['subCats'][subCat]['markers'].push(marker);
                         parents[parentCat]['subCats'][subCat]['count'] += 1
                     }
-
-                    //
-                    //     parents[markers[marker].pcats[parentCat]][markers[marker].cats[subCat]] = {
-                    //         'markers': [markers[marker]],
-                    //         'count': 1
-                    //     }
-                    // }
-                    // else{
-                    //     parents[markers[marker].pcats[parentCat]][markers[marker].cats[subCat]]['markers']
-                    //         .push(markers[marker]);
-                    //     parents[markers[marker].pcats[parentCat]][markers[marker].cats[subCat]]['count'] += 1
-                    // }
             }
         }
         console.log('parents', parents);
-        // window.vals = [];
-        // window.labls = [];
-        //
-        // for (var cat in parents){
-        //     // console.log('parents[cat]', parents[cat]);
-        //     //sets pcat['value'] to the number of markers that have it and pushes to global array
-        //     parents[cat]['value'] = parents[cat]['markers'].length;
-        //     vals.push(parents[cat]['value']);
-        //
-        //     //sets pcat['label'] to the name of the pcat and pushes it to the global array
-        //     parents[cat]['label'] = cat;
-        //     labls.push(parents[cat]['label']);
-        //     // console.log('parents[cat].length:', parents[cat]['value']);
-        //
-        //     // console.log('subcat:', parents[cat]['value']);
-        //     parents[cat]['label'] = cat;
-        //     // console.log
-        // }
 
         var parentSeries = [{
             name: 'Business Types',
@@ -912,18 +646,12 @@ function initMap(data) {
         }
 
 
-
-
-
         $('#results-chart').highcharts({
                 chart: {
                     type: 'pie'
                 },
                 title: {
                     text: 'Best Businesses Near You'
-                },
-                subtitle: {
-                    text: 'Click the slices to view versions. Source: netmarketshare.com.'
                 },
                 plotOptions: {
                     series: {
@@ -936,266 +664,18 @@ function initMap(data) {
 
                 tooltip: {
                     headerFormat: '<span style="font-size:11px">{series.name}</span><br>',
-                    pointFormat: '<span style="color:{point.color}">{point.name}</span>: <b>{point.y:.2f}%</b> of total<br/>'
+                    pointFormat: '<span style="color:{point.color}">{point.name}</span>: <b>{point.y}</b><br/>'
                 },
 
                 series: parentSeries,
                 drilldown: parentDrilldown
 
             });
-                //
-
-
-
-                //     data: [{
-                //         name: 'Microsoft Internet Explorer',
-                //         y: 56.33,
-                //         drilldown: 'Microsoft Internet Explorer'
-                //     }, {
-                //         name: 'Chrome',
-                //         y: 24.03,
-                //         drilldown: 'Chrome'
-                //     }, {
-                //         name: 'Firefox',
-                //         y: 10.38,
-                //         drilldown: 'Firefox'
-                //     }, {
-                //         name: 'Safari',
-                //         y: 4.77,
-                //         drilldown: 'Safari'
-                //     }, {
-                //         name: 'Opera',
-                //         y: 0.91,
-                //         drilldown: 'Opera'
-                //     }, {
-                //         name: 'Proprietary or Undetectable',
-                //         y: 0.2,
-                //         drilldown: null
-                //     }]
-                // }],
-                // drilldown: {
-                //     series: [{
-                //         name: 'Microsoft Internet Explorer',
-                //         id: 'Microsoft Internet Explorer',
-                //         data: [
-                //             ['v11.0', 24.13],
-                //             ['v8.0', 17.2],
-                //             ['v9.0', 8.11],
-                //             ['v10.0', 5.33],
-                //             ['v6.0', 1.06],
-                //             ['v7.0', 0.5]
-                //         ]
-                //     }, {
-                //         name: 'Chrome',
-                //         id: 'Chrome',
-                //         data: [
-                //             ['v40.0', 5],
-                //             ['v41.0', 4.32],
-                //             ['v42.0', 3.68],
-                //             ['v39.0', 2.96],
-                //             ['v36.0', 2.53],
-                //             ['v43.0', 1.45],
-                //             ['v31.0', 1.24],
-                //             ['v35.0', 0.85],
-                //             ['v38.0', 0.6],
-                //             ['v32.0', 0.55],
-                //             ['v37.0', 0.38],
-                //             ['v33.0', 0.19],
-                //             ['v34.0', 0.14],
-                //             ['v30.0', 0.14]
-                //         ]
-                //     }, {
-                //         name: 'Firefox',
-                //         id: 'Firefox',
-                //         data: [
-                //             ['v35', 2.76],
-                //             ['v36', 2.32],
-                //             ['v37', 2.31],
-                //             ['v34', 1.27],
-                //             ['v38', 1.02],
-                //             ['v31', 0.33],
-                //             ['v33', 0.22],
-                //             ['v32', 0.15]
-                //         ]
-                //     }, {
-                //         name: 'Safari',
-                //         id: 'Safari',
-                //         data: [
-                //             ['v8.0', 2.56],
-                //             ['v7.1', 0.77],
-                //             ['v5.1', 0.42],
-                //             ['v5.0', 0.3],
-                //             ['v6.1', 0.29],
-                //             ['v7.0', 0.26],
-                //             ['v6.2', 0.17]
-                //         ]
-                //     }, {
-                //         name: 'Opera',
-                //         id: 'Opera',
-                //         data: [
-                //             ['v12.x', 0.34],
-                //             ['v28', 0.24],
-                //             ['v27', 0.17],
-                //             ['v29', 0.16]
-                //         ]
-                //     }]
-                // }
-            // });
-
-
-        // var options = {responsive: true};
-        //
-        // var ctx = $("#resultChart");
-        //
-        // var chartData = {
-        //     labels: labls,
-        //     datasets: [
-        //         {data: vals,
-        //         backgroundColor: [
-        //             'rgba(255, 99, 132, 0.2)',
-        //             'rgba(54, 162, 235, 0.2)',
-        //             'rgba(255, 206, 86, 0.2)',
-        //             'rgba(75, 192, 192, 0.2)',
-        //             'rgba(153, 102, 255, 0.2)',
-        //             'rgba(255, 159, 64, 0.2)']
-        //     }]
-        //
-        // }
-        //
-        // var myDonutChart = new Chart(ctx, {
-        //     type: 'doughnut',
-        //     data= chartData,
-        //     options: options
-        // });
-        // $('#donutLegend').html(myDonutChart.generateLegend());
 
     }
 
 }
-//
-// $(function () {
-//             // Create the chart
-//             $('#results-chart').highcharts({
-//                 chart: {
-//                     type: 'pie'
-//                 },
-//                 title: {
-//                     text: 'Browser market shares. January, 2015 to May, 2015'
-//                 },
-//                 subtitle: {
-//                     text: 'Click the slices to view versions. Source: netmarketshare.com.'
-//                 },
-//                 plotOptions: {
-//                     series: {
-//                         dataLabels: {
-//                             enabled: true,
-//                             format: '{point.name}: {point.y:.1f}%'
-//                         }
-//                     }
-//                 },
-//
-//                 tooltip: {
-//                     headerFormat: '<span style="font-size:11px">{series.name}</span><br>',
-//                     pointFormat: '<span style="color:{point.color}">{point.name}</span>: <b>{point.y:.2f}%</b> of total<br/>'
-//                 },
-//                 series: [{
-//                     name: 'Brands',
-//                     colorByPoint: true,
-//                     data: [{
-//                         name: 'Microsoft Internet Explorer',
-//                         y: 56.33,
-//                         drilldown: 'Microsoft Internet Explorer'
-//                     }, {
-//                         name: 'Chrome',
-//                         y: 24.03,
-//                         drilldown: 'Chrome'
-//                     }, {
-//                         name: 'Firefox',
-//                         y: 10.38,
-//                         drilldown: 'Firefox'
-//                     }, {
-//                         name: 'Safari',
-//                         y: 4.77,
-//                         drilldown: 'Safari'
-//                     }, {
-//                         name: 'Opera',
-//                         y: 0.91,
-//                         drilldown: 'Opera'
-//                     }, {
-//                         name: 'Proprietary or Undetectable',
-//                         y: 0.2,
-//                         drilldown: null
-//                     }]
-//                 }],
-//                 drilldown: {
-//                     series: [{
-//                         name: 'Microsoft Internet Explorer',
-//                         id: 'Microsoft Internet Explorer',
-//                         data: [
-//                             ['v11.0', 24.13],
-//                             ['v8.0', 17.2],
-//                             ['v9.0', 8.11],
-//                             ['v10.0', 5.33],
-//                             ['v6.0', 1.06],
-//                             ['v7.0', 0.5]
-//                         ]
-//                     }, {
-//                         name: 'Chrome',
-//                         id: 'Chrome',
-//                         data: [
-//                             ['v40.0', 5],
-//                             ['v41.0', 4.32],
-//                             ['v42.0', 3.68],
-//                             ['v39.0', 2.96],
-//                             ['v36.0', 2.53],
-//                             ['v43.0', 1.45],
-//                             ['v31.0', 1.24],
-//                             ['v35.0', 0.85],
-//                             ['v38.0', 0.6],
-//                             ['v32.0', 0.55],
-//                             ['v37.0', 0.38],
-//                             ['v33.0', 0.19],
-//                             ['v34.0', 0.14],
-//                             ['v30.0', 0.14]
-//                         ]
-//                     }, {
-//                         name: 'Firefox',
-//                         id: 'Firefox',
-//                         data: [
-//                             ['v35', 2.76],
-//                             ['v36', 2.32],
-//                             ['v37', 2.31],
-//                             ['v34', 1.27],
-//                             ['v38', 1.02],
-//                             ['v31', 0.33],
-//                             ['v33', 0.22],
-//                             ['v32', 0.15]
-//                         ]
-//                     }, {
-//                         name: 'Safari',
-//                         id: 'Safari',
-//                         data: [
-//                             ['v8.0', 2.56],
-//                             ['v7.1', 0.77],
-//                             ['v5.1', 0.42],
-//                             ['v5.0', 0.3],
-//                             ['v6.1', 0.29],
-//                             ['v7.0', 0.26],
-//                             ['v6.2', 0.17]
-//                         ]
-//                     }, {
-//                         name: 'Opera',
-//                         id: 'Opera',
-//                         data: [
-//                             ['v12.x', 0.34],
-//                             ['v28', 0.24],
-//                             ['v27', 0.17],
-//                             ['v29', 0.16]
-//                         ]
-//                     }]
-//                 }
-//             });
-// });
+
 
 
 
@@ -1219,9 +699,6 @@ function getLocalBest(location, cutoff, callback) {
 }
 
 
-//event listener to load map on page load
-// google.maps.event.addDomListener(window, 'load', initMap);
-
 function handleLocationError(browserHasGeolocation, infoWindow, pos) {
   infoWindow.setPosition(pos);
   infoWindow.setContent(browserHasGeolocation ?
@@ -1242,7 +719,7 @@ function handleLocationError(browserHasGeolocation, infoWindow, pos) {
 //event handler to update displayed cutoff above fader
 function updateCutoff(evt){
     console.log('update cutoff run');
-    $('#cutoff-val').html("Don't show ratings below " + (parseFloat($('#haven-cutoff').val()) + 3));
+    $('#cutoff-val').html("Don't show ratings below: " + (parseFloat($('#haven-cutoff').val()) + 3));
 
 }
 
@@ -1252,72 +729,114 @@ $('#haven-cutoff').change(updateCutoff);
 
 function getLocation(evt) {
     // console.log('getLocation called');
-    if (navigator.geolocation) {
-        var browserSupportFlag = true;
-        // todo build if statement to check whether location has been defined.
-        navigator.geolocation.getCurrentPosition(function (position) {
-            window.initialLocation = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
-            // console.log(initialLocation);
+    //comment out for dynamic location
+    window.initialLocation = new google.maps.LatLng(37.7579717, -122.388535);
 
-            //gets best local businesses near starting point
-            var geocoder = new google.maps.Geocoder;
+    var geocoder = new google.maps.Geocoder;
             // console.log('currentAddress inside getLocation', currentAddress);
              // if (currentAddress === undefined) {
-                geocoder.geocode({location: initialLocation}, function (results) {
+    geocoder.geocode({location: initialLocation}, function (results) {
                     // console.log(results[0].formatted_address);
                     // console.log(results[0].formatted_address);
-                    window.currentAddress = results[0].formatted_address;
+        window.currentAddress = results[0].formatted_address;
                     // console.log(currentAddress);
-                    
-                    // address popup modal
-                    $('#myModal').modal({
-                        keyboard: false
-                    });
-                    $('#modal-title').html('Verify your Address');
-                    $('.modal-body').html("<form><textarea id='user-address' name='initialLocation'></textarea></form>");
-                    $('#user-address').val(currentAddress);
 
-                    $('#myModal').modal('show')
-                    ;
-                })
-            // }
-                ;
+        var cutoff = $('#haven-cutoff').val();
+        getLocalBest(currentAddress, cutoff,
+            function(data){initMap(data)})
+    });
 
-            $('#save-address-btn').click(setNewAddress);
+    // }
 
-            //
-            // $('#myModal').modal({
-            //     keyboard: false
-            // });
-            //
-            // $('#address').html("<form action='/set-address'><input type='text' name= 'initialLocation' placeholder= "+
-            //     current_address + "><input type='submit'>");
-            //
-            // $('#myModal').modal('show')
-            //
+    $('#save-address-btn').click(setNewAddress)
 
-
-        }, function () {
-            handleNoGeolocation(browserSupportFlag)
-        });
-    }
-    else {
-        var browserSupportFlag = false;
-        handleNoGeolocation(browserSupportFlag);
-    }
-
-    function handleNoGeolocation(errorFlag) {
-        if (errorFlag == true) {
-            // todo enter address for modal
-            alert("Geolocation service failed.");
-            window.initialLocation = defaultLatLong;
-        } else {
-            // todo enter address for modal
-            alert("Your browser doesn't support geolocation, please enter an address");
-            window.initialLocation = defaultLatLong
-        }
-    }
 }
+
+//   Uncomment for working splash. Commented out for demo
+//     if (navigator.geolocation) {
+//         var browserSupportFlag = true;
+//         var geocoder = new google.maps.Geocoder;
+//             // console.log('currentAddress inside getLocation', currentAddress);
+//              // if (currentAddress === undefined) {
+//         geocoder.geocode({location: initialLocation}, function (results) {
+//                     // console.log(results[0].formatted_address);
+//                     // console.log(results[0].formatted_address);
+//             window.currentAddress = results[0].formatted_address;
+//                     // console.log(currentAddress);
+//
+//                     // address popup modal
+//                     $('#myModal').modal({
+//                         keyboard: false
+//                     });
+//                     $('#modal-title').html('Verify your Address');
+//                     $('.modal-body').html("<form><textarea id='user-address' name='initialLocation'></textarea></form>");
+//                     $('#user-address').val(currentAddress);
+//
+//                     $('#myModal').modal('show')
+//                     ;
+//                 })
+//             // }
+//                 ;
+//
+//             $('#save-address-btn').click(setNewAddress);
+//
+//         }, function () {
+//             handleNoGeolocation(browserSupportFlag)
+//         });
+//
+//
+//         // todo build if statement to check whether location has been defined.
+//         navigator.geolocation.getCurrentPosition(function (position) {
+//             window.initialLocation = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+//             // console.log(initialLocation);
+//
+//             //gets best local businesses near starting point
+//             var geocoder = new google.maps.Geocoder;
+//             // console.log('currentAddress inside getLocation', currentAddress);
+//              // if (currentAddress === undefined) {
+//                 geocoder.geocode({location: initialLocation}, function (results) {
+//                     // console.log(results[0].formatted_address);
+//                     // console.log(results[0].formatted_address);
+//                     window.currentAddress = results[0].formatted_address;
+//                     // console.log(currentAddress);
+//
+//                     // address popup modal
+//                     $('#myModal').modal({
+//                         keyboard: false
+//                     });
+//                     $('#modal-title').html('Verify your Address');
+//                     $('.modal-body').html("<form><textarea id='user-address' name='initialLocation'></textarea></form>");
+//                     $('#user-address').val(currentAddress);
+//
+//                     $('#myModal').modal('show')
+//                     ;
+//                 })
+//             // }
+//                 ;
+//
+//             $('#save-address-btn').click(setNewAddress);
+//
+//         }, function () {
+//             handleNoGeolocation(browserSupportFlag)
+//         });
+//     }
+//     else {
+//         var browserSupportFlag = false;
+//         handleNoGeolocation(browserSupportFlag);
+//     }
+//
+//     function handleNoGeolocation(errorFlag) {
+//         if (errorFlag == true) {
+//             // todo enter address for modal
+//             alert("Geolocation service failed.");
+//             window.initialLocation = defaultLatLong;
+//         } else {
+//             // todo enter address for modal
+//             alert("Your browser doesn't support geolocation, please enter an address");
+//             window.initialLocation = defaultLatLong
+//         }
+//     }
+// }
 
 function setNewAddress (evt){
     window.currentAddress = $('#user-address').val();
@@ -1344,7 +863,9 @@ function getSession(evt){
     })
 }
 
-$('#address-btn').click(getLocation);
+$('#address-btn').click(function(evt){
+    preventDefault(evt);
+    getLocation});
 // $(document).on('click', '#random-fucking-btn', function(){console.log('button')});
 
 

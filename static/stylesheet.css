@@ -4,53 +4,392 @@
     /*padding: 0;*/
 /*}*/
 
-body{
-    padding-top: 70px;
+
+.navbar{
+    background-color: #422330;
+    /*background-color: #934642;*/
+    border:none;
+    /*color: #514C53;*/
 }
+
+.navbar-default .navbar-brand{
+    color: #934642;
+}
+
+.navbar-default .navbar-brand:hover{
+    color: #E0734F;
+}
+
+
+.navbar-default .navbar-nav>li>a {
+    color:#934642;
+}
+
+.navbar-default .navbar-nav>li>a:focus, .navbar-default .navbar-nav>li>a:hover {
+    color: #E0734F
+}
+
+body{
+    padding-top: 39px;
+    background-image: url(/static/patterns/billie_holiday.png);
+    font-family: 'Muli', sans-serif !important;
+    color: #934642;
+}
+a {
+    color: #E0734F
+}
+
+a:hover{
+    color: #934642
+}
+
 #splash-map{
     width:100%;
-    height: 400px;
+    height: 410px;
  	/*height:calc(100% - 0px);*/
 }
 #results-map{
     width: 300px;
     height: 300px;
     position: fixed;
-    top: 20px;
-    float: right;
+    top: 60px;
+    right: 90%
 }
 
-/*.query-block{*/
-    /*background-color: antiquewhite;*/
-/*}*/
-
-/*#solo-bus-photo-div{*/
-    /*display: inline;*/
-    /*background-color: deeppink;*/
-/*}*/
-
-#solo-bus-photo {
-    height: 150px;
-    /*!*width: 100%*!*/
-    /*}*/
+tspan{
+    font-family: 'Muli', sans-serif;
 }
 
-#bus-info{
-    background-color: antiquewhite;
+#search-div{
+    background-color: #934642;
+    background-image: url(/static/splash1.jpg);
+    background-size: cover;
+    background-position: 60px 0;
+
+    /*background-blend-mode: ;*/
+    /*background-image: url(/static/houses.jpg);*/
+    font-family: 'Muli', sans-serif;
+    padding-top: 2.5%;
+    padding-bottom: 2.5%;
+    color: white;
+    /*-webkit-backdrop-filter: blur(50px);*/
 }
 
-#bus-text-block{
-    background-color: darkseagreen;
+
+#search-box-heading{
+    text-align: center;
+    vertical-align: middle;
+}
+#search-box-heading h1{
+    font-size: 6em;
 }
 
-/*#bus-top-row{*/
-    /*background-color: #31708f;*/
+#search-box-heading p{
+    font-size: 2.7em;
+    padding-bottom: 2.3%;
+}
+
+
+#search-field{
+    background-color: rgba(0,0,0,0);
+    border-color: rgba(0,0,0,0);
+    -webkit-appearance:none;
+    outline: none;
+    width: 80%;
+    height: 45px;
+    font-size: 2.5em;
+    vertical-align: top;
+    text-align: center;
+    border-bottom: 2px solid white;
+    color: white;
+}
+
+input:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0px 1000px white inset;
+    box-shadow: 0 0 0px 1000px white inset;
+}
+
+input::-webkit-input-placeholder{
+    color: lightgrey;
+}
+
+#address-btn{
+    background:none;
+    border-left: none;
+    border-top: 2px solid white;
+    border-right: 2px solid white;
+    border-bottom: 2px solid white;
+    vertical-align: top;
+    height: 45px;
+    /*width: 5%;*/
+    margin:0;
+    /*border-radius: 0 10px 10px 0;*/
+    /*margin-right: 3%;*/
+    transition: all .5s;
+}
+#address-btn:hover {
+    background:white;
+    color: black;
+}
+
+/*#address-btn img {*/
+    /*width: 20px;*/
 /*}*/
 
-/*#solo-bus-name{*/
-    /*background-color: purple;*/
-/*}*/
+.search{
+    border: solid 1px white;
+    padding: 8px;
+}
+#search-btn{
+    border: 2px solid white;
+    background:none;
+    /*border:none;*/
+    width: 11%;
+    height: 45px;
+    margin: 0px;
+    /*border-radius: 10px 0 0 10px;*/
+    font-size: 1.5em;
+    transition: all .5s;
+    margin-left: 3%;
+}
 
-#solo-bus-map{
-    background-color: #ac2925;
+#search-btn:hover {
+    background:white;
+    color: black;
+}
+
+#haven-cutoff{
+    width: 40%;
+    margin: auto;
+    margin-top: 3%;
+    margin-bottom: 1.5%;
+}
+
+input[type=range]{
+    -webkit-appearance: none;
+}
+input[type=range]::-webkit-slider-runnable-track {
+    width: 300px;
+    height: 5px;
+    background: #ddd;
+    border: none;
+    border-radius: 3px;
+}
+
+input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    border: none;
+    height: 16px;
+    width: 16px;
+    border-radius: 50%;
+    background: white;
+    margin-top: -5px;
+}
+
+input[type=range]:focus {
+    outline: none;
+}
+
+input[type=range]:focus::-webkit-slider-runnable-track {
+    background: #ccc;
+}
+
+#haven-filters .row{
+    align-items: center;
+}
+#cutoff-val{
+    text-align:center;
+    font-size: 1.5em;
+}
+
+#search-method{
+    vertical-align: middle;
+    text-align: center;
+}
+
+input[type='radio']{
+    margin-left: 8px;
+    margin-right: 4px;
+}
+
+#search-results{
+    background-color: white;
+    padding-left: 0px;
+}
+
+
+
+#bus-upper-block {
+    height: 300px;
+    border: 1px solid #934642;
+    box-shadow: 2px 2px 8px #f3f3f3;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+#bus-photo-div{
+    height: 298px;
+    background-size: cover;
+    background-position: center;
+}
+
+#bus-info-div{
+    padding-left: 45px;
+}
+
+#review-blocks{
+    height: auto;
+    /*border: 1px solid #934642;*/
+    box-shadow: 2px 2px 8px #f3f3f3;
+    border: 1px solid #934642;
+
+}
+
+#haven-review-block{
+    height:auto;
+}
+
+#yelp-review-block{
+    height: auto;
+    /*border-left: 1px solid #934642;*/
+}
+
+.review-block-btn{
+    align: bottom;
+    /*margin-bottom: 5px;*/
+}
+
+#haven-review-modal-btn{
+    padding-bottom: 5px;
+}
+
+#yelp-more-btn-block{
+    /*border-left: 1px solid #934642;*/
+}
+
+#yelp-more-btn-block div{
+
+}
+.review-btn-block{
+    /*border-left: 1px solid #934642;*/
+    /*border-right: 1px solid #934642;*/
+    /*border-bottom: 1px solid #934642;*/
+    /*!*box-shadow: 2px 0 8px #f3f3f3;*!*/
+    padding-bottom: 10px
+}
+.query-result{
+    height: 200px;
+    border: 1px solid #934642;
+    box-shadow: 2px 2px 8px #f3f3f3;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+.res-bus-photo{
+    height: 198px;
+    background-size: cover;
+}
+.res-bus-photo img{
+    width: auto;
+}
+
+.bus-search-text{
+    padding-left: 45px;
+}
+.res-bus-name{
+    font-weight: bold;
+}
+
+.bus-haven-score-container{
+    height: 99px;
+    padding-top: 15px;
+    vertical-align: middle;
+    text-align: right;
+    /*background-color: papayawhip;*/
+    padding-right: 5px;
+    border-left: 1px solid #934642;
+    border-bottom: 1px solid #934642;
+}
+
+.bus-yelp-score-container{
+    height: 99px;
+    padding-top: 15px;
+    vertical-align: middle;
+    text-align: right;
+    padding-right: 5px;
+    border-left: 1px solid #934642
+}
+
+.bus-haven-score-container span{
+    padding-left: 15px;
+    font-size: 3.2em;
+    font-weight: bold;
+    vertical-align: middle;
+}
+
+.bus-yelp-score-container span{
+    vertical-align: middle;
+    padding-left: 15px;
+    font-size: 3.2em;
+    font-weight: bold;
+}
+
+.bus-btns{
+    background-color: white;
+    border: 1px solid #934642;
+    color: #934642;
+    box-shadow: 2px 2px 8px #f3f3f3;
+}
+
+#return-to-query-btn{
+    margin-top: 10px;
+    margin-bottom: 15px;
+}
+.bus-btns:hover{
+    color: #E0734F;
+}
+
+
+
+#results-chart{
+    padding-top: 10px;
+}
+
+.highcharts-button text{
+    font-family: Muli, sans-serif;
+
+}
+
+.query-btns button{
+    background-color: white;
+    border: 1px solid #934642;
+    color: #934642;
+    box-shadow: 2px 2px 8px #f3f3f3;
+    padding-right: 5px;
+}
+.query-btns button:hover{
+        color: #E0734F;
+}
+
+.btn-primary {
+    background-color: white;
+    color: #934642;
+    border: 1px solid #934642;
+}
+
+.btn-primary:hover {
+    color: white;
+    background-color: #934642;
+    border: 1px solid #934642;
+}
+
+#user-score-selection{
+    background-color: white;
+}
+.btn{
+    border-radius:0;
+}
+
+textarea{
+    border-color: #934642;
+    width: 100%
 }
