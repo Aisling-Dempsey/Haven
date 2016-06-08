@@ -51,7 +51,7 @@ Users are also able to add reviews and ratings when they are looking at a busine
  
 
 #### Stack
-Haven currenly uses the following Languages, Libraries, and APIs:
+Haven currently uses the following Languages, Libraries, and APIs:
 -  Python
 -  Flask
 -  Javascript
