@@ -11,8 +11,8 @@ Haven was conceived, engineered, and designed by Aisling Dempsey as a
 student project for Hackbright Academy.
 
 #### Contents
-- [Features](#features)
 - [Flow](#flow)
+- [Features](#features)
 - [Stack](#stack)
 - [Disclaimer](#disclaimer)
 - [Deployment](#deployment)
