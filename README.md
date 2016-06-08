@@ -27,7 +27,8 @@ They also get search results displayed in a clear, simple manner
 
 ![haven_screenshot](static/images/readme-query.png)
 
-![haven_screenshot](static/images/readme-review.png)
+
+![haven_screenshot](static/images/readme-business.png)
 
 Users are also able to add reviews and ratings when they are looking at a business' page:
 
@@ -64,10 +65,13 @@ Haven currenly uses the following Languages, Libraries, and APIs:
 -  Bootstrap
 
 #### Disclaimer
-Haven in its current form is intended solely for demo-ing purposes. All user accounts and reviews are randomly generated and stored as plain-text for ease of debugging. If this were to be deployed, it would need passwords to be stored as hashes that were salted and peppered.
+Haven in its current form is intended solely for demo-ing purposes. 
+All user accounts and reviews are randomly generated and stored as 
+plain-text for ease of debugging. If this were to be deployed, it would 
+need passwords to be stored as hashes that were salted and peppered.
 
 #### Deployment
 At this time, Haven is not deployed.
 
 #### Author
-Aisling is a Software Engineer living in the Bay Area
+Aisling is a Software Engineer living in the Bay Area.
