@@ -7,8 +7,8 @@ near them.
 In its current form, Haven is set up as a proof of concept with a fake 
 database of user ratings. 
 
-Haven was conceived, engineered and designed by Aisling Dempsey as a 
-student projet for Hackbright Academy.
+Haven was conceived, engineered, and designed by Aisling Dempsey as a 
+student project for Hackbright Academy.
 
 #### Contents
 - [Features](#features)
@@ -18,15 +18,16 @@ student projet for Hackbright Academy.
 - [Deployment](#deployment)
 
 #### Flow
-Users are greeted witha splash page showing both the search bar 
+Users are greeted with a splash page showing both the search bar 
 and the best local businesses:
 
 ![haven_screenshot](static/images/readme-splash.png)
 
-They also get search results displayed in a clear, simple manner
+They also get search results displayed in a clear, simple manner:
 
 ![haven_screenshot](static/images/readme-query.png)
 
+As are individual businesses:
 
 ![haven_screenshot](static/images/readme-business.png)
 
@@ -46,7 +47,7 @@ Users are also able to add reviews and ratings when they are looking at a busine
 *Future*
 - [ ] Include safe restrooms from Refuge Restrooms
 - [ ] Allow option to overlay heat map of hate crimes on all maps
-- [ ] Have data visualization affect local business markers
+- [ ] Have data visualization affect local business map markers
  
 
 #### Stack
