@@ -728,115 +728,79 @@ $('#haven-cutoff').change(updateCutoff);
 
 
 function getLocation(evt) {
-    // console.log('getLocation called');
     //comment out for dynamic location
-    window.initialLocation = new google.maps.LatLng(37.7579717, -122.388535);
-
-    var geocoder = new google.maps.Geocoder;
-            // console.log('currentAddress inside getLocation', currentAddress);
-             // if (currentAddress === undefined) {
-    geocoder.geocode({location: initialLocation}, function (results) {
-                    // console.log(results[0].formatted_address);
-                    // console.log(results[0].formatted_address);
-        window.currentAddress = results[0].formatted_address;
-                    // console.log(currentAddress);
-
-        var cutoff = $('#haven-cutoff').val();
-        getLocalBest(currentAddress, cutoff,
-            function(data){initMap(data)})
-    });
-
-    // }
-
-    $('#save-address-btn').click(setNewAddress)
-
-}
-
-//   Uncomment for working splash. Commented out for demo
-//     if (navigator.geolocation) {
-//         var browserSupportFlag = true;
-//         var geocoder = new google.maps.Geocoder;
-//             // console.log('currentAddress inside getLocation', currentAddress);
-//              // if (currentAddress === undefined) {
-//         geocoder.geocode({location: initialLocation}, function (results) {
+//     window.initialLocation = new google.maps.LatLng(37.7579717, -122.388535);
+//
+//     var geocoder = new google.maps.Geocoder;
+//
+//     geocoder.geocode({location: initialLocation}, function (results) {
 //                     // console.log(results[0].formatted_address);
 //                     // console.log(results[0].formatted_address);
-//             window.currentAddress = results[0].formatted_address;
+//         window.currentAddress = results[0].formatted_address;
 //                     // console.log(currentAddress);
 //
-//                     // address popup modal
-//                     $('#myModal').modal({
-//                         keyboard: false
-//                     });
-//                     $('#modal-title').html('Verify your Address');
-//                     $('.modal-body').html("<form><textarea id='user-address' name='initialLocation'></textarea></form>");
-//                     $('#user-address').val(currentAddress);
+//         var cutoff = $('#haven-cutoff').val();
+//         getLocalBest(currentAddress, cutoff,
+//             function(data){initMap(data)})
+//     });
 //
-//                     $('#myModal').modal('show')
-//                     ;
-//                 })
-//             // }
-//                 ;
+//     // }
 //
-//             $('#save-address-btn').click(setNewAddress);
+//     $('#save-address-btn').click(setNewAddress)
 //
-//         }, function () {
-//             handleNoGeolocation(browserSupportFlag)
-//         });
-//
-//
-//         // todo build if statement to check whether location has been defined.
-//         navigator.geolocation.getCurrentPosition(function (position) {
-//             window.initialLocation = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
-//             // console.log(initialLocation);
-//
-//             //gets best local businesses near starting point
-//             var geocoder = new google.maps.Geocoder;
-//             // console.log('currentAddress inside getLocation', currentAddress);
-//              // if (currentAddress === undefined) {
-//                 geocoder.geocode({location: initialLocation}, function (results) {
-//                     // console.log(results[0].formatted_address);
-//                     // console.log(results[0].formatted_address);
-//                     window.currentAddress = results[0].formatted_address;
-//                     // console.log(currentAddress);
-//
-//                     // address popup modal
-//                     $('#myModal').modal({
-//                         keyboard: false
-//                     });
-//                     $('#modal-title').html('Verify your Address');
-//                     $('.modal-body').html("<form><textarea id='user-address' name='initialLocation'></textarea></form>");
-//                     $('#user-address').val(currentAddress);
-//
-//                     $('#myModal').modal('show')
-//                     ;
-//                 })
-//             // }
-//                 ;
-//
-//             $('#save-address-btn').click(setNewAddress);
-//
-//         }, function () {
-//             handleNoGeolocation(browserSupportFlag)
-//         });
-//     }
-//     else {
-//         var browserSupportFlag = false;
-//         handleNoGeolocation(browserSupportFlag);
-//     }
-//
-//     function handleNoGeolocation(errorFlag) {
-//         if (errorFlag == true) {
-//             // todo enter address for modal
-//             alert("Geolocation service failed.");
-//             window.initialLocation = defaultLatLong;
-//         } else {
-//             // todo enter address for modal
-//             alert("Your browser doesn't support geolocation, please enter an address");
-//             window.initialLocation = defaultLatLong
-//         }
-//     }
 // }
+
+  // Uncomment for working splash. Commented out for demo
+    if (navigator.geolocation) {
+        var browserSupportFlag = true;
+
+        // todo build if statement to check whether location has been defined.
+        navigator.geolocation.getCurrentPosition(function (position) {
+            window.initialLocation = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+
+            //gets best local businesses near starting point
+            var geocoder = new google.maps.Geocoder;
+             // if (currentAddress === undefined) {
+            geocoder.geocode({location: initialLocation}, function (results) {
+                window.currentAddress = results[0].formatted_address;
+
+                // address popup modal
+                $('#myModal').modal({
+                    keyboard: false
+                });
+                $('#modal-title').html('Verify your Address');
+                $('.modal-body').html("<form><textarea id='user-address' name='initialLocation'></textarea></form>");
+                $('#user-address').val(currentAddress);
+
+                $('#myModal').modal('show')
+                ;
+            })
+            // }
+                ;
+
+            $('#save-address-btn').click(setNewAddress);
+
+        }, function () {
+            handleNoGeolocation(browserSupportFlag)
+        });
+    }
+    else {
+        var browserSupportFlag = false;
+        handleNoGeolocation(browserSupportFlag);
+    }
+
+    function handleNoGeolocation(errorFlag) {
+        if (errorFlag == true) {
+            // todo enter address for modal
+            alert("Geolocation service failed.");
+            window.initialLocation = defaultLatLong;
+        } else {
+            // todo enter address for modal
+            alert("Your browser doesn't support geolocation, please enter an address");
+            window.initialLocation = defaultLatLong
+        }
+    }
+}
 
 function setNewAddress (evt){
     window.currentAddress = $('#user-address').val();
