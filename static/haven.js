@@ -729,26 +729,26 @@ $('#haven-cutoff').change(updateCutoff);
 
 function getLocation(evt) {
     //comment out for dynamic location
-//     window.initialLocation = new google.maps.LatLng(37.7579717, -122.388535);
-//
-//     var geocoder = new google.maps.Geocoder;
-//
-//     geocoder.geocode({location: initialLocation}, function (results) {
-//                     // console.log(results[0].formatted_address);
-//                     // console.log(results[0].formatted_address);
-//         window.currentAddress = results[0].formatted_address;
-//                     // console.log(currentAddress);
-//
-//         var cutoff = $('#haven-cutoff').val();
-//         getLocalBest(currentAddress, cutoff,
-//             function(data){initMap(data)})
-//     });
-//
-//     // }
-//
-//     $('#save-address-btn').click(setNewAddress)
-//
-// }
+    window.initialLocation = new google.maps.LatLng(37.7579717, -122.388535);
+
+    var geocoder = new google.maps.Geocoder;
+
+    geocoder.geocode({location: initialLocation}, function (results) {
+                    // console.log(results[0].formatted_address);
+                    // console.log(results[0].formatted_address);
+        window.currentAddress = results[0].formatted_address;
+                    // console.log(currentAddress);
+
+        var cutoff = $('#haven-cutoff').val();
+        getLocalBest(currentAddress, cutoff,
+            function(data){initMap(data)})
+    });
+
+    // }
+
+    $('#save-address-btn').click(setNewAddress)
+
+}
 
   // Uncomment for working splash. Commented out for demo
     if (navigator.geolocation) {
